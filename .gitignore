@@ -61,3 +61,10 @@ bower_components/
 node_modules/
 assets/js/
 assets/css/
+
+# Vim stuff
+*.swp
+
+# Server logs
+yellr-serv/logs.json
+yellr-serv/log.txt
