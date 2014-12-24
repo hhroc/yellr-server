@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<head>
+  <title>Yellr - Moderator backend</title>
+  <meta name="description" content="Yellr backend moderation - Citizen engagement and journalism app">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+  <script src="js/libs/modernizr.js"></script>
+  <link rel="stylesheet" href="style/style.css">
+</head>
+<body id="moderator" data-page="single-collection"><a href="#main" class="assistive-text">Skip to main content</a>
+  <div class="container">
+    <div id="main" class="flex">
+      <div id="left" class="flex-1">
+        <section id="sidebar">
+          <header>
+            <section class="profile-overview">
+              <figure class="profile-picture-wrapper"><img src="img/freedom.jpg"></figure>
+              <hgroup class="profile-deets">
+                <h2 class="moderator-name">Luis Rosario</h2>
+                <h3 class="moderator-organization">WXXI</h3>
+              </hgroup>
+            </section>
+          </header>
+          <nav id="dash-nav">
+            <ul class="nav-list primary-list">
+              <li><a href="create-assignment.html" class="primary-btn new-assignment-btn">Create Assignment</a>
+              </li>
+              <li><a href="write-article.html" class="primary-btn write-article-btn">Write Article</a>
+              </li>
+            </ul>
+            <ul class="nav-list secondary-nav-list">
+              <li><a href="index.html" class="menu-link">Raw Feed</a></li>
+              <li><a href="contributors.html" class="menu-link">All Contributors</a></li>
+            </ul>
+            <ul class="nav-list secondary-nav-list">
+              <li><a href="assignments.html" class="menu-link">Assignments</a></li>
+              <li><a href="collections.html" class="menu-link">Collections</a></li>
+              <li><a href="messages.html" class="menu-link">Messages</a></li>
+            </ul>
+            <ul class="nav-list secondary-nav-list">
+              <li><a href="settings.html" class="menu-link">Settings</a></li>
+              <li><a id="logout-btn" href="#logout" class="menu-link">Logout</a></li>
+            </ul>
+          </nav>
+        </section>
+      </div>
+      <div id="right" class="flex-4 right-wrapper">
+        <section id="view-collection-overview">
+          <h2 class="t1"></h2>
+          <p class="collection-description"></p><span id="export-content-btn" class="btn">Export Content</span>
+          <div class="collection-view-controls-container"><span class="t2">View</span>
+            <ul class="collection-view-controls">
+              <li>
+                <label>
+                  <input type="radio" name="view" value="grid" checked><span>Grid</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="radio" name="view" value="list"><span>List</span>
+                </label>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <div id="collection-wrapper" class="grid">
+          <div class="collection-grid-sizer"></div>
+          <div class="gutter-sizer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="templates">
+    <script id="view-collection-gi-template" type="text/x-handlebars-template">
+      {{#if collection}}
+        {{#each collection}}
+        <div class="collection-gi">
+          <div class="story-item">
+            {{#each media_objects }}
+            <div data-type="{{media_type}}" class="media-preview">
+              {{#if file_name}}
+              <figure class="media-file-image">
+                <img src="/media/{{file_name}}" alt="{{ media_type_description }}">
+                <figcaption>{{ media_type_description }}</figcaption>
+              </figure>
+              {{else}}
+              <p class="media-text">{{ media_text }}</p>
+              {{/if}}
+            </div>
+            {{/each }}
+            <p class="item-source"><a href="#">{{client_id}}</a></p>
+          </div>
+          <div class="story-meta flex">
+            <div class="flex-2">&nbsp;</div>
+            <ul class="options-list flex-1">
+              <li><i title="Leave feedback" class="fa fa-comment"></i></li>
+              <li><i title="Remove from collection" class="fa fa-close"></i></li>
+            </ul>
+          </div>
+        </div>
+        {{/each}}
+      {{else}}
+        <div class="faded">
+          <h3 class="t2">Collection is empty</h3>
+          <p>Check the main feed for latest user submissions.</p>
+        </div>
+      {{/if}}
+      
+    </script>
+  </div>
+  <div id="overlay-div-container">
+  </div>
+  <script src="js/libs/jquery.js"></script>
+  <script src="js/libs/jquery.form.min.js"></script>
+  <script src="js/libs/packery.js"></script>
+  <script src="js/libs/moment.js"></script>
+  <script src="js/libs/handlebars.js"></script>
+  <script src="js/moderator.js"></script>
+</body></html>
