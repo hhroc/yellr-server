@@ -344,7 +344,7 @@ class Assignments(Base):
     def get_all_with_questions_from_token(cls, session, token, \
             start=0, count=0):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
+            #user = Users.get_from_token(session, token)
             assignments_query = session.query(
                 Assignments.assignment_id,
                 Assignments.publish_datetime,
@@ -356,7 +356,7 @@ class Assignments(Base):
                 Assignments.bottom_right_lng,
                 Assignments.use_fence,
                 Assignments.collection_id,
-                Users.organization,
+                #Users.organization,
                 Questions.question_text,
                 Questions.question_type_id,
                 Questions.answer0,
@@ -370,12 +370,15 @@ class Assignments(Base):
                 Questions.answer8,
                 Questions.answer9,
                 func.count(Posts.post_id), 
-            ).outerjoin(
-                Users
+            #).outerjoin(
+            #    Users
             ).outerjoin(
                 QuestionAssignments,
+                QuestionAssignments.assignment_id == \
+                    Assignments.assignment_id,
             ).outerjoin(
-                Questions,
+                Questions,Questions.question_id == \
+                    QuestionAssignments.question_id,
             ).outerjoin(
                 Posts,Posts.assignment_id == Assignments.assignment_id,
             ).filter(
