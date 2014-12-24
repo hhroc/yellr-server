@@ -577,16 +577,21 @@ def admin_get_my_assignments(request):
             count = count,
         )
 
-        print "\n\n"
+        print "\nAssignments:\n"
         print assignments
-        print "\n\n"
+        print "\nAssignment Count:\n"
         print assignment_count
         print "\n\n"
 
-        ret_assignments = {}
+        ret_assignments = []
         # this is for development.ini ... sqlite was puking on the query
         if assignment_count != 0 and len(assignments) > 0 and assignments[0][0] != None:
 
+            
+            seen_assignment_ids = []
+            assignment = {}
+
+            # itterate throught he list, and build our resposne
             index = 0
             for assignment_id, publish_datetime, expire_datetime, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
@@ -594,23 +599,17 @@ def admin_get_my_assignments(request):
                     question_text, question_type_id, answer0, answer1, answer2, \
                     answer3, answer4, answer5, answer6, answer7, answer8, \
                     answer9, post_count in assignments:
-                if assignment_id in ret_assignments:
-                    ret_assignments[assignment_id]['questions'].append({
-                        'question_text': question_text,
-                        'question_type_id': question_type_id,
-                        'answer0': answer0,
-                        'answer1': answer1,
-                        'answer2': answer2,
-                        'answer3': answer3,
-                        'answer4': answer4,
-                        'answer5': answer5,
-                        'answer6': answer6,
-                        'answer7': answer7,
-                        'answer8': answer8,
-                        'answer9': answer9,
-                    })
-                else:
-                    ret_assignments[assignment_id] = {
+
+                if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
+
+                    # add our existing assignment to the list of assignments
+                    # to return
+                    if assignment:
+
+                        ret_assignments.append(assignment)
+                    
+                    # build our assignment with no question(s) 
+                    assignment = {
                         'assignment_id': assignment_id,
                         'publish_datetime': str(publish_datetime),
                         'expire_datetime': str(expire_datetime),
@@ -620,22 +619,35 @@ def admin_get_my_assignments(request):
                         'bottom_right_lng': bottom_right_lng,
                         #'use_fence': use_fence,
                         #'organization': organization,
-                        'questions': [{
-                            'question_text': question_text,
-                            'question_type_id': question_type_id,
-                            'answer0': answer0,
-                            'answer1': answer1,
-                            'answer2': answer2,
-                            'answer3': answer3,
-                            'answer4': answer4,
-                            'answer5': answer5,
-                            'answer6': answer6,
-                            'answer7': answer7,
-                            'answer8': answer8,
-                            'answer9': answer9,
-                        }],
-                        'post_count': post_count,
+                        'questions': [],
                     }
+
+                    # record that we have seen the assignment_id
+                    seen_assignment_ids.append(assignment_id)
+
+                # build our question
+                question = {
+                    'question_text': question_text,
+                    'question_type_id': question_type_id,
+                    'answer0': answer0,
+                    'answer1': answer1,
+                    'answer2': answer2,
+                    'answer3': answer3,
+                    'answer4': answer4,
+                    'answer5': answer5,
+                    'answer6': answer6,
+                    'answer7': answer7,
+                    'answer8': answer8,
+                    'answer9': answer9,
+                }
+
+                # add the question to the current assignment
+                assignment['questions'].append(question)
+
+                if index == 0 and index == len(assignments)-1:
+                    ret_assignments.append(assignment)
+
+                index += 1
 
         result['assignment_count'] = assignment_count
         result['assignments'] = ret_assignments
