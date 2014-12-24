@@ -59,7 +59,7 @@ def admin_get_access_token(request):
         user_name = ''
         password = ''
         try:
-            user_name = request.GET['user_name']
+            user_name = request.GET['username']
             password = request.GET['password']
 
         except:
@@ -290,7 +290,7 @@ def admin_create_question(request):
 One or more of the following fields is missing or invalid: language_code, \
 question_text, description, question_type. \
 """
-            #raise Exception('missing field')
+            raise Exception('missing field')
 
 
         # answers is a json array of strings
