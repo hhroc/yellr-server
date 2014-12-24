@@ -54,7 +54,7 @@ docs/_build/
 target/
 
 # Sass
-.sasscache/
+.sass-cache/
 
 # JS deps
 bower_components/
