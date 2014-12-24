@@ -52,3 +52,12 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Sass
+.sasscache
+
+# JS deps
+bower_components/
+node_modules/
+assets/js/
+assets/css/
