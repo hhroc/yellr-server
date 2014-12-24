@@ -584,12 +584,13 @@ def admin_get_my_assignments(request):
         print "\n\n"
 
         ret_assignments = {}
-        if assignment_count != 0:
+        # this is for development.ini ... sqlite was puking on the query
+        if assignment_count != 0 and len(assignments) > 0 and assignments[0][0] != None:
 
             index = 0
             for assignment_id, publish_datetime, expire_datetime, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
-                    bottom_right_lng, use_fence, collection_id, organization, \
+                    bottom_right_lng, use_fence, collection_id, \
                     question_text, question_type_id, answer0, answer1, answer2, \
                     answer3, answer4, answer5, answer6, answer7, answer8, \
                     answer9, post_count in assignments:
