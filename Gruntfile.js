@@ -10,6 +10,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 src: [
+                    'bower_components/angular/angular.js',
                     'app/*.js', // root files first
                     'app/**/*.js' // then everything else
                 ],
@@ -69,4 +70,5 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
 
     grunt.registerTask('default', ['concat', 'uglify', 'sass', 'clean', 'watch']);
+    grunt.registerTask('compile', ['concat', 'uglify', 'sass', 'clean']);
 };
