@@ -71,3 +71,4 @@ assets/css/
 # Server logs
 yellr-serv/logs.json
 yellr-serv/log.txt
+yellr-serv/yellr-serv.sqlite
