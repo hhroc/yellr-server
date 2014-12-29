@@ -344,7 +344,7 @@ class Assignments(Base):
     def get_all_with_questions_from_token(cls, session, token, \
             start=0, count=0):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
+            #user = Users.get_from_token(session, token)
             assignments_query = session.query(
                 Assignments.assignment_id,
                 Assignments.publish_datetime,
@@ -356,7 +356,7 @@ class Assignments(Base):
                 Assignments.bottom_right_lng,
                 Assignments.use_fence,
                 Assignments.collection_id,
-                Users.organization,
+                #Users.organization,
                 Questions.question_text,
                 Questions.question_type_id,
                 Questions.answer0,
@@ -369,13 +369,16 @@ class Assignments(Base):
                 Questions.answer7,
                 Questions.answer8,
                 Questions.answer9,
-                func.count(Posts.post_id), 
-            ).outerjoin(
-                Users
-            ).outerjoin(
+                func.count(Posts.post_id),
+            #).outerjoin(
+            #    Users
+            ).join(
                 QuestionAssignments,
-            ).outerjoin(
-                Questions,
+                QuestionAssignments.assignment_id == \
+                    Assignments.assignment_id,
+            ).join(
+                Questions,Questions.question_id == \
+                    QuestionAssignments.question_id,
             ).outerjoin(
                 Posts,Posts.assignment_id == Assignments.assignment_id,
             ).filter(
@@ -383,6 +386,8 @@ class Assignments(Base):
                 Assignments.expire_datetime >= datetime.datetime.now(),
             ).order_by(
                 desc(Assignments.publish_datetime),
+            ).group_by(
+                Assignments.assignment_id,
             )
             total_assignment_count = assignments_query.count()
             assignments = assignments_query.all()
@@ -474,9 +479,9 @@ class Assignments(Base):
             ).filter(
                 Assignments.assignment_id == assignment_id,
             ).first()
-            
+
             assignment.collection_id = collection_id
-            
+
             session.add(assignment)
             transaction.commit()
 
@@ -813,6 +818,8 @@ class Posts(Base):
                 # Posts.assignment_id == assignment_id,
             ).order_by(
                  desc(Posts.post_datetime),
+            ).group_by(
+                 Posts.post_id,
             )
             total_post_count = posts_query.count()
             posts = posts_query.limit(256).all()
@@ -849,18 +856,30 @@ class Posts(Base):
                 Languages.name,
             ).join(
                 PostMediaObjects,
+                #PostMediaObjects.post_id == \
+                #    Posts.post_id,
             ).join(
                 MediaObjects,
+                #MediaObjects.media_object_id == \
+                #    MediaObjects.media_object_id,
             ).join(
                 MediaTypes,
+                #MediaTypes.media_type_id == \
+                #    MediaObjects.media_type_id,
             ).join(
-                Users,Users.user_id == Posts.user_id,
+                Users,
+                Users.user_id == \
+                    Posts.user_id,
             ).join(
                 Languages,
+                #Languages.language_id ==
+                #    Posts.language_id,
             ).filter(
                 Posts.assignment_id == assignment_id,
             ).order_by(
                  desc(Posts.post_datetime),
+            ).group_by(
+                 Posts.post_id,
             )
             total_post_count = posts_query.count()
             if start == 0 and count == 0:
@@ -910,6 +929,8 @@ class Posts(Base):
                 CollectionPosts.collection_id == collection_id,
             ).order_by(
                  desc(Posts.post_datetime),
+            ).group_by(
+                Posts.post_id,
             )
             total_post_count = posts_query.count()
             if start == 0 and count == 0:
@@ -957,7 +978,9 @@ class Posts(Base):
             ).filter(
                 Posts.user_id == user.user_id,
             ).order_by(
-                 desc(Posts.post_datetime),
+                desc(Posts.post_datetime),
+            ).group_by(
+                Posts.post_id,
             )
             total_post_count = posts_query.count()
             if start == 0 and count == 0:

@@ -59,11 +59,11 @@ def admin_get_access_token(request):
         user_name = ''
         password = ''
         try:
-            user_name = request.GET['user_name']
+            user_name = request.GET['username']
             password = request.GET['password']
 
         except:
-            result['error_text'] = "Missing 'user_name' or 'password' within request"
+            result['error_text'] = "Missing 'username' or 'password' within request"
             raise Exception('missing credentials')
 
         user, token = Users.authenticate(DBSession, user_name, password)
@@ -73,7 +73,7 @@ def admin_get_access_token(request):
             raise Exception('invalid credentials')
         else:
             result['token'] = token
-            result['user_name'] = user.user_name
+            result['username'] = user.user_name
             result['first_name'] = user.first_name
             result['last_name'] = user.last_name
             result['organization'] = user.organization
@@ -290,7 +290,7 @@ def admin_create_question(request):
 One or more of the following fields is missing or invalid: language_code, \
 question_text, description, question_type. \
 """
-            #raise Exception('missing field')
+            raise Exception('missing field')
 
 
         # answers is a json array of strings
@@ -535,7 +535,7 @@ top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng. \
 
     return make_response(result)
 
-@view_config(route_name='admin/get_my_assignments.json')
+@view_config(route_name='admin/get_assignments.json')
 def admin_get_my_assignments(request):
 
     result = {'success': False}
@@ -577,39 +577,39 @@ def admin_get_my_assignments(request):
             count = count,
         )
 
-        print "\n\n"
+        print "\nAssignments:\n"
         print assignments
-        print "\n\n"
+        print "\nAssignment Count:\n"
         print assignment_count
         print "\n\n"
 
-        ret_assignments = {}
-        if assignment_count != 0:
+        ret_assignments = []
+        # this is for development.ini ... sqlite was puking on the query
+        if assignment_count != 0 and len(assignments) > 0 and assignments[0][0] != None:
 
+
+            seen_assignment_ids = []
+            assignment = {}
+
+            # itterate throught he list, and build our resposne
             index = 0
             for assignment_id, publish_datetime, expire_datetime, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
-                    bottom_right_lng, use_fence, collection_id, organization, \
+                    bottom_right_lng, use_fence, collection_id, \
                     question_text, question_type_id, answer0, answer1, answer2, \
                     answer3, answer4, answer5, answer6, answer7, answer8, \
                     answer9, post_count in assignments:
-                if assignment_id in ret_assignments:
-                    ret_assignments[assignment_id]['questions'].append({
-                        'question_text': question_text,
-                        'question_type_id': question_type_id,
-                        'answer0': answer0,
-                        'answer1': answer1,
-                        'answer2': answer2,
-                        'answer3': answer3,
-                        'answer4': answer4,
-                        'answer5': answer5,
-                        'answer6': answer6,
-                        'answer7': answer7,
-                        'answer8': answer8,
-                        'answer9': answer9,
-                    })
-                else:
-                    ret_assignments[assignment_id] = {
+
+                if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
+
+                    # add our existing assignment to the list of assignments
+                    # to return
+                    if assignment:
+
+                        ret_assignments.append(assignment)
+
+                    # build our assignment with no question(s)
+                    assignment = {
                         'assignment_id': assignment_id,
                         'publish_datetime': str(publish_datetime),
                         'expire_datetime': str(expire_datetime),
@@ -619,22 +619,35 @@ def admin_get_my_assignments(request):
                         'bottom_right_lng': bottom_right_lng,
                         #'use_fence': use_fence,
                         #'organization': organization,
-                        'questions': [{
-                            'question_text': question_text,
-                            'question_type_id': question_type_id,
-                            'answer0': answer0,
-                            'answer1': answer1,
-                            'answer2': answer2,
-                            'answer3': answer3,
-                            'answer4': answer4,
-                            'answer5': answer5,
-                            'answer6': answer6,
-                            'answer7': answer7,
-                            'answer8': answer8,
-                            'answer9': answer9,
-                        }],
-                        'post_count': post_count,
+                        'questions': [],
                     }
+
+                    # record that we have seen the assignment_id
+                    seen_assignment_ids.append(assignment_id)
+
+                # build our question
+                question = {
+                    'question_text': question_text,
+                    'question_type_id': question_type_id,
+                    'answer0': answer0,
+                    'answer1': answer1,
+                    'answer2': answer2,
+                    'answer3': answer3,
+                    'answer4': answer4,
+                    'answer5': answer5,
+                    'answer6': answer6,
+                    'answer7': answer7,
+                    'answer8': answer8,
+                    'answer9': answer9,
+                }
+
+                # add the question to the current assignment
+                assignment['questions'].append(question)
+
+                if index == 0 and index == len(assignments)-1:
+                    ret_assignments.append(assignment)
+
+                index += 1
 
         result['assignment_count'] = assignment_count
         result['assignments'] = ret_assignments
@@ -837,8 +850,8 @@ def admin_get_question_types(request):
     return make_response(result)
 
 
-@view_config(route_name='admin/create_user.json')
-def admin_create_user(request):
+@view_config(route_name='admin/create_user2.json')
+def admin_create_user2(request):
 
     result = {'success': False}
 
@@ -934,44 +947,64 @@ One or more of the following fields is missing or invalid: assignment_id. \
             count = count,
         )
 
-        index = 0
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
+        print "\n\nPosts:\n\n"
+        print posts
+        print "\n\n"
+
+        ret_posts = []
+
+        if post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
                     'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
                 }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
 
         result['post_count'] = post_count
         result['posts'] = ret_posts
@@ -1555,7 +1588,7 @@ def admin_get_subscriber_list(request):
 
     return make_response(result)
 
-@view_config(route_name='admin/create_user.json')
+@view_config(route_name='admin/create_user.json') #wat
 def admin_create_user(request):
 
     result = {'success': False}
@@ -1585,8 +1618,8 @@ def admin_create_user(request):
 One or more of the following fields is missing or invalid: client_id. \
 """
             raise Exception('Missing or invalid field.')
- 
-        # we need to make sure that the user trying to create the 
+
+        # we need to make sure that the user trying to create the
         # new user has the right access level
         system_user_type = UserTypes.get_from_name(
             session = DBSession,
@@ -1601,23 +1634,40 @@ One or more of the following fields is missing or invalid: client_id. \
             name = 'moderator',
         )
 
+        new_user_id = None
+
         if user.user_type_id == system_user_type.user_type_id or \
                 user.user_type_id == admin_user_type.user_type_id or \
                 user.user_type_id == moderator_user_type.user_type_id:
-            
+
             new_user = Users.create_new_user(
                 session = DBSession,
                 user_type_id = user_type_id,
+                client_id = client_id,
             )
 
-        result['subscribers'] = new_user 
-        result['disabled'] = True
+            verified_new_user = Users.verify_user(
+                session = DBSession,
+                client_id = user.client_id,
+                user_name = user_name,
+                password = password,
+                first_name = first_name,
+                last_name = last_name,
+                email = email,
+            )
+
+
+            new_user_id = verified_new_user.user_id
+
+
+        result['user_id'] = new_user_id
+        #result['disabled'] = True
         result['success'] = True
 
     ##except:
     ##    pass
 
-    admin_log("HTTP: admin/get_subscriber_list.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_subscriber_list.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 

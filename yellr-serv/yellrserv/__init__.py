@@ -50,12 +50,12 @@ def main(global_config, **settings):
     config.add_route('admin/update_question.json', 'admin/update_question.json')
     config.add_route('admin/publish_assignment.json', 'admin/publish_assignment.json')
     config.add_route('admin/update_assignment.json', 'admin/update_assignment.json')
-    config.add_route('admin/get_my_assignments.json', 'admin/get_my_assignments.json')
+    config.add_route('admin/get_assignments.json', 'admin/get_assignments.json')
     config.add_route('admin/create_message.json', 'admin/create_message.json')
     config.add_route('admin/get_my_messages.json', 'admin/get_my_messages.json')
     config.add_route('admin/get_languages.json', 'admin/get_languages.json')
     config.add_route('admin/get_question_types.json', 'admin/get_question_types.json')
-    config.add_route('admin/create_user.json', 'admin/create_user.json')
+    config.add_route('admin/create_user2.json', 'admin/create_user2.json')
     config.add_route('admin/get_assignment_responses.json', \
         'admin/get_assignment_responses.json')
     config.add_route('admin/register_post_view.json','admin/register_post_view.json')
@@ -68,7 +68,7 @@ def main(global_config, **settings):
     config.add_route('admin/get_collection_posts.json', 'admin/get_collection_posts.json')
     config.add_route('admin/get_user_posts.json','admin/get_user_posts.json')
     config.add_route('admin/get_subscriber_list.json','admin/get_subscriber_list.json')
-    config.add_route('admin/creae_user.json','admin/create_user.json')
+    config.add_route('admin/create_user.json','admin/create_user.json')
 
     # client views
     #config.add_route('server_info.json','server_info.json')
@@ -83,6 +83,6 @@ def main(global_config, **settings):
     config.add_route('upload_test.json','upload_test.json')
     config.add_route('publish_post.json','publish_post.json')
     config.add_route('get_profile.json', 'get_profile.json')
-    
+
     config.scan()
     return config.make_wsgi_app()
