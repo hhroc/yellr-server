@@ -1,0 +1,35 @@
+@import 'vars';
+
+.side-nav {
+    @extend .medium-3;
+
+    background-color: $type;
+    padding: 0;
+    height: 100%;
+}
+
+.user {
+    background-color: $primary;
+    padding: 10px 0;
+    text-align: center;
+
+    .user-image {
+        width: 150px;
+        height: 150px;
+        background-color: $type;
+        border-radius: 75px;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .name {
+        font-weight: bold;
+        font-size: 1.3rem;
+    }
+
+    .org {
+        font-size: 1rem;
+        font-weight: normal;
+    }
+}
