@@ -33,10 +33,10 @@ module.exports = function (grunt) {
         sass: {
             dist: {
                 options: {
-                    style: 'compress'
+                    style: 'compress',
                 },
                 files: {
-                    'assets/css/styles.css': 'app/sass/global.scss'
+                    'assets/css/site.css': 'app/sass/site.scss'
                 }
             }
         },
@@ -59,7 +59,7 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            js: ['assets/js/scripts.js', 'assets/js/scripts.js.map']
+            js: ['assets/js/scripts.js', 'assets/js/scripts.js.map'],
         }
     });
 
