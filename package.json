@@ -1,0 +1,28 @@
+{
+  "name": "yellr-server",
+  "version": "0.1.0",
+  "description": "Server for yellr project",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Nolski/yellr-server.git"
+  },
+  "author": "Mike Nolan <me@nolski.rocks> (Nolski)",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/Nolski/yellr-server/issues"
+  },
+  "homepage": "https://github.com/Nolski/yellr-server",
+  "dependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-concat": "^0.5.0",
+    "grunt-contrib-copy": "^0.7.0",
+    "grunt-contrib-sass": "^0.8.1",
+    "grunt-contrib-uglify": "^0.7.0",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}

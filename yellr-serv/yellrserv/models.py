@@ -369,7 +369,7 @@ class Assignments(Base):
                 Questions.answer7,
                 Questions.answer8,
                 Questions.answer9,
-                func.count(Posts.post_id), 
+                func.count(Posts.post_id),
             #).outerjoin(
             #    Users
             ).join(
@@ -479,9 +479,8 @@ class Assignments(Base):
             ).filter(
                 Assignments.assignment_id == assignment_id,
             ).first()
-            
             assignment.collection_id = collection_id
-            
+
             session.add(assignment)
             transaction.commit()
 
@@ -872,7 +871,7 @@ class Posts(Base):
                     Posts.user_id,
             ).join(
                 Languages,
-                #Languages.language_id == 
+                #Languages.language_id ==
                 #    Posts.language_id,
             ).filter(
                 Posts.assignment_id == assignment_id,

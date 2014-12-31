@@ -1,3 +1,6 @@
+# OSX
+.DS_Store
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -52,3 +55,20 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Sass
+.sass-cache/
+
+# JS deps
+bower_components/
+node_modules/
+assets/js/
+assets/css/
+
+# Vim stuff
+*.swp
+
+# Server logs
+yellr-serv/logs.json
+yellr-serv/log.txt
+yellr-serv/yellr-serv.sqlite
