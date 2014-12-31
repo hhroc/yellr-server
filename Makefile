@@ -6,7 +6,9 @@ dependencies:
 
 compile:
 	mkdir -p app/sass/deps
+	mkdir -p assets/templates
 	cp -r bower_components/foundation/scss/ app/sass/deps/
+	cp -r app/templates/ assets/templates/
 	grunt compile
 
 clean:

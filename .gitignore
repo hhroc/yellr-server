@@ -62,8 +62,11 @@ target/
 # JS deps
 bower_components/
 node_modules/
+
+# Compiled stuff
 assets/js/
 assets/css/
+assets/templates/
 
 # Vim stuff
 *.swp
