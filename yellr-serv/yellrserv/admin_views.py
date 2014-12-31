@@ -587,7 +587,7 @@ def admin_get_my_assignments(request):
         # this is for development.ini ... sqlite was puking on the query
         if assignment_count != 0 and len(assignments) > 0 and assignments[0][0] != None:
 
-            
+
             seen_assignment_ids = []
             assignment = {}
 
@@ -607,8 +607,8 @@ def admin_get_my_assignments(request):
                     if assignment:
 
                         ret_assignments.append(assignment)
-                    
-                    # build our assignment with no question(s) 
+
+                    # build our assignment with no question(s)
                     assignment = {
                         'assignment_id': assignment_id,
                         'publish_datetime': str(publish_datetime),
@@ -989,7 +989,7 @@ One or more of the following fields is missing or invalid: assignment_id. \
                     }
 
                     seen_post_ids.append(post_id)
-                
+
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
@@ -1003,7 +1003,7 @@ One or more of the following fields is missing or invalid: assignment_id. \
 
                 if index == len(posts)-1:
                     ret_posts.append(post)
-                
+
                 index += 1
 
         result['post_count'] = post_count
@@ -1618,8 +1618,8 @@ def admin_create_user(request):
 One or more of the following fields is missing or invalid: client_id. \
 """
             raise Exception('Missing or invalid field.')
- 
-        # we need to make sure that the user trying to create the 
+
+        # we need to make sure that the user trying to create the
         # new user has the right access level
         system_user_type = UserTypes.get_from_name(
             session = DBSession,
@@ -1639,7 +1639,7 @@ One or more of the following fields is missing or invalid: client_id. \
         if user.user_type_id == system_user_type.user_type_id or \
                 user.user_type_id == admin_user_type.user_type_id or \
                 user.user_type_id == moderator_user_type.user_type_id:
-            
+
             new_user = Users.create_new_user(
                 session = DBSession,
                 user_type_id = user_type_id,
@@ -1660,7 +1660,7 @@ One or more of the following fields is missing or invalid: client_id. \
             new_user_id = verified_new_user.user_id
 
 
-        result['user_id'] = new_user_id 
+        result['user_id'] = new_user_id
         #result['disabled'] = True
         result['success'] = True
 

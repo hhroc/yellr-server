@@ -1,0 +1,103 @@
+@import 'vars';
+
+.side-nav {
+    @extend .medium-2;
+
+    background-color: $type;
+    padding: 0;
+    height: 100%;
+}
+
+.user {
+    background-color: $primary;
+    padding: 10px 0;
+    text-align: center;
+
+    .user-image {
+        width: 150px;
+        height: 150px;
+        background-color: $type;
+        border-radius: 75px;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .name {
+        font-weight: bold;
+        font-size: 1.3rem;
+        margin: 0;
+    }
+
+    .org {
+        font-size: 1rem;
+        font-weight: normal;
+        margin: 0;
+    }
+}
+
+.nav-list {
+    border-bottom: 1px solid $type-light;
+    padding: 0 0 .875rem 0;
+    margin-bottom: .875rem;
+
+    li {
+        list-style: none;
+    }
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.secondary-nav-list {
+    li {
+        list-style: none;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    a {
+        @include transition(background-color, 0.2s, ease-in-out);
+
+        color: $background;
+        text-decoration: none;
+        font-weight: normal;
+        font-size: 14px;
+        padding: .55rem 12%;
+        line-height: 1;
+        width: 100%;
+        display: block;
+
+        &:hover {
+            background-color: $type-light;
+        }
+    }
+}
+
+.create-assignment-btn {
+    @include primary-btn();
+    @include transition(background-color, 0.2s, ease-in-out);
+
+    color: $type;
+    background-color: $primary;
+
+    &:hover {
+        background-color: $background;
+    }
+}
+
+.write-article-btn {
+    @include primary-btn();
+    @include transition(type, 0.2s, ease-in-out);
+    @include transition(background-color, 0.2s, ease-in-out);
+
+    color: $background;
+    background-color: $info;
+
+    &:hover {
+        color: $type;
+        background-color: $background;
+    }
+}
