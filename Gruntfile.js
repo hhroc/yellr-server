@@ -10,6 +10,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 src: [
+                    'bower_components/cryptojslib/rollups/hmac-sha256.js',
                     'bower_components/angular/angular.js',
                     'app/*.js', // root files first
                     'app/**/*.js' // then everything else
