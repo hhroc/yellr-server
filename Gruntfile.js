@@ -12,6 +12,7 @@ module.exports = function (grunt) {
                 src: [
                     'bower_components/cryptojslib/rollups/hmac-sha256.js',
                     'bower_components/angular/angular.js',
+                    'bower_components/angular-ui-router/release/angular-ui-router.js',
                     'app/*.js', // root files first
                     'app/**/*.js' // then everything else
                 ],
@@ -45,7 +46,7 @@ module.exports = function (grunt) {
         watch: {
             js: {
                 files: ['app/**/*.js'],
-                tasks: ['concat_js', 'uglify_js', 'clean'],
+                tasks: ['concat', 'uglify', 'clean'],
                 options: {
                     spawn: false
                 }

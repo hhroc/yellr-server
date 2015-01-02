@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="Yellr" ng-controller="yellrBaseCtrl">
 <head>
     <title>Yellr Moderator</title>
     <link rel="stylesheet" type="text/css" href="assets/css/site.css"/>
@@ -47,9 +47,9 @@
             </li>
         </ul>
     </div>
-    <div class='main'>
+    <div class='main' ui-view>
     </div>
 
-<script type="text/javacript" src="assets/js/scripts.min.js"></script>
+    <script src="assets/js/scripts.min.js"></script>
 </body>
 </html>

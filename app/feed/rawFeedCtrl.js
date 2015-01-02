@@ -10,7 +10,7 @@ angular
          * @return void
          */
         $scope.getFeed = function () {
-            console.log('feed');
+            console.log('getFeed');
         };
 
         $scope.getFeed();

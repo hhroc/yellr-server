@@ -5,7 +5,7 @@ angular
     .config(['$stateProvider', '$urlRouterProvider',
             function ($stateProvider, $urlRouterProvider) {
 
-        $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/notfound');
 
         $stateProvider
             .state('feed', {
@@ -14,3 +14,5 @@ angular
                 controller: 'rawFeedCtrl'
             });
     }]);
+
+console.log('Yellr routes');
