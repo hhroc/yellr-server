@@ -1,3 +1,13 @@
-<div class="row">
-    <h1>Raw Feed</h1>
+<h1>Raw Feed</h1>
+
+<div class="post-column" ng-repeat="post in posts">
+    <div class="inner-post">
+        <img src="http://placehold.it/300x100" alt=""/>
+        <div class="post-body">
+            <h4 class="post-header">{{post.title}}</h4>
+            <p class="post-description">{{post.description}}</p>
+            <p class="post-time">{{post.time}}</p>
+            <a class="view-post" href="#/feed/{{post_link}}">VIEW POST</a>
+        </div>
+    </div>
 </div>

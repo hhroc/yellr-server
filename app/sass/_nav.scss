@@ -1,7 +1,8 @@
 @import 'vars';
 
 .side-nav {
-    @extend .medium-2;
+    @extend .small-2;
+    @extend .columns;
 
     background-color: $type;
     padding: 0;
@@ -73,6 +74,18 @@
         &:hover {
             background-color: $type-light;
         }
+
+        &:active {
+            background-color: $primary;
+            color: $type;
+            font-weight: bold;
+        }
+    }
+
+    .active {
+        background-color: $primary;
+        color: $type;
+        font-weight: bold;
     }
 }
 

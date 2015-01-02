@@ -57,6 +57,27 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false
                 }
+            },
+            html: {
+                files: ['app/templates/**/*.html'],
+                tasks: ['sync'],
+                options: {
+                    spawn: false
+                }
+            }
+        },
+
+        sync: {
+            html: {
+                files: [{
+                    cwd: 'app/templates/',
+                    src: [
+                        '**/*.html'
+                    ],
+                    dest: 'assets/templates/',
+                }],
+                verbose: true,
+                flatten: true
             }
         },
 
@@ -70,7 +91,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-sync');
 
-    grunt.registerTask('default', ['concat', 'uglify', 'sass', 'clean', 'watch']);
-    grunt.registerTask('compile', ['concat', 'uglify', 'sass', 'clean']);
+    grunt.registerTask('default', ['concat', 'uglify', 'sass', 'clean', 'sync', 'watch']);
+    grunt.registerTask('compile', ['concat', 'uglify', 'sass', 'clean', 'sync']);
 };

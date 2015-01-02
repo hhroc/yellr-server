@@ -10,7 +10,7 @@ angular
         $stateProvider
             .state('feed', {
                 url: '/feed',
-                templateUrl: '/templates/feed.html',
+                templateUrl: 'app/templates/feed.html',
                 controller: 'rawFeedCtrl'
             });
     }]);

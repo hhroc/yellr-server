@@ -1,0 +1,60 @@
+.inner-post {
+    background-color: $background;
+    border-radius: 5px;
+
+    img {
+        width: 100%;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .post-body {
+        margin: 10px 20px;
+
+        .post-header {
+            color: $type-light;
+            font-size: 25px;
+            margin: 0;
+        }
+
+        .view-post {
+            color: $type;
+            background: $background;
+            font-size: 15px;
+            text-decoration: none;
+            font-weight: bold;
+
+            margin-bottom: 20px;
+            padding: 5px 10px;
+
+            display: inline-block;
+
+            border: solid 3px darken($background-accent, 30);
+            border-radius: 3px;
+
+            &:hover {
+                background-color: lighten($primary, 40);
+                border-color: $primary;
+                cursor: pointer;
+            }
+        }
+
+        .post-description {
+            margin: 5px 0 10px 0;
+        }
+
+        .post-time {
+            margin: 5px 0;
+            color: $type-light;
+            font-size: 12px;
+        }
+    }
+}
+
+.post-column {
+    @extend .small-4;
+    @extend .columns;
+
+    float: left !important;
+}
+
