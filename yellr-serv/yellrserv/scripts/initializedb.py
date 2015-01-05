@@ -144,7 +144,7 @@ def main(argv=sys.argv):
         user_name = 'system',
         # we hash the password since we will be getting the password
 	# pre-hashed from the web front-end
-	password = hashlib.sha256('password'),
+	password = hashlib.sha256('password').hexdigest(),
         email=''
     )
 
