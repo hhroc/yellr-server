@@ -1,3 +1,22 @@
+.posts {
+    @extend .small-10;
+    @extend .columns;
+}
+
+.post-button {
+    @include transition(all, 0.2s, ease-in-out);
+
+    color: $type;
+    background: $background;
+    font-size: 15px;
+
+    margin-bottom: 20px;
+    padding: 5px 10px;
+
+    border: solid 3px darken($background-accent, 30);
+    border-radius: 3px;
+}
+
 .inner-post {
     background-color: $background;
     border-radius: 5px;
@@ -17,20 +36,40 @@
             margin: 0;
         }
 
+        .add-post {
+            @extend .post-button;
+
+            float: right;
+            margin-top: 2px;
+            margin-right: 5px;
+
+            &:hover {
+                background-color: lighten($secondary, 20);
+                border-color: $secondary;
+                cursor: pointer;
+            }
+        }
+
+        .delete-post {
+            @extend .post-button;
+
+            float: right;
+            margin-top: 2px;
+
+            &:hover {
+                background-color: lighten($warn, 20);
+                border-color: $warn;
+                cursor: pointer;
+            }
+        }
+
         .view-post {
-            color: $type;
-            background: $background;
-            font-size: 15px;
+            @extend .post-button;
+
             text-decoration: none;
             font-weight: bold;
 
-            margin-bottom: 20px;
-            padding: 5px 10px;
-
             display: inline-block;
-
-            border: solid 3px darken($background-accent, 30);
-            border-radius: 3px;
 
             &:hover {
                 background-color: lighten($primary, 40);

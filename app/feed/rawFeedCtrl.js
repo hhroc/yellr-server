@@ -14,35 +14,62 @@ angular
                 {
                     title: 'Post Title',
                     description: 'This is an example of what a preview of the post would be. It would likely be cut off right about here...',
-                    time: '11:59pm 01/01/15',
+                    time: '2 hours ago',
                     link: ''
                 },
                 {
                     title: 'Post Title',
                     description: 'This is an example of what a preview of the post would be. It would likely be cut off right about here...',
-                    time: '11:59pm 01/01/15',
+                    time: '2 hours ago',
                     link: ''
                 },
                 {
                     title: 'Post Title',
                     description: 'This is an example of what a preview of the post would be. It would likely be cut off right about here...',
-                    time: '11:59pm 01/01/15',
+                    time: '2 hours ago',
                     link: ''
                 },
                 {
                     title: 'Post Title',
                     description: 'This is an example of what a preview of the post would be. It would likely be cut off right about here...',
-                    time: '11:59pm 01/01/15',
+                    time: '2 hours ago',
                     link: ''
                 },
                 {
                     title: 'Post Title',
                     description: 'This is an example of what a preview of the post would be. It would likely be cut off right about here...',
-                    time: '11:59pm 01/01/15',
+                    time: '2 hours ago',
                     link: ''
                 },
             ];
         };
 
+        /**
+         * Gets all current collections
+         *
+         * @return collections : All collection objects
+         */
+        $scope.getCollections = function () {
+            return [
+                {
+                    name: 'Fracking Ban',
+                    numPosts: 4,
+                },
+                {
+                    name: 'Urban/Suburban',
+                    numPosts: 23,
+                },
+                {
+                    name: 'College Tuition',
+                    numPosts: 19
+                },
+                {
+                    name: 'Campaign Finance',
+                    numPosts: 102,
+                },
+            ];
+        };
+
         $scope.posts = $scope.getFeed();
+        $scope.collections = $scope.getCollections();
     }]);
