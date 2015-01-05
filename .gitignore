@@ -64,6 +64,7 @@ bower_components/
 node_modules/
 
 # Compiled stuff
+yellr-serv/yellrserv/moderator/assets/
 assets/js/
 assets/css/
 assets/templates/

@@ -10,12 +10,12 @@ angular
         $stateProvider
             .state('login', {
                 url: '/login',
-                templateUrl: 'app/templates/login.html',
+                templateUrl: 'assets/templates/login.html',
                 controller: 'loginCtrl'
             })
             .state('feed', {
                 url: '/feed',
-                templateUrl: 'app/templates/feed.html',
+                templateUrl: 'assets/templates/feed.html',
                 controller: 'rawFeedCtrl'
             });
     }]);

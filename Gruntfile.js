@@ -16,7 +16,7 @@ module.exports = function (grunt) {
                     'app/*.js', // root files first
                     'app/**/*.js' // then everything else
                 ],
-                dest: 'assets/js/scripts.js'
+                dest: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js'
             }
         },
 
@@ -24,11 +24,11 @@ module.exports = function (grunt) {
             options : {
                 sourceMap : true,
                 sourceMapIncludeSources : true,
-                sourceMapIn : 'assets/js/scripts.js.map'
+                sourceMapIn : 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map'
             },
             dist: {
-                src: 'assets/js/scripts.js',
-                dest: 'assets/js/scripts.min.js'
+                src: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js',
+                dest: 'yellr-serv/yellrserv/moderator/assets/js/scripts.min.js'
             }
         },
 
@@ -38,7 +38,7 @@ module.exports = function (grunt) {
                     style: 'compress',
                 },
                 files: {
-                    'assets/css/site.css': 'app/sass/site.scss'
+                    'yellr-serv/yellrserv/moderator/assets/css/site.css': 'app/sass/site.scss'
                 }
             }
         },
@@ -74,7 +74,7 @@ module.exports = function (grunt) {
                     src: [
                         '**/*.html'
                     ],
-                    dest: 'assets/templates/',
+                    dest: 'yellr-serv/yellrserv/moderator/assets/templates/',
                 }],
                 verbose: true,
                 flatten: true
@@ -82,7 +82,7 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            js: ['assets/js/scripts.js', 'assets/js/scripts.js.map'],
+            js: ['yellr-serv/yellrserv/moderator/assets/js/scripts.js', 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map'],
         }
     });
 
