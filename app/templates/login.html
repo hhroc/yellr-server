@@ -15,15 +15,15 @@
                     <form id="mod-login" class="login-form">
                         <div class="input-group">
                             <label for="username">Username</label>
-                            <input type="text" id="username" name="username" />
+                            <input type="text" id="username" ng-model="username" />
                         </div>
                         <div class="input-group">
                             <label for="password">Password</label>
-                            <input type="password" id="password" name="password" />
+                            <input type="password" id="password" ng-model="password" />
                         </div>
 
                         <div class="input-group">
-                            <input type="submit" value="Login" class="login-btn" />
+                            <input type="submit" value="Login" class="login-btn" ng-click="login(username, password)"/>
                         </div>
                     </form>
                 </div>
