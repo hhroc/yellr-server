@@ -3,6 +3,7 @@ import uuid
 import json
 import requests
 import datetime
+import hashlib
 
 ROOT_DOMAIN = "http://127.0.0.1:5002/"
 
@@ -101,7 +102,7 @@ def run_tests():
         None,
         {
             'username': 'system',
-            'password': '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'
+            'password': hashlib.sha256('password').hexdigest(),
         },
         'GET',
     )
@@ -403,7 +404,7 @@ def run_tests():
 
     new_user_client_id = str(uuid.uuid4())
     new_username = 'temp_user'
-    new_password = 'password123'
+    new_password = hashlib.sha256('password123').hexdigest()
 
     success, payload = _execute_test(
         'admin/create_user.json',
