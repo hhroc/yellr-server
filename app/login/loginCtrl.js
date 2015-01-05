@@ -13,7 +13,6 @@ angular
          * @param password
          */
         $scope.login = function (username, password) {
-            console.log('login', username, password);
 
             userApiService.getAccessToken(username, password)
             .success(function(data, status, headers, config) {
@@ -23,7 +22,10 @@ angular
                     token: data.token
                 };
 
-                $location.path('/feed');
+                console.log(data);
+
+                if(data.success) $location.path('/feed');
+                else console.log('Login Failure');
             })
 
             .error(function(data, status, headers, config) {

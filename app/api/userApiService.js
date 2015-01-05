@@ -20,8 +20,7 @@ angular
          *                       some metadata
          */
         userApi.getAccessToken = function (username, password) {
-            // TODO: use double hashed password on backend
-            var hashedPass = password, // CryptoJS.SHA256(password).toString(),
+            var hashedPass = CryptoJS.SHA256(password).toString(),
                 url = '/admin/get_access_token.json';
 
             return $http({

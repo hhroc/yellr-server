@@ -15,7 +15,7 @@ angular
          *                   posts
          * @return posts : http promise containing all posts
          */
-        assignmentApi.getPosts = function (accessToken, start, count, reported) {
+        assignmentApi.getFeed = function (accessToken, start, count, reported) {
             var url = '/admin/get_posts.json',
                 params = { token: accessToken };
 
