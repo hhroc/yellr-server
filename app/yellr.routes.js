@@ -8,6 +8,11 @@ angular
         $urlRouterProvider.otherwise('/notfound');
 
         $stateProvider
+            .state('login', {
+                url: '/login',
+                templateUrl: 'app/templates/login.html',
+                controller: 'loginCtrl'
+            })
             .state('feed', {
                 url: '/feed',
                 templateUrl: 'app/templates/feed.html',

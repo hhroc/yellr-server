@@ -1,4 +1,7 @@
 .main {
     @extend .small-10;
     @extend .columns;
+
+    background-color: $background-accent;
+    min-height: 100%;
 }
