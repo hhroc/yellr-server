@@ -8,13 +8,13 @@ ROOT_DOMAIN = "http://127.0.0.1:5002/"
 
 def log(output):
 
-    print "[{0}]: {1}".format(str(datetime.datetime.now()).split('.')[0],output) 
+    print "[{0}]: {1}".format(str(datetime.datetime.now()).split('.')[0],output)
 
 def url_action(url_payload, data, method):
 
-    """ 
+    """
         url_action(url, data, method)
-        
+
             url = url to send
             data = dict of things to send
             method = 'GET' or 'POST'
@@ -101,7 +101,7 @@ def run_tests():
         None,
         {
             'username': 'system',
-            'password': 'password'
+            'password': '5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8'
         },
         'GET',
     )
@@ -164,7 +164,7 @@ def run_tests():
     log('----')
     log('')
     log('')
-     
+
     success, payload = _execute_test(
         'admin/publish_assignment.json',
         token,
@@ -182,7 +182,7 @@ def run_tests():
     log('Assignment ID: {0}'.format(assignment_id))
     log('----')
     log('')
-    log('') 
+    log('')
 
     success, payload = _execute_test(
         'admin/get_assignments.json',
@@ -376,7 +376,7 @@ def run_tests():
 
     #
     # Publish Story
-    #    
+    #
 
     success, payload = _execute_test(
         'admin/publish_story.json',
