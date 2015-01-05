@@ -4,6 +4,8 @@ import uuid
 import datetime
 import json
 
+import hashlib
+
 import transaction
 
 from sqlalchemy import engine_from_config
@@ -140,7 +142,9 @@ def main(argv=sys.argv):
         session = DBSession,
         client_id = system_user_client_id,
         user_name = 'system',
-        password = 'password',
+        # we hash the password since we will be getting the password
+	# pre-hashed from the web front-end
+	password = hashlib.sha256('password'),
         email=''
     )
 
