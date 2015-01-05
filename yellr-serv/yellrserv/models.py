@@ -479,7 +479,6 @@ class Assignments(Base):
             ).filter(
                 Assignments.assignment_id == assignment_id,
             ).first()
-
             assignment.collection_id = collection_id
 
             session.add(assignment)
