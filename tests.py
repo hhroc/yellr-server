@@ -3,6 +3,7 @@ import uuid
 import json
 import requests
 import datetime
+import hashlib
 
 ROOT_DOMAIN = "http://127.0.0.1:5002/"
 
@@ -101,7 +102,7 @@ def run_tests():
         None,
         {
             'username': 'system',
-            'password': 'password'
+            'password': hashlib.sha256('password').hexdigest(),
         },
         'GET',
     )
