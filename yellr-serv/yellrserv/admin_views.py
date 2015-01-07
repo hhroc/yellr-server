@@ -1587,7 +1587,7 @@ def admin_get_subscriber_list(request):
 
     return make_response(result)
 
-@view_config(route_name='admin/create_user.json') #wat
+@view_config(route_name='admin/create_user.json')
 def admin_create_user(request):
 
     result = {'success': False}
@@ -1669,4 +1669,91 @@ One or more of the following fields is missing or invalid: client_id. \
 
     return make_response(result)
 
+@view_config(route_name='admin/get_post.json')
+def admin_get_post(request):
+
+    result = {'success': False}
+    #try:
+    if True:
+        token = None
+        valid_token = False
+        valid, user = check_token(request)
+        if valid == False:
+            result['error_text'] = "Missing or invalid 'token' field in request."
+            raise Exception('invalid/missing token')
+
+        try:
+        #if True:
+            post_id = request.GET['post_id']
+        except:
+            result['error_text'] = "Missing post_id"
+            raise Exception('missing post_id') 
+
+        posts, post_count = Posts.get_with_media_objects_from_post_id(
+            session = DBSession,
+            post_id = post_id,
+        )
+
+        ret_posts = []
+
+        if post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
+                    'media_id': media_id,
+                    'file_name': file_name,
+                    'caption': caption,
+                    'media_text': media_text,
+                    'media_type_name': media_type_name,
+                    'media_type_description': media_type_description,
+                }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
+ 
+        result['post'] = ret_posts[0]
+        result['success'] = True
+
+    #except:
+    #    pass
+
+    return make_response(result)
 
