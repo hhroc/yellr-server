@@ -4,24 +4,25 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
-        concat: {
+        concat_sourcemap: {
             options: {
-                sourceMap :true
+                sourceRoot: '/moderator/assets/js/'
             },
             dist: {
-                src: [
-                    'bower_components/cryptojslib/rollups/hmac-sha256.js',
-                    'bower_components/jquery/dist/jquery.js',
-                    'bower_components/angular/angular.js',
-                    'bower_components/angular-ui-router/release/angular-ui-router.js',
-                    'bower_components/angular-mocks/angular-mocks.js',
-                    'bower_components/angular-foundation/mm-foundation.js',
-                    'bower_components/angular-foundation/mm-foundation-tpls.js',
-                    'app/*.js', // root files first
-                    'app/**/*.js', // then everything else
-                    '!app/tests/**/*.js' // ignore tests
-                ],
-                dest: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js'
+                files: {
+                    'yellr-serv/yellrserv/moderator/assets/js/scripts.js' : [
+                        'bower_components/cryptojslib/rollups/hmac-sha256.js',
+                        'bower_components/jquery/dist/jquery.js',
+                        'bower_components/angular/angular.js',
+                        'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-mocks/angular-mocks.js',
+                        'bower_components/angular-foundation/mm-foundation.js',
+                        'bower_components/angular-foundation/mm-foundation-tpls.js',
+                        'app/*.js', // root files first
+                        'app/**/*.js', // then everything else
+                        '!app/tests/**/*.js' // ignore tests
+                    ]
+                },
             }
         },
 
@@ -29,7 +30,8 @@ module.exports = function (grunt) {
             options : {
                 sourceMap : true,
                 sourceMapIncludeSources : true,
-                sourceMapIn : 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map'
+                sourceMapIn : 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map',
+                sourceMapName: 'moderator/assets/js/scripts.min.js.map'
             },
             dist: {
                 src: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js',
@@ -51,7 +53,7 @@ module.exports = function (grunt) {
         watch: {
             js: {
                 files: ['app/**/*.js'],
-                tasks: ['concat', 'uglify', 'clean'],
+                tasks: ['concat_sourcemap', 'uglify', 'clean'],
                 options: {
                     spawn: false
                 }
@@ -87,17 +89,17 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            js: ['yellr-serv/yellrserv/moderator/assets/js/scripts.js', 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map'],
+            js: ['yellr-serv/yellrserv/moderator/assets/js/scripts.js', 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map', 'moderator/'],
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-concat-sourcemap');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-sync');
 
-    grunt.registerTask('default', ['concat', 'uglify', 'sass', 'clean', 'sync', 'watch']);
-    grunt.registerTask('compile', ['concat', 'uglify', 'sass', 'clean', 'sync']);
+    grunt.registerTask('default', ['concat_sourcemap', 'uglify', 'sass', 'clean', 'sync', 'watch']);
+    grunt.registerTask('compile', ['concat_sourcemap', 'uglify', 'sass', 'clean', 'sync']);
 };
