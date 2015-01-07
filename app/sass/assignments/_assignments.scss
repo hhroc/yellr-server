@@ -1,0 +1,28 @@
+.assignments {
+    @extend .small-12;
+    @extend .columns;
+}
+
+.assignment-block {
+    background-color: $background;
+    border-radius: 5px;
+    padding: 10px 30px;
+
+    .assignment-question {
+        h1 {
+            margin: 0;
+        }
+
+        p {
+            color: $type-light;
+            margin: 0;
+        }
+    }
+
+    &:hover {
+        @include transition(all, 0.2s, ease-in-out);
+
+        background-color: lighten($primary, 5);
+        cursor: pointer;
+    }
+}

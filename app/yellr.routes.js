@@ -17,6 +17,16 @@ angular
                 url: '/feed',
                 templateUrl: 'assets/templates/feed.html',
                 controller: 'rawFeedCtrl'
+            })
+            .state('assignments', {
+                url: '/assignments',
+                templateUrl: 'assets/templates/viewAssignments.html',
+                controller: 'viewAssignmentsCtrl'
+            })
+            .state('view-post', {
+                url: '/view/:postId',
+                templateUrl: 'assets/templates/viewPost.html',
+                controller: 'viewPostCtrl'
             });
     }]);
 

@@ -31,6 +31,13 @@ angular
             });
         };
 
+        /**
+         * Gets all assignments
+         *
+         * @param accessToken : token needed for all admin functions
+         *
+         * @return response : response with list of assignments and questions
+         */
         assignmentApi.getAssignments = function (accessToken) {
             var url = '/admin/get_assignments.json';
 
