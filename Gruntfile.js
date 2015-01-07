@@ -13,8 +13,10 @@ module.exports = function (grunt) {
                     'bower_components/cryptojslib/rollups/hmac-sha256.js',
                     'bower_components/angular/angular.js',
                     'bower_components/angular-ui-router/release/angular-ui-router.js',
+                    'bower_components/angular-mocks/angular-mocks.js',
                     'app/*.js', // root files first
-                    'app/**/*.js' // then everything else
+                    'app/**/*.js', // then everything else
+                    '!app/tests/**/*.js' // ignore tests
                 ],
                 dest: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js'
             }
