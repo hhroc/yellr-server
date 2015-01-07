@@ -36,7 +36,7 @@ def url_action(url_payload, data, method):
             log("URL: {0}".format(url_payload))
 
             http_response = requests.get(url_payload).text
-            log("HTTP Response: {0}".format(json_response))
+            log("HTTP Response: {0}".format(http_response))
             json_response = json.loads(http_response)
 
         elif method == 'POST':
@@ -44,7 +44,7 @@ def url_action(url_payload, data, method):
             log("URL: {0}".format(url_payload))
 
             http_response = requests.post(url_payload, data=data).text
-            log("HTTP Response: {0}".format(json_response))
+            log("HTTP Response: {0}".format(http_response))
             json_response = json.loads(http_response)
 
     #except:
@@ -314,6 +314,19 @@ def run_tests():
     log('')
     log('')
 
+    success, payload = _execute_test(
+        'admin/get_post.json',
+        token,
+        {
+            'post_id': client_a_posts[0]['post_id'],
+        },
+        'GET',
+    )
+    client_a_post_response = payload['post']
+    log('Client A Post Response ID: {0}'.format(client_a_post_response['post_id']))
+    log('----')
+    log('')
+    log('')
 
     #
     # Create response post B

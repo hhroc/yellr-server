@@ -69,6 +69,7 @@ def main(global_config, **settings):
     config.add_route('admin/get_user_posts.json','admin/get_user_posts.json')
     config.add_route('admin/get_subscriber_list.json','admin/get_subscriber_list.json')
     config.add_route('admin/create_user.json','admin/create_user.json')
+    config.add_route('admin/get_post.json', 'admin/get_post.json')
 
     # client views
     #config.add_route('server_info.json','server_info.json')
