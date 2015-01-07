@@ -2,7 +2,7 @@
 <html ng-app="Yellr" ng-controller="yellrBaseCtrl">
 <head>
     <title>Yellr Moderator</title>
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"/>
     <link rel="stylesheet" type="text/css" href="assets/css/site.css"/>
 </head>
 <body>
@@ -22,29 +22,29 @@
         </ul>
         <ul class="nav-list secondary-nav-list">
             <li>
-                <a class="active" href="/#/feed">Raw Feed</a>
+                <a ng-class="{active:feedPage}" href="#/feed">Raw Feed</a>
             </li>
             <li>
-                <a href="/#/contributors">All Contributors</a>
-            </li>
-        </ul>
-        <ul class="nav-list secondary-nav-list">
-            <li>
-                <a href="/#/assignments">Assignments</a>
-            </li>
-            <li>
-                <a href="/#/collections">Collections</a>
-            </li>
-            <li>
-                <a href="/#/messages">Messages</a>
+                <a href="#/contributors">All Contributors</a>
             </li>
         </ul>
         <ul class="nav-list secondary-nav-list">
             <li>
-                <a href="/#/settings">Settings</a>
+                <a href="#/assignments">Assignments</a>
             </li>
             <li>
-                <a href="/#/logout">Logout</a>
+                <a href="#/collections">Collections</a>
+            </li>
+            <li>
+                <a href="#/messages">Messages</a>
+            </li>
+        </ul>
+        <ul class="nav-list secondary-nav-list">
+            <li>
+                <a href="#/settings">Settings</a>
+            </li>
+            <li>
+                <a href="#/logout">Logout</a>
             </li>
         </ul>
     </div>

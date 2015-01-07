@@ -5,11 +5,14 @@
         <div class="inner-post">
             <img src="http://placehold.it/300x100" alt=""/>
             <div class="post-body">
-                <h4 class="post-header">{{post.title}}</h4>
-                <p class="post-description">{{post.description}}</p>
+                <h4 class="post-header" ng-if="post.title">{{post.title}}</h4>
+                <p class="post-description" ng-if="post.description">{{post.description}}</p>
                 <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>
                 <button class="delete-post"><i class="fa fa-trash"></i></button>
-                <button class="add-post"><i class="fa fa-plus"></i></button>
+                <button class="add-post" dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
+                <ul id="drop-{{post.post_id}}" class="f-dropdown add-post-dropdown">
+                    <li ng-repeat="collection in collections" ng-click="addPostToCollection(post, collection)">{{collection.name}}</li>
+                </ul>
                 <a class="view-post" href="#/feed/{{post_link}}">VIEW POST</a>
             </div>
         </div>

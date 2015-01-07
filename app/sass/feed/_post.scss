@@ -39,7 +39,7 @@
         .add-post {
             @extend .post-button;
 
-            float: right;
+            float: right !important;
             margin-top: 2px;
             margin-right: 5px;
 
@@ -47,6 +47,16 @@
                 background-color: lighten($secondary, 20);
                 border-color: $secondary;
                 cursor: pointer;
+            }
+        }
+
+        .add-post-dropdown {
+            padding: 0;
+
+            li {
+                padding: 10px;
+                width: 100%;
+                text-align: center;
             }
         }
 

@@ -6,7 +6,8 @@ angular
     .module('Yellr')
     .controller('rawFeedCtrl',
         ['$scope', '$rootScope', '$location', 'assignmentApiService',
-         function ($scope, $rootScope, $location, assignmentApiService) {
+            'collectionApiService',
+         function ($scope, $rootScope, $location, assignmentApiService, collectionApiService) {
 
         if($rootScope.user === undefined) {
             $location.path('/login');
@@ -15,6 +16,8 @@ angular
 
         $scope.user = $rootScope.user;
 
+        $scope.$parent.clear();
+        $scope.$parent.feedPage = true;
 
         /**
          * Populates feed with first 50 items
@@ -22,11 +25,8 @@ angular
          * @return void
          */
         $scope.getFeed = function () {
-            console.log('getFeed');
             assignmentApiService.getFeed($scope.user.token)
                 .success(function (data) {
-                    console.log('getFeed() success: ', data);
-
                     var posts = [];
                     for(var postId in data.posts) {
                         // TODO: get title and image
@@ -46,30 +46,44 @@ angular
         /**
          * Gets all current collections
          *
-         * @return collections : All collection objects
+         * @return void
          */
         $scope.getCollections = function () {
+            collectionApiService.getAllCollections($scope.user.token)
+                .success(function (data) {
 
-            return [
-                {
-                    name: 'Fracking Ban',
-                    numPosts: 4,
-                },
-                {
-                    name: 'Urban/Suburban',
-                    numPosts: 23,
-                },
-                {
-                    name: 'College Tuition',
-                    numPosts: 19
-                },
-                {
-                    name: 'Campaign Finance',
-                    numPosts: 102,
-                },
-            ];
+                //TODO: Remove this once #18 is resolved
+                data.collections.forEach(function (collection) {
+                    collection.numPosts = 0;
+                });
+
+                $scope.collections = data.collections;
+            });
         };
 
+        /**
+         * Adds the given post to a collection
+         *
+         * @return void
+         */
+        $scope.addPostToCollection = function(post, collection) {
+            console.log(post.post_id, collection.collection_id);
+            collectionApiService.addPost($scope.user.token,
+                                         collection.collection_id, post.post_id)
+                .success(function (data) {
+
+                collection.numPosts++;
+            });
+        };
+
+        /**
+         * Deletes a post from the feed
+         *
+         * @return void
+         */
+        $scope.deletePost = function (post) {
+
+        };
 
         $scope.getFirstText = function (post) {
             for(var i = 0; i < post.media_objects.length; i++) {
@@ -81,5 +95,5 @@ angular
         };
 
         $scope.getFeed();
-        $scope.collections = $scope.getCollections();
+        $scope.getCollections();
     }]);
