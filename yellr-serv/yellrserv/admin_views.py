@@ -168,8 +168,8 @@ def admin_get_posts(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
 
         token = None
         valid_token = False
@@ -203,52 +203,68 @@ def admin_get_posts(request):
             count = count,
         )
 
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
+        ret_posts = []
+
+        if total_post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
                     'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
                 }
 
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
 
         result['total_post_count'] = total_post_count
         result['posts'] = ret_posts
 
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     #admin_log("HTTP: admin/get_posts.json => {0}".format(json.dumps(result)))
 
@@ -259,8 +275,8 @@ def admin_create_question(request):
 
     result = {'success': False}
 
-    if True:
-    #try:
+    #if True:
+    try:
 
         token = None
         valid_token = False
@@ -268,10 +284,6 @@ def admin_create_question(request):
         if valid == False:
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
-
-        print "\n\n"
-        print request.POST
-        print "\n\n"
 
         #if True:
         try:
@@ -320,8 +332,8 @@ question_text, description, question_type. \
         result['question_id'] = question.question_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/create_question.json => {0}".format(json.dumps(result)))
 
@@ -332,8 +344,8 @@ def admin_update_question(request):
 
     result = {'success': False}
 
-    if True:
-    #try:
+    #if True:
+    try:
 
         token = None
         valid_token = False
@@ -379,8 +391,8 @@ question_text, description, question_type. \
         result['question_id'] = question.question_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/updatequestion.json => {0}".format(json.dumps(result)))
 
@@ -391,8 +403,8 @@ def admin_publish_assignment(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -471,10 +483,12 @@ bottom_right_lat, bottom_right_lng.
 
         result['assignment_id'] = assignment.assignment_id
 
+        result['collection_id'] = collection.collection_id
+
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/publish_assignment.json => {0}".format(json.dumps(result)))
 
@@ -485,8 +499,8 @@ def admin_update_assignment(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -495,8 +509,8 @@ def admin_update_assignment(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        if True:
-        #try:
+        #if True:
+        try:
             assignment_id = request.POST['assignment_id']
             #client_id = request.POST['client_id']
             life_time = int(request.POST['life_time'])
@@ -506,7 +520,7 @@ def admin_update_assignment(request):
             bottom_right_lat = float(request.POST['bottom_right_lat'])
             bottom_right_lng = float(request.POST['bottom_right_lng'])
             #use_fence = boolean(request.POST['use_fence'])
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: life_time, \
 top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng. \
@@ -528,8 +542,8 @@ top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng. \
         result['assignment_id'] = assignment.assignment_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/update_assignment.json => {0}".format(json.dumps(result)))
 
@@ -540,8 +554,8 @@ def admin_get_my_assignments(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -549,14 +563,6 @@ def admin_get_my_assignments(request):
         if valid == False:
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token what ...')
-
-#        #try:
-#            assignment_id = int(request.GET['assignment_id'])
-#        #except:
-#            result['error_text'] = """\
-#One or more of the following fields is missing or invalid: assignment_id. \
-#"""
-#            raise Exception('invalid/missing field')
 
         start=0
         try:
@@ -576,12 +582,6 @@ def admin_get_my_assignments(request):
             start = start,
             count = count,
         )
-
-        print "\nAssignments:\n"
-        print assignments
-        print "\nAssignment Count:\n"
-        print assignment_count
-        print "\n\n"
 
         ret_assignments = []
         # this is for development.ini ... sqlite was puking on the query
@@ -653,8 +653,8 @@ def admin_get_my_assignments(request):
         result['assignments'] = ret_assignments
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_my_assignments.json => {0}".format(json.dumps(result)))
 
@@ -665,8 +665,8 @@ def admin_create_message(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -705,8 +705,8 @@ subject, text.
             result['message_id'] = message.message_id
             result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/create_message.json => {0}".format(json.dumps(result)))
 
@@ -717,8 +717,8 @@ def admin_get_my_messages(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -726,24 +726,6 @@ def admin_get_my_messages(request):
         if valid == False:
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
-
-#        #try:
-#            to_client_id = request.POST['to_client_id']
-#            subject = request.POST['subject']
-#            text = request.POST['text']
-#        #except:
-#            result['error_text'] = """\
-#One or more of the following fields is missing or invalid: to_client_id, \
-#subject, text.
-#"""
-#            raise Exception('invalid/missing field')
-
-#        parent_message_id = None
-#        #try:
-#            parent_message_id = request.POST['parent_message_id']
-#        #except:
-#        #    pass
-
 
         user = Users.get_from_token(DBSession, token)
         messages = Messages.get_messages_from_client_id(
@@ -771,8 +753,8 @@ def admin_get_my_messages(request):
         result['messages'] = ret_messages
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_my_messages.json => {0}".format(json.dumps(result)))
 
@@ -784,8 +766,8 @@ def admin_get_languages(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -806,8 +788,8 @@ def admin_get_languages(request):
         result['languages'] = ret_languages
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_languages.json => {0}".format(json.dumps(result)))
 
@@ -818,8 +800,8 @@ def admin_get_question_types(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -842,8 +824,8 @@ def admin_get_question_types(request):
         result['question_types'] = ret_question_types
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_question_types.json => {0}".format(json.dumps(result)))
 
@@ -855,8 +837,8 @@ def admin_create_user2(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -865,7 +847,7 @@ def admin_create_user2(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #try:
+        try:
             user_type_text = request.POST['user_type']
             user_name = request.POST['user_name']
         #    password = request.POST['password']
@@ -873,7 +855,7 @@ def admin_create_user2(request):
             last_name = request.POST['last_name']
             email = request.POST['email']
             organization = request.POST['organization']
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: user_type, \
 user_name, password, first_name, last_name, email, organization. \
@@ -900,8 +882,8 @@ user_name, password, first_name, last_name, email, organization. \
         result['user_id'] = user.user_id
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     return make_response(result)
 
@@ -910,8 +892,8 @@ def admin_get_assignment_responses(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -946,10 +928,6 @@ One or more of the following fields is missing or invalid: assignment_id. \
             start = start,
             count = count,
         )
-
-        print "\n\nPosts:\n\n"
-        print posts
-        print "\n\n"
 
         ret_posts = []
 
@@ -1010,8 +988,8 @@ One or more of the following fields is missing or invalid: assignment_id. \
         result['posts'] = ret_posts
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_assignment_responses.json => {0}".format(json.dumps(result)))
 
@@ -1022,8 +1000,8 @@ def admin_register_post_view(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1032,9 +1010,9 @@ def admin_register_post_view(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #try:
+        try:
             post_id = request.POST['post_id']
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: post_id. \
 """
@@ -1058,8 +1036,8 @@ One or more of the following fields is missing or invalid: post_id. \
         result['notification_id'] = notification.notification_id
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/register_post_view.json => {0}".format(json.dumps(result)))
 
@@ -1071,8 +1049,8 @@ def admin_publish_story(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1120,8 +1098,8 @@ bottom_right_lat, bottom_right_lng, language_code. \
         result['story_unique_id'] = story.story_unique_id
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/publish_story.json => {0}".format(json.dumps(result)))
 
@@ -1132,8 +1110,8 @@ def admin_get_my_collection(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1141,18 +1119,6 @@ def admin_get_my_collection(request):
         if valid == False:
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
-
-#        #try:
-#        if True:
-#            name = request.POST['name']
-#            description = request.POST['description']
-#            tags = request.POST['tags']
-#        #except:
-#            result['error_text'] = """\
-#One or more of the following fields is missing or invalid: name, \
-#description, tags. \
-#"""
-#            raise Exception('Missing or invalid field.')
 
         collections = Collections.get_all_from_http(
            session = DBSession,
@@ -1174,8 +1140,8 @@ def admin_get_my_collection(request):
         result['collections'] = ret_collections
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
 
@@ -1186,8 +1152,8 @@ def admin_create_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1196,17 +1162,17 @@ def admin_create_collection(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #try:
-        if True:
+        try:
+        #if True:
             name = request.POST['name']
             description = request.POST['description']
             tags = request.POST['tags']
-        #except:
-#            result['error_text'] = """\
-#One or more of the following fields is missing or invalid: name, \
-#description, tags. \
-#"""
-#            raise Exception('Missing or invalid field.')
+        except:
+            result['error_text'] = """\
+One or more of the following fields is missing or invalid: name, \
+description, tags. \
+"""
+            raise Exception('Missing or invalid field.')
 
         collection = Collections.create_new_collection_from_http(
             session = DBSession,
@@ -1219,8 +1185,8 @@ def admin_create_collection(request):
         result['collection_id'] = collection.collection_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/create_collection.json => {0}".format(json.dumps(result)))
 
@@ -1231,8 +1197,8 @@ def admin_add_post_to_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1241,11 +1207,11 @@ def admin_add_post_to_collection(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #try:
-        if True:
+        try:
+        #if True:
             collection_id = int(request.POST['collection_id'])
             post_id = int(request.POST['post_id'])
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: collection_id, \
 post_id. \
@@ -1262,8 +1228,8 @@ post_id. \
         result['collection_id'] = collection_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/add_post_to_collection.json => {0}".format(json.dumps(result)))
 
@@ -1274,8 +1240,8 @@ def admin_remove_post_from_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1284,11 +1250,11 @@ def admin_remove_post_from_collection(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #try:
-        if True:
+        try:
+        #if True:
             collection_id = int(request.POST['collection_id'])
             post_id = int(request.POST['post_id'])
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: collection_id, \
 post_id. \
@@ -1307,8 +1273,8 @@ post_id. \
         else:
             result['error_text'] = 'Post does not exist within collection.'
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/remove_post_from_collection.json => {0}".format(json.dumps(result)))
 
@@ -1319,8 +1285,8 @@ def admin_disable_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1347,8 +1313,8 @@ One or more of the following fields is missing or invalid: collection_id. \
         result['disabled'] = True
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/disable_collection.json => {0}".format(json.dumps(result)))
 
@@ -1359,8 +1325,8 @@ def admin_get_collection_posts(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1400,44 +1366,60 @@ One or more of the following fields is missing or invalid: collection_id. \
             collection_id = collection_id,
         )
 
-        index = 0
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
+        ret_posts = []
+
+        if post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
                     'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
                 }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
 
         result['post_count'] = post_count
         result['collection_id'] = collection.collection_id
@@ -1445,8 +1427,8 @@ One or more of the following fields is missing or invalid: collection_id. \
         result['posts'] = ret_posts
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_collection_posts.json => {0}".format(json.dumps(result)))
 
@@ -1457,8 +1439,8 @@ def admin_get_user_posts(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1467,10 +1449,10 @@ def admin_get_user_posts(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #try:
-        if True:
+        try:
+        #if True:
             client_id = request.GET['client_id']
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: client_id. \
 """
@@ -1495,51 +1477,68 @@ One or more of the following fields is missing or invalid: client_id. \
             count = count,
         )
 
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
+        ret_posts = []
+
+        if post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
                     'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
                 }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
 
         result['post_count'] = post_count
         result['posts'] = ret_posts
         result['client_id'] = client_id
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_user_posts.json => {0}".format(json.dumps(result)))
 
@@ -1550,8 +1549,8 @@ def admin_get_subscriber_list(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1583,8 +1582,8 @@ def admin_get_subscriber_list(request):
         result['subscribers'] = ret_subscribers
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     return make_response(result)
 
@@ -1593,8 +1592,8 @@ def admin_create_user(request):
 
     result = {'success': False}
 
-    ##try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1656,7 +1655,6 @@ One or more of the following fields is missing or invalid: client_id. \
                 email = email,
             )
 
-
             new_user_id = verified_new_user.user_id
 
 
@@ -1664,8 +1662,8 @@ One or more of the following fields is missing or invalid: client_id. \
         #result['disabled'] = True
         result['success'] = True
 
-    ##except:
-    ##    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_subscriber_list.json => {0}".format(json.dumps(result)))
 
