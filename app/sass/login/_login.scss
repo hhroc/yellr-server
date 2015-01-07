@@ -72,7 +72,7 @@
         box-shadow: none;
 
         &:focus{
-            background-color: darken($primary, 5);
+            background-color: darken($primary, 10);
             outline: none;
         }
 

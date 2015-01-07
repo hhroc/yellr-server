@@ -87,6 +87,11 @@
         background-color: $primary;
         color: $type;
         font-weight: bold;
+
+        &:hover {
+            background-color: lighten($primary, 10);
+            color: $type;
+        }
     }
 }
 
