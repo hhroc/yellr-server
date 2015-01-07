@@ -1,6 +1,6 @@
 'use strict';
 
-describe('Calling user centric APIs', function () {
+describe('Calling Access Token API', function () {
     var userApiService, httpBackend,
         username = 'admin',
         correctPassword = 'ABC123ImCorrect',
@@ -45,5 +45,66 @@ describe('Calling user centric APIs', function () {
             function(response) {
                 expect(response.success).toEqual(false);
             });
+    });
+});
+
+describe('Calling Post API', function () {
+    var token = 'ABC123ImCorrectToken',
+        badToken = 'XYZ098ImWrong',
+        url = 'admin/get_posts.json?token=',
+        badTokenMsg = 'Invalid auth token.',
+        missingTokenMsg = 'Missing "token" field in request.',
+        assignmentApiService, httpBackend;
+
+    beforeEach(module('Yellr'));
+    beforeEach(inject(function (_assignmentApiService_, $httpBackend) {
+        assignmentApiService = _assignmentApiService_;
+        httpBackend = $httpBackend;
+
+        // Correct request
+        httpBackend.whenGET(url + token)
+            .respond({
+                post_count: 1,
+                posts: {
+                    '1': {}
+                },
+                success: true
+            });
+
+        // Incorrect Token
+        httpBackend.whenGET(url + badToken)
+            .respond({
+                error_text: badTokenMsg,
+                success: false
+            });
+
+        httpBackend.whenGET(url)
+            .respond({
+                error_text: missingTokenMsg,
+                success: false
+            });
+    }));
+
+    it('should return success on normal api call', function () {
+        assignmentApiService.getFeed(token)
+        .then(function (response) {
+            expect(response.success).toEqual(true);
+        });
+    });
+
+    it('should error due to wrong token', function () {
+        assignmentApiService.getFeed(badToken)
+        .then(function (response) {
+            expect(response.success).toEqual(false);
+            expect(response.error_text).toEqual(badTokenMsg);
+        });
+    });
+
+    it('should error due to no token', function () {
+        assignmentApiService.getFeed()
+        .then(function (response) {
+            expect(response.success).toEqual(false);
+            expect(response.error_text).toEqual(missingTokenMsg);
+        });
     });
 });
