@@ -471,6 +471,8 @@ bottom_right_lat, bottom_right_lng.
 
         result['assignment_id'] = assignment.assignment_id
 
+        result['collection_id'] = collection.collection_id
+
         result['success'] = True
 
     ##except:
@@ -1241,11 +1243,11 @@ def admin_add_post_to_collection(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #try:
-        if True:
+        try:
+        #if True:
             collection_id = int(request.POST['collection_id'])
             post_id = int(request.POST['post_id'])
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: collection_id, \
 post_id. \

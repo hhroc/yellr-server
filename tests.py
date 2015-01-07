@@ -36,6 +36,7 @@ def url_action(url_payload, data, method):
             log("URL: {0}".format(url_payload))
 
             http_response = requests.get(url_payload).text
+            log("HTTP Response: {0}".format(json_response))
             json_response = json.loads(http_response)
 
         elif method == 'POST':
@@ -43,9 +44,8 @@ def url_action(url_payload, data, method):
             log("URL: {0}".format(url_payload))
 
             http_response = requests.post(url_payload, data=data).text
+            log("HTTP Response: {0}".format(json_response))
             json_response = json.loads(http_response)
-
-        #log("HTTP Response: {0}".format(json_response))
 
     #except:
     #    pass
@@ -180,7 +180,9 @@ def run_tests():
         'POST',
     )
     assignment_id = payload['assignment_id']
+    collection_id = payload['collection_id']
     log('Assignment ID: {0}'.format(assignment_id))
+    log('Collection ID: {0}'.format(collection_id))
     log('----')
     log('')
     log('') 
@@ -318,6 +320,29 @@ def run_tests():
     log('----')
     log('')
     log('')
+
+    success, payload = _execute_test(
+        'admin/add_post_to_collection.json',
+        token,
+        {
+            'collection_id': collection_id,
+            'post_id': post_id_a,
+        },
+        'POST',
+    )
+    collection_post_id = payload['post_id']
+    collection_collection_id = payload['collection_id']
+    
+    if not (collection_post_id == post_id_a and collection_collection_id == \
+            collection_id):
+        raise Exception('Post ID and Collection ID did not match after assignment.')
+
+    log('Post ID: {0}'.format(collection_post_id))
+    log('Collection ID: {0}'.format(collection_collection_id))
+    log('----')
+    log('')
+    log('')
+ 
 
     #
     # Perform a free post
