@@ -70,7 +70,7 @@ assets/css/
 assets/templates/
 
 # Vim stuff
-*.swp
+**/*.swp
 
 # Server logs
 yellr-serv/logs.json
