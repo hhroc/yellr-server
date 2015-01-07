@@ -188,6 +188,54 @@ def run_tests():
     log('') 
 
     success, payload = _execute_test(
+        'admin/get_my_collections.json',
+        token,
+        {
+            # does not take any input fields
+        },
+        'GET',
+    )
+    collections = payload['collections']
+    log('Collection Count: {0}'.format(len(collections)))
+    if len(collections) != 1:
+        raise Exception("Error: Created collection was not returned.")
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/create_collection.json',
+        token,
+        {
+            'name': 'Random Things',
+            'description': 'My collection of randomness',
+            'tags': '',
+        },
+        'POST',
+    )
+    new_collection_id = payload['collection_id']
+    log('New Collection ID: {0}'.format(new_collection_id))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/get_my_collections.json',
+        token,
+        {
+            # does not take any input fields
+        },
+        'GET',
+    )
+    second_round_collections = payload['collections']
+    log('Collection Count: {0}'.format(len(collections)))
+    if len(second_round_collections) != 2:
+        raise Exception("Error: Created collection was not returned.")
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
         'admin/get_assignments.json',
         token,
         {
@@ -249,6 +297,23 @@ def run_tests():
     log('----')
     log('')
     log('')
+
+    success, payload = _execute_test(
+        'admin/get_user_posts.json',
+        token,
+        {
+            'client_id': client_id_a,
+        },
+        'GET',
+    )
+    client_a_posts = payload['posts']
+    log('Client Post Count: {0}'.format(len(client_a_posts)))
+    if len(client_a_posts) != 1:
+        raise Exception('Error: client_a post was not returned in list of user posts.')
+    log('----')
+    log('')
+    log('')
+
 
     #
     # Create response post B
@@ -339,6 +404,22 @@ def run_tests():
 
     log('Post ID: {0}'.format(collection_post_id))
     log('Collection ID: {0}'.format(collection_collection_id))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/get_collection_posts.json',
+        token,
+        {
+            'collection_id': collection_id,
+        },
+        'GET',
+    )
+    collection_posts = payload['posts']
+    log('Collection Post Count: {0}'.format(len(collection_posts)))
+    if len(collection_posts) != 1:
+        raise Exception('Error: added post was not returned with collection posts.')
     log('----')
     log('')
     log('')
