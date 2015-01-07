@@ -168,8 +168,8 @@ def admin_get_posts(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
 
         token = None
         valid_token = False
@@ -203,52 +203,68 @@ def admin_get_posts(request):
             count = count,
         )
 
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
+        ret_posts = []
+
+        if total_post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
                     'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
                 }
 
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
 
         result['total_post_count'] = total_post_count
         result['posts'] = ret_posts
 
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     #admin_log("HTTP: admin/get_posts.json => {0}".format(json.dumps(result)))
 
@@ -1350,44 +1366,60 @@ One or more of the following fields is missing or invalid: collection_id. \
             collection_id = collection_id,
         )
 
-        index = 0
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
+        ret_posts = []
+
+        if post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
                     'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
                 }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
 
         result['post_count'] = post_count
         result['collection_id'] = collection.collection_id
@@ -1445,43 +1477,60 @@ One or more of the following fields is missing or invalid: client_id. \
             count = count,
         )
 
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
+        ret_posts = []
+
+        if post_count != 0 and len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for post_id, assignment_id, user_id, title, post_datetime, \
+                    reported, lat, lng, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, client_id, \
+                    language_code, language_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        'post_id': post_id,
+                        'assignment_id': assignment_id,
+                        'user_id': user_id,
+                        'title': title,
+                        'post_datetime': str(post_datetime),
+                        'reported': reported,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'media_objects': []
+                    }
+
+                    seen_post_ids.append(post_id)
+
+                media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
                     'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
                 }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
 
         result['post_count'] = post_count
         result['posts'] = ret_posts
