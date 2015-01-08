@@ -100,6 +100,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-sync');
 
-    grunt.registerTask('default', ['concat_sourcemap', 'uglify', 'sass', 'clean', 'sync', 'watch']);
-    grunt.registerTask('compile', ['concat_sourcemap', 'uglify', 'sass', 'clean', 'sync']);
+    grunt.registerTask('default', ['concat_sourcemap', 'uglify', 'sync', 'sass', 'clean', 'watch']);
+    grunt.registerTask('compile', ['concat_sourcemap', 'uglify', 'sync', 'sass', 'clean']);
 };
