@@ -23,3 +23,6 @@ clean:
 
 dev: clean dependencies compile
 	./node_modules/grunt-cli/bin/grunt watch
+
+test:
+	./node_modules/karma/bin/karma start --browsers Firefox --single-run
