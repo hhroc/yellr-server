@@ -65,6 +65,7 @@ node_modules/
 
 # Compiled stuff
 yellr-serv/yellrserv/moderator/assets/
+app/sass/deps/
 assets/js/
 assets/css/
 assets/templates/
