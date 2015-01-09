@@ -31,7 +31,7 @@ module.exports = function (grunt) {
                 sourceMap : true,
                 sourceMapIncludeSources : true,
                 sourceMapIn : 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map',
-                sourceMapName: 'moderator/assets/js/scripts.min.js.map'
+                sourceMapName: 'yellr-serv/yellrserv/moderator/assets/js/scripts.min.js.map'
             },
             dist: {
                 src: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js',
