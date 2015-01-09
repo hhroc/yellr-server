@@ -18,6 +18,25 @@ angular
                 templateUrl: 'assets/templates/feed.html',
                 controller: 'rawFeedCtrl'
             })
+            .state('new-assignment', {
+                templateUrl: 'assets/templates/newAssignment.html',
+                controller: 'newAssignmentCtrl'
+            })
+            .state('new-assignment.content', {
+                url: '/new-assignment/content',
+                templateUrl: 'assets/templates/newAssignmentContent.html',
+                controller: 'newAssignmentContentCtrl'
+            })
+            .state('new-assignment.questions', {
+                url: '/new-assignment/questions',
+                templateUrl: 'assets/templates/newAssignmentQuestions.html',
+                controller: 'newAssignmentQuestionsCtrl'
+            })
+            .state('new-assignment.geofence', {
+                url: '/new-assignment/geofence',
+                templateUrl: 'assets/templates/newAssignmentGeofence.html',
+                controller: 'newAssignmentGeofenceCtrl'
+            })
             .state('assignments', {
                 url: '/assignments',
                 templateUrl: 'assets/templates/viewAssignments.html',
@@ -29,5 +48,3 @@ angular
                 controller: 'viewPostCtrl'
             });
     }]);
-
-console.log('Yellr routes');

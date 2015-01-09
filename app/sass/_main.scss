@@ -2,6 +2,7 @@
     @extend .small-10;
     @extend .columns;
 
+    padding: 0;
     background-color: $background-accent;
-    min-height: 100%;
+    height: 100%;
 }
