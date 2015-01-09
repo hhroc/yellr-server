@@ -26,3 +26,4 @@ dev: clean dependencies compile
 
 test:
 	./node_modules/karma/bin/karma start --browsers Firefox --single-run
+	./node_modules/jshint/bin/jshint app/**/*.js
