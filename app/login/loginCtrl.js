@@ -6,6 +6,13 @@ angular
         'userApiService', function ($scope, $rootScope, $location,
                                     userApiService) {
 
+        var localUser = window.sessionStorage.getItem('YellrUser');
+
+        if(localUser) {
+            $rootScope.user = JSON.parse(localUser);
+            $location.path('/feed');
+        }
+
         /**
          * logs the user in and assigns token in global scope
          *
@@ -22,7 +29,7 @@ angular
                     token: data.token
                 };
 
-                console.log(data);
+                window.sessionStorage.setItem('YellrUser', JSON.stringify($rootScope.user));
 
                 if(data.success) $location.path('/feed');
                 else console.log('Login Failure');
