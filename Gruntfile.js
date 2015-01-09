@@ -85,6 +85,17 @@ module.exports = function (grunt) {
                 }],
                 verbose: true,
                 flatten: true
+            },
+            js: {
+                files: [{
+                    src: [
+                        'app/*.js',
+                        'app/**/*.js'
+                    ],
+                    dest: 'yellr-serv/yellrserv/moderator/assets/js/'
+                }],
+                verbose: true,
+                flatten: true
             }
         },
 
@@ -100,6 +111,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-sync');
 
-    grunt.registerTask('default', ['concat_sourcemap', 'uglify', 'sync', 'sass', 'clean', 'watch']);
-    grunt.registerTask('compile', ['concat_sourcemap', 'uglify', 'sync', 'sass', 'clean']);
+    grunt.registerTask('default', ['concat_sourcemap', 'uglify', 'sync', 'sass', 'watch']);
+    grunt.registerTask('compile', ['concat_sourcemap', 'uglify', 'sync', 'sass']);
 };
