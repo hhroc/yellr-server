@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html ng-app="Yellr" ng-controller="yellrBaseCtrl">
+<head>
+    <title>Yellr Moderator</title>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="assets/css/site.css"/>
+</head>
+<body>
+    <div class="side-nav">
+        <div class="user">
+            <div class="user-image"></div>
+            <h3 class="name">{{user.name}}</h3>
+            <h4 class="org">{{user.organization}}</h4>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <a href="#/new-assignment/content" class="create-assignment-btn">Create Assignment</a>
+            </li>
+            <li>
+                <a href="#/write-article" class="write-article-btn">Write Article</a>
+            </li>
+        </ul>
+        <ul class="nav-list secondary-nav-list">
+            <li>
+                <a ng-class="{active:feedPage}" href="#/feed">Raw Feed</a>
+            </li>
+            <li>
+                <a href="#/contributors">All Contributors</a>
+            </li>
+        </ul>
+        <ul class="nav-list secondary-nav-list">
+            <li>
+                <a ng-class="{active:assignmentsPage}" href="#/assignments">Assignments</a>
+            </li>
+            <li>
+                <a href="#/collections">Collections</a>
+            </li>
+            <li>
+                <a href="#/messages">Messages</a>
+            </li>
+        </ul>
+        <ul class="nav-list secondary-nav-list">
+            <li>
+                <a href="#/settings">Settings</a>
+            </li>
+            <li>
+                <a href="#/logout">Logout</a>
+            </li>
+        </ul>
+    </div>
+    <div class='main' ui-view>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+    <script src="assets/js/scripts.min.js"></script>
+</body>
+</html>

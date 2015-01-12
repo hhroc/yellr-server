@@ -1,0 +1,109 @@
+.posts {
+    @extend .small-10;
+    @extend .columns;
+}
+
+.post-button {
+    @include transition(all, 0.2s, ease-in-out);
+
+    color: $type;
+    background: $background;
+    font-size: 15px;
+
+    margin-bottom: 20px;
+    padding: 5px 10px;
+
+    border: solid 3px darken($background-accent, 30);
+    border-radius: 3px;
+}
+
+.inner-post {
+    background-color: $background;
+    border-radius: 5px;
+
+    img {
+        width: 100%;
+        margin: 0;
+        border-radius: 5px 5px 0 0;
+    }
+
+    .post-body {
+        margin: 10px 20px;
+
+        .post-header {
+            color: $type-light;
+            font-size: 25px;
+            margin: 0;
+        }
+
+        .add-post {
+            @extend .post-button;
+
+            float: right !important;
+            margin-top: 2px;
+            margin-right: 5px;
+
+            &:hover {
+                background-color: lighten($secondary, 20);
+                border-color: $secondary;
+                cursor: pointer;
+            }
+        }
+
+        .add-post-dropdown {
+            padding: 0;
+
+            li {
+                padding: 10px;
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        .delete-post {
+            @extend .post-button;
+
+            float: right;
+            margin-top: 2px;
+
+            &:hover {
+                background-color: lighten($warn, 20);
+                border-color: $warn;
+                cursor: pointer;
+            }
+        }
+
+        .view-post {
+            @extend .post-button;
+
+            text-decoration: none;
+            font-weight: bold;
+
+            display: inline-block;
+
+            &:hover {
+                background-color: lighten($primary, 40);
+                border-color: $primary;
+                cursor: pointer;
+            }
+        }
+
+        .post-description {
+            margin: 5px 0 10px 0;
+        }
+
+        .post-time {
+            margin: 5px 0;
+            color: $type-light;
+            font-size: 12px;
+        }
+    }
+}
+
+.post-column {
+    @extend .small-4;
+    @extend .columns;
+
+    float: left !important;
+}
+

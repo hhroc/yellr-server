@@ -1,6 +1,12 @@
 @import 'deps/foundation/components/_grid.scss';
+@import 'deps/foundation/components/_forms.scss';
+@import 'deps/foundation/components/_dropdown.scss';
 
 @import 'vars';
 @import 'global';
 @import 'nav';
 @import 'main';
+
+@import 'feed/_main.scss';
+@import 'login/_login.scss';
+@import 'assignments/_main.scss';

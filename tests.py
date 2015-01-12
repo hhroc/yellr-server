@@ -9,13 +9,13 @@ ROOT_DOMAIN = "http://127.0.0.1:5002/"
 
 def log(output):
 
-    print "[{0}]: {1}".format(str(datetime.datetime.now()).split('.')[0],output) 
+    print "[{0}]: {1}".format(str(datetime.datetime.now()).split('.')[0],output)
 
 def url_action(url_payload, data, method):
 
-    """ 
+    """
         url_action(url, data, method)
-        
+
             url = url to send
             data = dict of things to send
             method = 'GET' or 'POST'
@@ -165,7 +165,7 @@ def run_tests():
     log('----')
     log('')
     log('')
-     
+
     success, payload = _execute_test(
         'admin/publish_assignment.json',
         token,
@@ -185,7 +185,7 @@ def run_tests():
     log('Collection ID: {0}'.format(collection_id))
     log('----')
     log('')
-    log('') 
+    log('')
 
     success, payload = _execute_test(
         'admin/get_my_collections.json',
@@ -496,7 +496,7 @@ def run_tests():
 
     #
     # Publish Story
-    #    
+    #
 
     success, payload = _execute_test(
         'admin/publish_story.json',
@@ -523,7 +523,7 @@ def run_tests():
 
     new_user_client_id = str(uuid.uuid4())
     new_username = 'temp_user'
-    new_password = 'password123'
+    new_password = hashlib.sha256('password123').hexdigest()
 
     success, payload = _execute_test(
         'admin/create_user.json',

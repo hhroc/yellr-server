@@ -1,18 +1,29 @@
-all: clean dependencies compile
+all: dependencies compile
 
 dependencies:
 	npm install
-	bower install
+	./node_modules/bower/bin/bower install
 
 compile:
 	mkdir -p app/sass/deps
-	cp -r bower_components/foundation/scss/ app/sass/deps/
-	grunt compile
+	mkdir -p assets/templates
+	cp -a bower_components/foundation/scss/. app/sass/deps/
+	ls
+	ls app/sass/
+	ls app/sass/deps/
+	./node_modules/grunt-cli/bin/grunt compile
 
 clean:
-	rm -rf assets/js/
-	rm -rf assets/css/
+	rm -rf yellr-serv/yellrserv/moderator/assets/js/
+	rm -rf yellr-serv/yellrserv/moderator/assets/css/
+	rm -rf yellr-serv/yellrserv/moderator/assets/templates/
+	rm -rf bower_components
+	rm -rf node_modules
 	rm -rf app/sass/deps/
 
 dev: clean dependencies compile
-	grunt watch
+	./node_modules/grunt-cli/bin/grunt watch
+
+test:
+	./node_modules/karma/bin/karma start --browsers Firefox --single-run
+	./node_modules/jshint/bin/jshint app/**/*.js

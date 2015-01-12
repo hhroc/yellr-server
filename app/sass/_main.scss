@@ -1,3 +1,8 @@
 .main {
-    background-color: $background;
+    @extend .small-10;
+    @extend .columns;
+
+    padding: 0;
+    background-color: $background-accent;
+    height: 100%;
 }

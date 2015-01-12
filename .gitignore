@@ -62,11 +62,16 @@ target/
 # JS deps
 bower_components/
 node_modules/
+
+# Compiled stuff
+yellr-serv/yellrserv/moderator/assets/
+app/sass/deps/
 assets/js/
 assets/css/
+assets/templates/
 
 # Vim stuff
-*.swp
+**/*.swp
 
 # Server logs
 yellr-serv/logs.json

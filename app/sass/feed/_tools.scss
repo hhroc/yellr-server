@@ -1,0 +1,53 @@
+.tools-column {
+    @extend .small-2;
+    @extend .columns;
+
+    h4 {
+        margin: 5px 0;
+        font-size: 1.8rem;
+    }
+}
+
+.total {
+    @extend .small-6;
+    @extend .columns;
+
+    border-bottom: solid 1px darken($background-accent, 20);
+    padding: 10px 0;
+
+    p {
+        color: $type-light;
+        margin: 0;
+    }
+
+    h4 {
+        margin: 0;
+        font-size: 2rem;
+        text-shadow: 1px 1px 0 $type-light;
+    }
+}
+
+.collections-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+        //background-color: lighten($primary, 40);
+        padding: 8px 2px;
+        margin: 2px 0;
+
+        .num-posts {
+            background-color: $primary;
+            color: $type;
+            float: right;
+
+            font-weight: bold;
+            padding: 3px;
+            margin-top: -4px;
+            display: inline-block;
+
+            border-radius: 7px;
+        }
+    }
+}

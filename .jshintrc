@@ -1,0 +1,21 @@
+{
+    "curly":false,
+    "jasmine": true,
+    "devel":true,
+    "node": true,
+    "globals":{
+        "angular": true,
+        "inject": true,
+        "HL": true,
+        "window": true,
+        "$": true,
+        "document": true,
+        "window": true,
+        "Handlebars": true
+    },
+    "indent":4,
+    "quotmark": "single",
+    "strict": true,
+    "trailing": true,
+    "undef": true
+}

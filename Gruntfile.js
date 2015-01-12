@@ -4,17 +4,25 @@ module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
 
-        concat: {
+        concat_sourcemap: {
             options: {
-                sourceMap :true
+                sourceRoot: '/moderator/assets/js/'
             },
             dist: {
-                src: [
-                    'bower_components/angular/angular.js',
-                    'app/*.js', // root files first
-                    'app/**/*.js' // then everything else
-                ],
-                dest: 'assets/js/scripts.js'
+                files: {
+                    'yellr-serv/yellrserv/moderator/assets/js/scripts.js' : [
+                        'bower_components/cryptojslib/rollups/hmac-sha256.js',
+                        'bower_components/jquery/dist/jquery.js',
+                        'bower_components/angular/angular.js',
+                        'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-mocks/angular-mocks.js',
+                        'bower_components/angular-foundation/mm-foundation.js',
+                        'bower_components/angular-foundation/mm-foundation-tpls.js',
+                        'app/*.js', // root files first
+                        'app/**/*.js', // then everything else
+                        '!app/tests/**/*.js' // ignore tests
+                    ]
+                },
             }
         },
 
@@ -22,11 +30,12 @@ module.exports = function (grunt) {
             options : {
                 sourceMap : true,
                 sourceMapIncludeSources : true,
-                sourceMapIn : 'assets/js/scripts.js.map'
+                sourceMapIn : 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map',
+                sourceMapName: 'yellr-serv/yellrserv/moderator/assets/js/scripts.min.js.map'
             },
             dist: {
-                src: 'assets/js/scripts.js',
-                dest: 'assets/js/scripts.min.js'
+                src: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js',
+                dest: 'yellr-serv/yellrserv/moderator/assets/js/scripts.min.js'
             }
         },
 
@@ -36,7 +45,7 @@ module.exports = function (grunt) {
                     style: 'compress',
                 },
                 files: {
-                    'assets/css/site.css': 'app/sass/site.scss'
+                    'yellr-serv/yellrserv/moderator/assets/css/site.css': 'app/sass/site.scss'
                 }
             }
         },
@@ -44,7 +53,7 @@ module.exports = function (grunt) {
         watch: {
             js: {
                 files: ['app/**/*.js'],
-                tasks: ['concat_js', 'uglify_js', 'clean'],
+                tasks: ['concat_sourcemap', 'uglify', 'clean'],
                 options: {
                     spawn: false
                 }
@@ -55,20 +64,53 @@ module.exports = function (grunt) {
                 options: {
                     spawn: false
                 }
+            },
+            html: {
+                files: ['app/templates/**/*.html'],
+                tasks: ['sync'],
+                options: {
+                    spawn: false
+                }
+            }
+        },
+
+        sync: {
+            html: {
+                files: [{
+                    cwd: 'app/templates/',
+                    src: [
+                        '**/*.html'
+                    ],
+                    dest: 'yellr-serv/yellrserv/moderator/assets/templates/',
+                }],
+                verbose: true,
+                flatten: true
+            },
+            js: {
+                files: [{
+                    src: [
+                        'app/*.js',
+                        'app/**/*.js'
+                    ],
+                    dest: 'yellr-serv/yellrserv/moderator/assets/js/'
+                }],
+                verbose: true,
+                flatten: true
             }
         },
 
         clean: {
-            js: ['assets/js/scripts.js', 'assets/js/scripts.js.map'],
+            js: ['yellr-serv/yellrserv/moderator/assets/js/scripts.js', 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map', 'moderator/'],
         }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-concat-sourcemap');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-sync');
 
-    grunt.registerTask('default', ['concat', 'uglify', 'sass', 'clean', 'watch']);
-    grunt.registerTask('compile', ['concat', 'uglify', 'sass', 'clean']);
+    grunt.registerTask('default', ['concat_sourcemap', 'uglify', 'sync', 'sass', 'watch']);
+    grunt.registerTask('compile', ['concat_sourcemap', 'uglify', 'sync', 'sass']);
 };
