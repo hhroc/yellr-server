@@ -242,12 +242,15 @@ def admin_get_posts(request):
 
                     seen_post_ids.append(post_id)
                 
-                root_file_name = splitext(file_name)[0]
-                file_extention = splitext(file_name)[1]
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
-                    'preview_file_name': "{0}p{1}".format(root_file_name,file_extention),
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -971,12 +974,15 @@ One or more of the following fields is missing or invalid: assignment_id. \
 
                     seen_post_ids.append(post_id)
 
-                root_file_name = splitext(file_name)[0]
-                file_extention = splitext(file_name)[1]
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
-                    'preview_file_name': "{0}p{1}".format(root_file_name,file_extention),
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -1411,12 +1417,15 @@ One or more of the following fields is missing or invalid: collection_id. \
 
                     seen_post_ids.append(post_id)
 
-                root_file_name = splitext(file_name)[0]
-                file_extention = splitext(file_name)[1]
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
-                    'preview_file_name': "{0}p{1}".format(root_file_name,file_extention),
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -1525,12 +1534,15 @@ One or more of the following fields is missing or invalid: client_id. \
 
                     seen_post_ids.append(post_id)
 
-                root_file_name = splitext(file_name)[0]
-                file_extention = splitext(file_name)[1]
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
-                    'preview_file_name': "{0}p{1}".format(root_file_name,file_extention),
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -1745,12 +1757,15 @@ def admin_get_post(request):
 
                     seen_post_ids.append(post_id)
 
-                root_file_name = splitext(file_name)[0]
-                file_extention = splitext(file_name)[1]
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
-                    'preview_file_name': "{0}p{1}".format(root_file_name,file_extention),
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
