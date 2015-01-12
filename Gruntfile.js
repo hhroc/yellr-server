@@ -15,6 +15,8 @@ module.exports = function (grunt) {
                         'bower_components/jquery/dist/jquery.js',
                         'bower_components/angular/angular.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.min.js',
+                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
                         'bower_components/angular-mocks/angular-mocks.js',
                         'bower_components/angular-foundation/mm-foundation.js',
                         'bower_components/angular-foundation/mm-foundation-tpls.js',
@@ -96,7 +98,7 @@ module.exports = function (grunt) {
                 }],
                 verbose: true,
                 flatten: true
-            }
+            },
         },
 
         clean: {

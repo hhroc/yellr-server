@@ -8,6 +8,7 @@ compile:
 	mkdir -p app/sass/deps
 	mkdir -p assets/templates
 	cp -a bower_components/foundation/scss/. app/sass/deps/
+	cp -a bower_components/twbs-bootstrap-sass/assets/stylesheets/. app/sass/deps/
 	ls
 	ls app/sass/
 	ls app/sass/deps/

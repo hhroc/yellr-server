@@ -1,7 +1,7 @@
 'use strict';
 
 angular
-    .module('Yellr', ['ui.router', 'mm.foundation'])
+    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap'])
     .config(['$stateProvider', '$urlRouterProvider',
             function ($stateProvider, $urlRouterProvider) {
 
