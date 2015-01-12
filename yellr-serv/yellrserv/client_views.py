@@ -637,25 +637,20 @@ def upload_media(request):
 
     result = {'success': False}
 
-    print "\n\nupload_media.json GET:\n\n"
-    print request.GET
-    print "\n\nupload_media.json POST:\n\n"
-    print request.POST
-    print "\n\n"
-
     #error_text = ''
     try:
     #if True:
 
-        if True:
-        #try:
+        #if True:
+        try:
             client_id = request.POST['client_id']
             media_type = request.POST['media_type']
-        #except:
-        #    result['error_text'] = 'Missing or invalid field'
-        #    raise Exception('missing fields')
+        except:
+            result['error_text'] = 'Missing or invalid field'
+            raise Exception('missing fields')
 
         file_name = ''
+        preview_file_name = ''
         file_path = ''
         if media_type == 'image' or media_type == 'video' \
                 or media_type == 'audio':
@@ -676,7 +671,8 @@ def upload_media(request):
             media_extention="processing"
 
             # generate a unique file name to store the file to
-            file_name = '{0}.{1}'.format(uuid.uuid4(),media_extention)
+            unique = uuid.uuid4()
+            file_name = '{0}.{1}'.format(unique,media_extention)
             file_path = os.path.join(system_config['upload_dir'], file_name)
 
             # write file to temp location, and then to disk
@@ -690,6 +686,8 @@ def upload_media(request):
                 if not data:
                     break
                 output_file.write(data)
+
+            output_file.close()
 
             #decode media type of written file
             #more file types can be added, but these should cover most for now
@@ -720,7 +718,18 @@ def upload_media(request):
                 if True:
                 #try:
 
+                    # strip meta data
                     subprocess.call(['mogrify', '-strip', temp_file_path])
+                    
+                    preview_file_name = '{0}p.{1}'.format(unique,media_extention)
+                    file_path_image_preview = os.path.join(system_config['upload_dir'], preview_file_name)
+
+                    # generate preview image
+                    #subprocess.call(['convert', temp_file_path, '-resize', '320x100', '-background', 'white', \
+                    #        'gravity', 'center', 'extent', '320x100', file_path_image_preview])
+                    subprocess.call(['convert', temp_file_path, '-resize', '320x100', '-size', '320x100', \
+                            'xc:white', '+swap', '-gravity', 'center', '-composite', file_path_image_preview])
+
                     # subprocess.call(['/usr/bin/mogrify', '-strip', temp_file_path])
                     # subprocess.call(['/usr/local/bin/mogrify', '-strip', temp_file_path])
                 #except:
@@ -793,8 +802,10 @@ def upload_media(request):
 
             # rename once we are valid
             os.rename(temp_file_path, file_path)
+             
 
             result['file_name'] = os.path.basename(file_path)
+            result['preview_file_name'] = os.path.basename(preview_file_name)
 
         #except:
             #result['error_text'] = 'Missing or invalid media_file contents.'
