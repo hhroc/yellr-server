@@ -421,6 +421,27 @@ def run_tests():
     log('')
     log('')
 
+    post_collection_assignment_success = True
+    try:
+        success, payload = _execute_test(
+            'admin/add_post_to_collection.json',
+            token,
+            {
+                'collection_id': 99,
+                'post_id': 100,
+            },
+            'POST',
+        )
+    except:
+        post_collection_assignment_success = False
+
+    if post_collection_assignment_success == True:
+        raise Exception("Invalid collection and post were added.");
+    log('Post-Collection assignment failed with invalid data.')
+    log('----')
+    log('')
+    log('')
+
     success, payload = _execute_test(
         'admin/get_collection_posts.json',
         token,

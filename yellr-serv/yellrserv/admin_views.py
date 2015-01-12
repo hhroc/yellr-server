@@ -241,10 +241,16 @@ def admin_get_posts(request):
                     }
 
                     seen_post_ids.append(post_id)
-
+                
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -968,9 +974,15 @@ One or more of the following fields is missing or invalid: assignment_id. \
 
                     seen_post_ids.append(post_id)
 
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -1110,8 +1122,8 @@ def admin_get_my_collection(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
 
         token = None
         valid_token = False
@@ -1127,7 +1139,7 @@ def admin_get_my_collection(request):
 
         ret_collections = []
         for collection_id, user_id, collection_datetime, name, description, \
-                tags, enabled in collections:
+                tags, enabled, in collections: #post_count in collections:
             ret_collections.append({
                 'collection_id': collection_id,
                 'collection_datetime': str(collection_datetime),
@@ -1140,8 +1152,8 @@ def admin_get_my_collection(request):
         result['collections'] = ret_collections
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
 
@@ -1218,14 +1230,28 @@ post_id. \
 """
             raise Exception('Missing or invalid field.')
 
-        collection = Collections.add_post_to_collection(
+        _collection = Collections.get_from_collection_id(
+            session = DBSession,
+            collection_id = collection_id,
+        )
+
+        _post = Posts.get_from_post_id(
+            session = DBSession,
+            post_id = post_id,
+        )
+
+        if _collection == None or _post == None:
+            result['error_test'] = "Invalid collection or post id"
+            raise Exception("Invalid collection or post id");
+
+        collection_post = Collections.add_post_to_collection(
             session = DBSession,
             collection_id = collection_id,
             post_id = post_id,
         )
 
-        result['post_id'] = post_id
-        result['collection_id'] = collection_id
+        result['post_id'] = collection_post.post_id
+        result['collection_id'] = collection_post.collection_id
         result['success'] = True
 
     except:
@@ -1405,9 +1431,15 @@ One or more of the following fields is missing or invalid: collection_id. \
 
                     seen_post_ids.append(post_id)
 
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -1516,9 +1548,15 @@ One or more of the following fields is missing or invalid: client_id. \
 
                     seen_post_ids.append(post_id)
 
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
@@ -1733,9 +1771,15 @@ def admin_get_post(request):
 
                     seen_post_ids.append(post_id)
 
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = splitext(file_name)[0]
+                    file_extention = splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
+                    'preview_file_name': preview_file_name,
                     'caption': caption,
                     'media_text': media_text,
                     'media_type_name': media_type_name,
