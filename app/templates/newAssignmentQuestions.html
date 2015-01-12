@@ -1,1 +1,19 @@
-<h4>questions</h4>
+<form>
+    <div class="question-form" ng-repeat="question in questions">
+        <label>
+            <h3>Question:</h3>
+            <input ng-model="questionText" type="text" class="main-input" placeholder="Question Text"/>
+        </label>
+        <label class="select-label">
+            <h3>Select Question Type</h3>
+            <select ng-model="questionType">
+                <option>Full Text</option>
+                <option>Multiple Choice</option>
+            </select>
+        </label>
+        {{questionText}}
+        {{questionType}}
+    </div>
+    <button class="save-button" ng-click="save()">Save</button>
+    <button class="add-question" ng-click="addQuestion()">Add Question</button>
+</form>

@@ -1,12 +1,12 @@
-@import '_assignments';
-@import '_new-assignment';
-@import '_assignment_question';
+.question-form {
+    border-bottom: solid 1px darken($background-accent, 10);
+    margin-bottom: 20px;
+}
 
-.save-button {
+.add-question {
     @include primary-btn();
 
-    float: right;
-    margin: 0 0 20px 0;
+    margin: 0;
     padding: .55rem 1rem;
     width: auto;
 
@@ -20,7 +20,6 @@
     }
 
     &:hover {
-        color: $background;
-        background-color: $secondary;
+        background-color: $primary;
     }
 }

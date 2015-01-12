@@ -17,6 +17,10 @@
     border-radius: 3px;
 }
 
+.f-dropdown:before {
+    top: -11px;
+}
+
 .inner-post {
     background-color: $background;
     border-radius: 5px;

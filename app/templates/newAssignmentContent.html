@@ -1,22 +1,19 @@
-<h4>content</h4>
-<form>
-    <input type="text" class="main-input" placeholder="Assignment Name"/>
+<form no-validate>
     <div class="row">
+        <input ng-model="name" ng-required type="text" class="main-input" placeholder="Assignment Name"/>
         <label class="select-label">
-            Select Language
+            <h3>Select Language</h3>
             <br/>
-            <select>
+            <select ng-model="language">
                 <option>EN</option>
                 <option>ES</option>
             </select>
         </label>
-        <label class="select-label">
-            Select Question Type
-            <br/>
-            <select>
-                <option>Full Text</option>
-                <option>Multiple Choice</option>
-            </select>
-        </label>
+        <div class="expire-datepicker">
+            <h3>Expiration Date</h3>
+            <p>date {{dt}}</p>
+            <datepicker ng-model="dt" min-date="minDate" class="well well-sm"></datepicker>
+        </div>
     </div>
+    <button class="save-button" ng-click="save()">Save</button>
 </form>
