@@ -781,6 +781,50 @@ class Posts(Base):
         return post
 
     @classmethod
+    def get_with_media_objects_from_post_id(cls, session, post_id):
+        with transaction.manager:
+            posts_query = session.query(
+                Posts.post_id,
+                Posts.assignment_id,
+                Posts.user_id,
+                Posts.title,
+                Posts.post_datetime,
+                Posts.reported,
+                Posts.lat,
+                Posts.lng,
+                MediaObjects.media_object_id,
+                MediaObjects.media_id,
+                MediaObjects.file_name,
+                MediaObjects.caption,
+                MediaObjects.media_text,
+                MediaTypes.name,
+                MediaTypes.description,
+                Users.verified,
+                Users.client_id,
+                Languages.language_code,
+                Languages.name,
+            ).join(
+                PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
+            ).join(
+                MediaObjects, #MediaObjects.media_object_id == PostMediaObjects.media_object_id,
+            ).join(
+                MediaTypes,
+            ).join(
+                Users, Users.user_id == Posts.user_id,
+            ).join(
+                Languages,
+            ).filter(
+                # Posts.assignment_id == assignment_id,
+            ).order_by(
+                 desc(Posts.post_datetime),
+            ).group_by(
+                 Posts.post_id,
+            )
+            total_post_count = posts_query.count()
+            posts = posts_query.all()
+        return posts, total_post_count
+
+    @classmethod
     def get_posts(cls, session, reported=False, start=0, count=0):
         with transaction.manager:
             posts_query = session.query(
@@ -1273,6 +1317,12 @@ class Collections(Base):
                 Collections.description,
                 Collections.tags,
                 Collections.enabled,
+                #func.count(Posts.post_id),
+            #).outerjoin(
+            #    CollectionPosts, CollectionPosts.collection_id == \
+            #        Collections.collection_id,
+            #).outerjoin(
+            #    Posts, Posts.post_id == CollectionPosts.post_id,
             ).filter(
                 Collections.user_id == user.user_id,
             ).all()
