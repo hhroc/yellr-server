@@ -2,16 +2,21 @@
 
 angular
     .module('Yellr')
-    .controller('newAssignmentQuestionsCtrl', ['$scope',
-    function ($scope) {
-        $scope.questions = [
-            {
-                question: '',
-                type: 'Full Text'
-            }
-        ];
+    .controller('newAssignmentQuestionsCtrl', ['$scope', '$timeout',
+    function ($scope, $timeout) {
+        $scope.questions = $scope.$parent.assignment.questions || [];
 
         $scope.addQuestion = function () {
-            $scope.questions.push({ question: '', type: 'Full Text' });
+            $scope.questions.push({ text: '', type: 1 });
+        };
+
+        $scope.save = function (questions) {
+            $scope.$parent.assignment.questions = questions;
+            $scope.$parent.notificationMessage = 'Saved Questions.';
+            $scope.$parent.activeNotification = true;
+
+            $timeout(function () {
+                $scope.$parent.activeNotification = false;
+            }, 1200);
         };
     }]);

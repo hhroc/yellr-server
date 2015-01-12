@@ -13,4 +13,9 @@ angular
         $scope.user = $rootScope.user;
 
         $scope.$parent.clear();
+
+        $scope.activeNotification = false;
+
+        $scope.assignment = {};
+        $scope.assignment.questions = [ { text: '', type: 0 } ];
     }]);

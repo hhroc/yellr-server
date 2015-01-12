@@ -45,6 +45,27 @@
     }
 }
 
+.notification {
+    position: fixed;
+    padding: 20px 0;
+    background-color: $secondary;
+    color: $background;
+    top: -65px;
+    width: inherit;
+    text-align: center;
+    font-weight: bold;
+}
+
+.active-notification {
+    @include transition(top, 0.2s, ease-in-out);
+    top: 0px;
+}
+
+.inactive-notification {
+    @include transition(top, 0.2s, ease-in-out);
+    top: -65px;
+}
+
 .expire-datepicker {
 
     table {

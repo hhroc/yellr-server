@@ -6,8 +6,9 @@
     @include primary-btn();
 
     float: right;
-    margin: 0 0 20px 0;
-    padding: .55rem 1rem;
+    margin: 0 0 20px 0 !important;
+    padding: .55rem 1rem !important;
+    border-radius: 5px !important;
     width: auto;
 
     border: solid 1px darken($background-accent, 10);
