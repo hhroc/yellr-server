@@ -14,6 +14,9 @@ module.exports = function (grunt) {
                         'bower_components/cryptojslib/rollups/hmac-sha256.js',
                         'bower_components/jquery/dist/jquery.js',
                         'bower_components/angular/angular.js',
+                        'bower_components/leaflet/dist/leaflet.js',
+                        'bower_components/angular-leaflet/dist/angular-leaflet-directive.js',
+                        'bower_components/mapbox.js/mapbox.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
                         'bower_components/angular-ui-bootstrap-bower/ui-bootstrap.min.js',
                         'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
@@ -25,6 +28,13 @@ module.exports = function (grunt) {
                         '!app/tests/**/*.js' // ignore tests
                     ]
                 },
+            }
+        },
+
+        concat: {
+            css: {
+                src: [],
+                dest: []
             }
         },
 
@@ -107,6 +117,7 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks('grunt-concat-sourcemap');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-watch');

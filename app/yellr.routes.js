@@ -1,7 +1,8 @@
 'use strict';
 
 angular
-    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap'])
+    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap',
+            'leaflet-directive'])
     .config(['$stateProvider', '$urlRouterProvider',
             function ($stateProvider, $urlRouterProvider) {
 
