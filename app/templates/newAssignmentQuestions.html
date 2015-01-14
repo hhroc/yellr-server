@@ -12,6 +12,13 @@
                 <option value="2">Multiple Choice</option>
             </select>
         </label>
+        <div ng-if="question.type == 2">
+            <h4>Choices</h4>
+            <div class="question-choice" ng-repeat="choice in question.choices track by $index">
+                <input ng-model="question.choices[$index]" type="text" placeholder="Question Choice" required/>
+            </div>
+            <button class="add-choice" ng-click="addChoice(question)">Add Choice</button>
+        </div>
     </div>
     <input type="submit" class="save-button" value="Save"/>
     <button class="add-question" ng-click="addQuestion(questions)">Add Question</button>
