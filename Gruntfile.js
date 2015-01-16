@@ -17,6 +17,7 @@ module.exports = function (grunt) {
                         'bower_components/mapbox.js/mapbox.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
                         'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
+                        'bower_components/angular-mocks/angular-mocks.js',
                         'bower_components/angular-foundation/mm-foundation-tpls.js',
                         'app/*.js', // root files first
                         'app/**/*.js', // then everything else
