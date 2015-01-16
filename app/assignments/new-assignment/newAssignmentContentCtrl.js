@@ -2,8 +2,8 @@
 
 angular
     .module('Yellr')
-    .controller('newAssignmentContentCtrl', ['$scope', '$timeout',
-    function ($scope, $timeout) {
+    .controller('newAssignmentContentCtrl', ['$scope',
+    function ($scope) {
         $scope.format = 'dd-MMMM-yyyy';
         $scope.dateOptions = {
             formatYear: 'yy',
@@ -12,11 +12,7 @@ angular
 
         $scope.save = function (assignment) {
             angular.extend($scope.$parent.assignment, assignment);
-            $scope.$parent.notificationMessage = 'Saved Assignment Information';
-            $scope.$parent.activeNotification = true;
-
-            $timeout(function () {
-                $scope.$parent.activeNotification = false;
-            }, 1200);
+            $scope.$parent.notify('Saved Assignment Information.');
+            $scope.$parent.validate();
         };
     }]);
