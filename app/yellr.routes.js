@@ -1,12 +1,9 @@
 'use strict';
 
 angular
-    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap',
-            'leaflet-directive'])
+    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap'])
     .config(['$stateProvider', '$urlRouterProvider',
             function ($stateProvider, $urlRouterProvider) {
-
-        $urlRouterProvider.otherwise('/notfound');
 
         $stateProvider
             .state('login', {

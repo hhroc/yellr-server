@@ -1,35 +1,24 @@
-<!DOCTYPE html>
-<html ng-app="Yellr" ng-controller="yellrBaseCtrl">
-<head>
-    <title>Yellr Moderator</title>
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="assets/css/site.css"/>
-</head>
-<body>
-    <div class="login">
-        <div class="vertical-center-wrapper">
-            <div class="vertical-center">
-                <div class="login-wrapper">
-                    <h1>Yellr</h1>
-                    <p>Communicate with your community</p>
-                    <form id="mod-login" class="login-form">
-                        <div class="input-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" ng-model="username" />
-                        </div>
-                        <div class="input-group">
-                            <label for="password">Password</label>
-                            <input type="password" id="password" ng-model="password" />
-                        </div>
+<div class="login">
+    <div class="vertical-center-wrapper">
+        <div class="vertical-center">
+            <div class="login-wrapper">
+                <h1>Yellr</h1>
+                <p>Communicate with your community</p>
+                <form id="mod-login" class="login-form">
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" ng-model="username" />
+                    </div>
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" ng-model="password" />
+                    </div>
 
-                        <div class="input-group">
-                            <input type="submit" value="Login" class="login-btn" ng-click="login(username, password)"/>
-                        </div>
-                    </form>
-                </div>
+                    <div class="input-group">
+                        <input type="submit" value="Login" class="login-btn" ng-click="login(username, password)"/>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-    <script src="assets/js/scripts.min.js"></script>
-</body>
-</html>
+</div>
