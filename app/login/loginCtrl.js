@@ -37,7 +37,7 @@ angular
 
             .error(function(data, status, headers, config) {
                 // TODO: Handle Error
-                console.log(data);
+                console.log('ERROR', data);
             });
         };
     }]);

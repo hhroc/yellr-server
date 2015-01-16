@@ -23,14 +23,11 @@ angular
         $scope.assignment.questions = [ { text: '', type: 0 } ];
 
         $scope.notify = function (message) {
-            console.log('notify');
             $scope.notificationMessage = message;
             $scope.activeNotification = true;
-            console.log($scope.activeNotification);
 
             $timeout(function () {
                 $scope.activeNotification = false;
-                console.log($scope.activeNotification);
             }, 1200);
         };
 
