@@ -69,6 +69,7 @@ app/sass/deps/
 assets/js/
 assets/css/
 assets/templates/
+yellr-serv/yellrserv/moderator/epiceditor/
 
 # Vim stuff
 **/*.swp
@@ -80,3 +81,6 @@ yellr-serv/yellr-serv.sqlite
 
 # API Key stuff
 app/yellr.global.js
+
+# Sourcemaps
+yellr-serv/yellrserv/moderator/scripts.min.js.map

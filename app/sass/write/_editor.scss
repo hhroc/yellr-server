@@ -1,0 +1,10 @@
+.editor-wrapper {
+    @extend .row;
+
+    height: 100%;
+}
+
+.editor {
+    height: 70%;
+    margin-top: 20px;
+}
