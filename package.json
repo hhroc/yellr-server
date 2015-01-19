@@ -29,7 +29,8 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-sync": "^0.2.2",
     "jshint": "^2.5.11",
-    "karma": "^0.12.31"
+    "karma": "^0.12.31",
+    "karma-phantomjs-launcher": "^0.1.4"
   },
   "devDependencies": {
     "jasmine-core": "^2.1.3",

@@ -35,5 +35,8 @@
             <a class="nav-link" href="#/new-assignment/geofence">GeoFence</a>
         </li>
     </ul>
+
+    <div class="publish non-publishable" ng-if="!canPublish">PUBLISH</div>
+    <div class="publish publishable" ng-if="canPublish" ng-click="publish()">PUBLISH</div>
 </div>
 <div class="notification" ng-class="activeNotification ? 'active-notification' : 'inactive-notification'">{{notificationMessage}}</div>

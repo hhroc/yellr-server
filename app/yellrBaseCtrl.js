@@ -2,7 +2,7 @@
 
 angular
     .module('Yellr')
-    .controller('yellrBaseCtrl', ['$scope', function ($scope) {
+    .controller('yellrBaseCtrl', ['$scope', '$http', function ($scope, $http) {
         $scope.feedPage = false;
         $scope.contributorsPage = false;
         $scope.assignmentsPage = false;
@@ -18,4 +18,6 @@ angular
             $scope.messagesPage = false;
             $scope.settingsPage = false;
         };
+
+        $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
     }]);

@@ -2,20 +2,35 @@
     <div class="question-form" ng-repeat="question in questions">
         <label>
             <h3>Question:</h3>
-            <input ng-model="question.text" type="text" class="main-input" placeholder="Question Text" required/>
+            <input ng-model="question.question_text" type="text" class="main-input" placeholder="Question Text" required/>
         </label>
-        <label class="select-label">
-            <h3>Select Question Type</h3>
-            <select ng-model="question.type" required>
-                <option value="">Select Question Type</option>
-                <option value="1">Full Text</option>
-                <option value="2">Multiple Choice</option>
-            </select>
+
+        <label>
+            <h3>Description:</h3>
+            <textarea ng-model="question.description"></textarea>
         </label>
+
+        <label for="language" class="select-label">
+            <h3>Select Language</h3>
+        </label>
+        <select id="language" ng-model="question.language_code" required>
+            <option value="">Choose Language</option>
+            <option value="{{lang.code}}" ng-repeat="lang in languages">{{lang.name}}</option>
+        </select>
+
+        <label for="question-type" class="select-label">
+            <h3>Question Type</h3>
+        </label>
+        <select id="question-type" ng-model="question.question_type" required>
+            <option value="">Choose Question Type</option>
+            <option value="1">Full Text</option>
+            <option value="2">Multiple Choice</option>
+        </select>
+
         <div ng-if="question.type == 2">
             <h4>Choices</h4>
             <div class="question-choice" ng-repeat="choice in question.choices track by $index">
-                <input ng-model="question.choices[$index]" type="text" placeholder="Question Choice" required/>
+                <input ng-model="question.answers[$index]" type="text" placeholder="Question Choice" required/>
             </div>
             <button class="add-choice" ng-click="addChoice(question)">Add Choice</button>
         </div>

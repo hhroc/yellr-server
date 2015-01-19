@@ -11,8 +11,11 @@ compile:
 	mkdir -p yellr-serv/yellrserv/moderator/assets/css
 	# Copy dependencies
 	cp -a bower_components/foundation/scss/. app/sass/deps/
+	# Copy Bootstrap
 	cp -a bower_components/twbs-bootstrap-sass/assets/stylesheets/. app/sass/deps/
-	cp bower_components/leaflet/dist/leaflet.css yellr-serv/yellrserv/moderator/assets/css/leaflet.css
+	# Copy Bourbon
+	cp -a bower_components/bower-bourbon/. app/sass/deps/
+	# Copy Leaflet things
 	cp bower_components/leaflet-draw/dist/leaflet.draw.css yellr-serv/yellrserv/moderator/assets/css/leaflet-draw.css
 	cp -a bower_components/leaflet-draw/dist/images/. yellr-serv/yellrserv/moderator/assets/css/images/
 	cp bower_components/mapbox.js/mapbox.standalone.css yellr-serv/yellrserv/moderator/assets/css/mapbox.css

@@ -98,7 +98,7 @@ angular
                                                bottomRightLat, bottomRightLng) {
 
             var url = '/admin/publish_assignment.json?token=' + accessToken,
-                params = {
+                data = {
                     life_time: lifeTime,
                     questions: questions,
                     top_left_lat: topLeftLat,
@@ -111,7 +111,7 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                params: params
+                data: data
             });
         };
 
