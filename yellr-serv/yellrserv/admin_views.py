@@ -421,8 +421,11 @@ def admin_publish_assignment(request):
 
         #if True:
         try:
-            #client_id = request.POST['client_id']
-            life_time = int(request.POST['life_time'])
+            life_time = 0
+            try:
+                life_time = int(float(request.POST['life_time']))
+            except:
+                pass
             if life_time == 0:
                 life_time = 168 # set to 1 week if blank
             questions = json.loads(request.POST['questions'])
