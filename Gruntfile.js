@@ -16,6 +16,7 @@ module.exports = function (grunt) {
                         'bower_components/angular/angular.js',
                         'bower_components/mapbox.js/mapbox.js',
                         'bower_components/epiceditor/epiceditor/js/epiceditor.js',
+                        'bower_components/async/lib/async.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
                         'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
                         'bower_components/angular-mocks/angular-mocks.js',

@@ -1,6 +1,7 @@
 'use strict';
 
 var moment = moment || {};
+var async = async || {};
 
 angular
     .module('Yellr')
@@ -97,14 +98,27 @@ angular
             var exp = moment($scope.assignment.expireDate);
             var timeDiff = moment.duration(exp.diff(moment())).asHours();
 
-            assignmentApiService.publishAssignment($rootScope.user.token,
-                timeDiff, $scope.assignment.questions,
-                $scope.assignment.geofence.topLeft.lat,
-                $scope.assignment.geofence.topLeft.lng,
-                $scope.assignment.geofence.bottomRight.lat,
-                $scope.assignment.geofence.bottomRight.lng)
-            .success(function (data) {
-                console.log(data);
+            async.map($scope.assignment.questions,
+            function (question, callback) {
+                console.log('calling: ', question);
+                assignmentApiService.createQuestion($rootScope.user.token,
+                    question.language_code, question.question_text,
+                    question.description, question.question_type,
+                    question.answers)
+                .success(function (data) {
+                    callback(null, data.question_id);
+                });
+            },
+            function (error, questionIds) {
+                assignmentApiService.publishAssignment($rootScope.user.token,
+                    timeDiff, questionIds,
+                    $scope.assignment.geofence.topLeft.lat,
+                    $scope.assignment.geofence.topLeft.lng,
+                    $scope.assignment.geofence.bottomRight.lat,
+                    $scope.assignment.geofence.bottomRight.lng)
+                .success(function (data) {
+                    console.log(data);
+                });
             });
         };
     }]);
