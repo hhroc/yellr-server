@@ -61,7 +61,7 @@ module.exports = function (grunt) {
         watch: {
             js: {
                 files: ['app/**/*.js'],
-                tasks: ['concat_sourcemap', 'uglify', 'clean'],
+                tasks: ['concat_sourcemap', 'uglify', 'clean', 'sync:sourcemap', 'sync:js'],
                 options: {
                     spawn: false
                 }
@@ -105,6 +105,17 @@ module.exports = function (grunt) {
                 verbose: true,
                 flatten: true
             },
+            sourcemap: {
+                files: [{
+                    cwd: 'yellr-serv/yellrserv/moderator/assets/js/',
+                    src: [
+                        'scripts.min.js.map'
+                    ],
+                    dest: 'yellr-serv/yellrserv/moderator/'
+                }],
+                verbose: true,
+                flatten: true
+            }
         },
 
         clean: {
