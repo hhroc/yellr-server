@@ -258,7 +258,7 @@ def get_assignments(request):
         #)
 
         ret_assignments = []
-        for assignment_id, publish_datetime, expire_datetime, top_left_lat, \
+        for assignment_id, publish_datetime, expire_datetime, name, top_left_lat, \
                 top_left_lng, bottom_right_lat, bottom_right_lng, use_fence, \
                 organization, question_text, question_type_id, description, \
                 answer0, answer1, answer2, answer3, answer4, answer5, answer6, \
@@ -272,6 +272,7 @@ def get_assignments(request):
                 'organization': organization,
                 'publish_datetime': str(publish_datetime),
                 'expire_datetime': str(expire_datetime),
+                'name': name,
                 'top_left_lat': top_left_lat,
                 'top_left_lng': top_left_lng,
                 'bottom_right_lat': bottom_right_lat,
