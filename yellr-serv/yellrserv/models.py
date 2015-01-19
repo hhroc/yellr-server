@@ -291,6 +291,7 @@ class Assignments(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'))
     publish_datetime = Column(DateTime)
     expire_datetime = Column(DateTime)
+    name = Column(Text)
     #assignment_unique_id = Column(Text)
     top_left_lat = Column(Float)
     top_left_lng = Column(Float)
@@ -349,6 +350,7 @@ class Assignments(Base):
                 Assignments.assignment_id,
                 Assignments.publish_datetime,
                 Assignments.expire_datetime,
+                Assignments.name,
                 #Assignments.assignment_unique_id,
                 Assignments.top_left_lat,
                 Assignments.top_left_lng,
@@ -405,6 +407,7 @@ class Assignments(Base):
                 Assignments.assignment_id,
                 Assignments.publish_datetime,
                 Assignments.expire_datetime,
+                Assignments.name,
                 #Assignments.assignment_unique_id,
                 Assignments.top_left_lat,
                 Assignments.top_left_lng,
@@ -449,7 +452,7 @@ class Assignments(Base):
         return assignments
 
     @classmethod
-    def create_from_http(cls, session, token, life_time, top_left_lat, \
+    def create_from_http(cls, session, token, name, life_time, top_left_lat, \
             top_left_lng, bottom_right_lat, bottom_right_lng, use_fence=True):
         with transaction.manager:
             user = Users.get_from_token(session, token)
@@ -460,6 +463,7 @@ class Assignments(Base):
                     publish_datetime = datetime.datetime.now(),
                     expire_datetime = datetime.datetime.now() + \
                         datetime.timedelta(hours=life_time),
+                    name = name,
                     #assignment_unique_id = str(uuid.uuid4()),
                     top_left_lat = top_left_lat,
                     top_left_lng = top_left_lng,
@@ -487,7 +491,7 @@ class Assignments(Base):
         return assignment
 
     @classmethod
-    def update_assignment(cls, session, assignment_id, life_time, \
+    def update_assignment(cls, session, assignment_id, name, life_time, \
             top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng, \
             use_fence=True):
         with transaction.manager:
@@ -496,6 +500,7 @@ class Assignments(Base):
             ).filter(
                 Assignments.assignment_id == assignment_id,
             ).first()
+            assignment.name = name
             expire_datetime = assignment.publish_datetime + \
                 datetime.timedelta(hours=life_time)
             assignment.expire_datetime = expire_datetime

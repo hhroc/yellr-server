@@ -421,6 +421,7 @@ def admin_publish_assignment(request):
 
         #if True:
         try:
+            name = request.POST['name']
             life_time = 0
             try:
                 life_time = int(float(request.POST['life_time']))
@@ -460,6 +461,7 @@ bottom_right_lat, bottom_right_lng.
         assignment = Assignments.create_from_http(
             session = DBSession,
             token = user.token,
+            name = name,
             life_time = life_time,
             #geo_fence = geo_fence,
             top_left_lat = top_left_lat,
@@ -471,7 +473,7 @@ bottom_right_lat, bottom_right_lng.
         collection = Collections.create_new_collection_from_http(
             session = DBSession,
             token = user.token,
-            name = "Assignment #{0}".format(assignment.assignment_id),
+            name = "{0} - Collection".format(name),
             description = "",
             tags = "",
         )
@@ -522,7 +524,12 @@ def admin_update_assignment(request):
         try:
             assignment_id = request.POST['assignment_id']
             #client_id = request.POST['client_id']
-            life_time = int(request.POST['life_time'])
+            name = request.POST['name']
+            life_time = 0
+            try:
+                life_time = int(float(request.POST['life_time']))
+            except:
+                life_time = 24*7
             #questions = json.loads(request.POST['questions'])
             top_left_lat = float(request.POST['top_left_lat'])
             top_left_lng = float(request.POST['top_left_lng'])
@@ -540,6 +547,7 @@ top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng. \
         assignment = Assignments.update_assignment(
             session = DBSession,
             assignment_id = assignment_id,
+            name = name,
             life_time = life_time,
             top_left_lat = top_left_lat,
             top_left_lng = top_left_lng,
@@ -602,7 +610,7 @@ def admin_get_my_assignments(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for assignment_id, publish_datetime, expire_datetime, \
+            for assignment_id, publish_datetime, expire_datetime, name, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
                     bottom_right_lng, use_fence, collection_id, \
                     question_text, question_type_id, answer0, answer1, answer2, \
@@ -622,6 +630,7 @@ def admin_get_my_assignments(request):
                         'assignment_id': assignment_id,
                         'publish_datetime': str(publish_datetime),
                         'expire_datetime': str(expire_datetime),
+                        'name': name,
                         'top_left_lat': top_left_lat,
                         'top_left_lng': top_left_lng,
                         'bottom_right_lat': bottom_right_lat,

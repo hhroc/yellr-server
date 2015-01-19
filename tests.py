@@ -170,6 +170,7 @@ def run_tests():
         'admin/publish_assignment.json',
         token,
         {
+            'name': 'New Years',
             'life_time': 24*7, # 1 week
             'questions': json.dumps([question_id]),
             'top_left_lat': 43.4,
