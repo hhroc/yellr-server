@@ -188,6 +188,23 @@ def run_tests():
     log('')
     log('')
 
+    random_client_id = str(uuid.uuid4())
+    success, payload = _execute_test(
+        'get_assignments.json',
+        random_client_id,
+        {
+            'language_code': 'en',
+            'lat': 43.2,
+            'lng': -77.5,
+        },
+        'GET',
+    )
+    assignments = payload['assignments']
+    log('Assignment Count: {0}'.format(len(assignments)))
+    log('----')
+    log('')
+    log('')
+
     success, payload = _execute_test(
         'admin/get_my_collections.json',
         token,
