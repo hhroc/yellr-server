@@ -257,11 +257,16 @@ def get_assignments(request):
         #    lng = lng,
         #)
 
+        print "\n\n"
+        print assignments
+        print "\n\n"
+
         ret_assignments = []
-        for assignment_id, publish_datetime, expire_datetime, name, top_left_lat, \
-                top_left_lng, bottom_right_lat, bottom_right_lng, use_fence, \
-                organization, question_text, question_type_id, description, \
-                answer0, answer1, answer2, answer3, answer4, answer5, answer6, \
+        for assignment_id, publish_datetime, expire_datetime, name, \
+                top_left_lat, top_left_lng, bottom_right_lat, \
+                bottom_right_lng, use_fence, collection_id, organization,\
+                question_text, question_type_id, description, answer0, \
+                answer1, answer2, answer3, answer4, answer5, answer6, \
                 answer7, answer8, answer9, post_count in assignments:
             #post_count = 0
             #for _assignment_id, _post_count in counts:
