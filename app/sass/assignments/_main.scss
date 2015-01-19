@@ -1,6 +1,7 @@
 @import '_assignments';
 @import '_new-assignment';
 @import '_assignment_question';
+@import '_assignment_geofence';
 
 .save-button {
     @include primary-btn();
