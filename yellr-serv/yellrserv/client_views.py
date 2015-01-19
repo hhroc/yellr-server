@@ -727,8 +727,11 @@ def upload_media(request):
                     # generate preview image
                     #subprocess.call(['convert', temp_file_path, '-resize', '320x100', '-background', 'white', \
                     #        'gravity', 'center', 'extent', '320x100', file_path_image_preview])
-                    subprocess.call(['convert', temp_file_path, '-resize', '320x100', '-size', '320x100', \
-                            'xc:white', '+swap', '-gravity', 'center', '-composite', file_path_image_preview])
+                    #subprocess.call(['convert', temp_file_path, '-resize', '320x100', '-size', '320x100', \
+                    #        'xc:white', '+swap', '-gravity', 'center', '-composite', file_path_image_preview])
+
+                    subprocess.call(['convert', temp_file_path, '-resize', '450', '-size', '450', \
+                        file_path_image_preview])
 
                     # subprocess.call(['/usr/bin/mogrify', '-strip', temp_file_path])
                     # subprocess.call(['/usr/local/bin/mogrify', '-strip', temp_file_path])
