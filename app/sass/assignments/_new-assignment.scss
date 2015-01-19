@@ -3,6 +3,7 @@
     @extend .columns;
 
     height: 100%;
+    overflow: auto;
 }
 
 .assignment-nav {
@@ -42,4 +43,92 @@
             }
         }
     }
+}
+
+.notification {
+    position: fixed;
+    padding: 20px 0;
+    background-color: $secondary;
+    color: $background;
+    top: -65px;
+    width: inherit;
+    text-align: center;
+    font-weight: bold;
+}
+
+.active-notification {
+    @include transition(top, 0.2s, ease-in-out);
+    top: 0px;
+}
+
+.inactive-notification {
+    @include transition(top, 0.2s, ease-in-out);
+    top: -65px;
+}
+
+.expire-datepicker {
+
+    table {
+        width: 100%;
+    }
+
+    .btn-sm {
+        padding: 25px 35px;
+        border: 1px solid #EEE;
+        font-size: 20px;
+
+        &:active {
+            border: none;
+            background-color: $primary !important;
+        }
+
+        &:focus {
+            outline: none;
+        }
+    }
+
+    .btn-info {
+        background-color: $background;
+    }
+
+    .text-info {
+        color: $type;
+    }
+}
+.btn-info:hover, .btn-info:focus, .btn-info.focus, .btn-info:active,
+.btn-info.active, .open>.dropdown-toggle.btn-info {
+    background-color: $primary;
+    color: $type;
+}
+
+.form-status {
+    float: right;
+    font-size: 33px;
+}
+
+.publish {
+    @include transition(all, 0.2s, ease-in-out);
+
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    font-size: 2.3rem;
+
+    position: absolute;
+    bottom: 0;
+
+    padding: 50px;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.publishable {
+    background-color: $primary;
+}
+
+.non-publishable {
+    color: $type-light;
+    background-color: lighten($background-accent, 5);
 }

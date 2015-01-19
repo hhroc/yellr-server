@@ -24,7 +24,6 @@ angular
         $scope.getAssignments = function () {
             assignmentApiService.getAssignments($scope.user.token)
             .success(function (data) {
-                console.log(data);
                 $scope.assignments = data.assignments;
             });
         };

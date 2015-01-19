@@ -1,11 +1,9 @@
 'use strict';
 
 angular
-    .module('Yellr', ['ui.router', 'mm.foundation'])
+    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap'])
     .config(['$stateProvider', '$urlRouterProvider',
             function ($stateProvider, $urlRouterProvider) {
-
-        $urlRouterProvider.otherwise('/notfound');
 
         $stateProvider
             .state('login', {
@@ -13,11 +11,24 @@ angular
                 templateUrl: 'assets/templates/login.html',
                 controller: 'loginCtrl'
             })
+
             .state('feed', {
                 url: '/feed',
                 templateUrl: 'assets/templates/feed.html',
                 controller: 'rawFeedCtrl'
             })
+            .state('view-post', {
+                url: '/view/:postId',
+                templateUrl: 'assets/templates/viewPost.html',
+                controller: 'viewPostCtrl'
+            })
+
+            .state('write-article',{
+                url: '/write',
+                templateUrl: 'assets/templates/writeArticle.html',
+                controller: 'writeArticleCtrl'
+            })
+
             .state('new-assignment', {
                 templateUrl: 'assets/templates/newAssignment.html',
                 controller: 'newAssignmentCtrl'
@@ -37,14 +48,10 @@ angular
                 templateUrl: 'assets/templates/newAssignmentGeofence.html',
                 controller: 'newAssignmentGeofenceCtrl'
             })
+
             .state('assignments', {
                 url: '/assignments',
                 templateUrl: 'assets/templates/viewAssignments.html',
                 controller: 'viewAssignmentsCtrl'
-            })
-            .state('view-post', {
-                url: '/view/:postId',
-                templateUrl: 'assets/templates/viewPost.html',
-                controller: 'viewPostCtrl'
             });
     }]);

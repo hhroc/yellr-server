@@ -75,7 +75,7 @@ angular
          * @return languages : list of all languages
          */
         userApi.getLanguages = function (accessToken) {
-            var url = '/admin/get_languages';
+            var url = '/admin/get_languages.json';
 
             return $http({
                 method: 'GET',

@@ -63,19 +63,19 @@ angular
                                            questionText, description,
                                            questionType, answers) {
             var url = '/admin/create_question.json?token=' + accessToken,
-                params = {
+                data = {
                     language_code: languageCode,
                     question_text: questionText,
                     description: description,
                     question_type: questionType
                 };
 
-            if(answers !== undefined) params.answers = answers;
+            if(answers !== undefined) data.answers = answers;
 
             return $http({
                 method: 'POST',
                 url: url,
-                params: params
+                data: $.param(data)
             });
         };
 
@@ -98,9 +98,9 @@ angular
                                                bottomRightLat, bottomRightLng) {
 
             var url = '/admin/publish_assignment.json?token=' + accessToken,
-                params = {
+                data = {
                     life_time: lifeTime,
-                    questions: questions,
+                    questions: JSON.stringify(questions),
                     top_left_lat: topLeftLat,
                     top_left_lng: topLeftLng,
                     bottom_right_lat: bottomRightLat,
@@ -111,7 +111,7 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                params: params
+                data: $.param(data)
             });
         };
 

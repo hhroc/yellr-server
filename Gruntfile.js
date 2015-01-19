@@ -14,15 +14,25 @@ module.exports = function (grunt) {
                         'bower_components/cryptojslib/rollups/hmac-sha256.js',
                         'bower_components/jquery/dist/jquery.js',
                         'bower_components/angular/angular.js',
+                        'bower_components/mapbox.js/mapbox.js',
+                        'bower_components/epiceditor/epiceditor/js/epiceditor.js',
+                        'bower_components/async/lib/async.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
+                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
                         'bower_components/angular-mocks/angular-mocks.js',
-                        'bower_components/angular-foundation/mm-foundation.js',
                         'bower_components/angular-foundation/mm-foundation-tpls.js',
                         'app/*.js', // root files first
                         'app/**/*.js', // then everything else
                         '!app/tests/**/*.js' // ignore tests
                     ]
                 },
+            }
+        },
+
+        concat: {
+            css: {
+                src: [],
+                dest: []
             }
         },
 
@@ -53,7 +63,7 @@ module.exports = function (grunt) {
         watch: {
             js: {
                 files: ['app/**/*.js'],
-                tasks: ['concat_sourcemap', 'uglify', 'clean'],
+                tasks: ['concat_sourcemap', 'uglify', 'clean', 'sync:sourcemap', 'sync:js'],
                 options: {
                     spawn: false
                 }
@@ -96,6 +106,17 @@ module.exports = function (grunt) {
                 }],
                 verbose: true,
                 flatten: true
+            },
+            sourcemap: {
+                files: [{
+                    cwd: 'yellr-serv/yellrserv/moderator/assets/js/',
+                    src: [
+                        'scripts.min.js.map'
+                    ],
+                    dest: 'yellr-serv/yellrserv/moderator/'
+                }],
+                verbose: true,
+                flatten: true
             }
         },
 
@@ -105,6 +126,7 @@ module.exports = function (grunt) {
     });
 
     grunt.loadNpmTasks('grunt-concat-sourcemap');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-contrib-watch');

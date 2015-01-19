@@ -1,1 +1,40 @@
-<h4>questions</h4>
+<form no-validate ng-submit="save(questions)">
+    <div class="question-form" ng-repeat="question in questions">
+        <label>
+            <h3>Question:</h3>
+            <input ng-model="question.question_text" type="text" class="main-input" placeholder="Question Text" required/>
+        </label>
+
+        <label>
+            <h3>Description:</h3>
+            <textarea ng-model="question.description"></textarea>
+        </label>
+
+        <label for="language" class="select-label">
+            <h3>Select Language</h3>
+        </label>
+        <select id="language" ng-model="question.language_code" required>
+            <option value="">Choose Language</option>
+            <option value="{{lang.code}}" ng-repeat="lang in languages">{{lang.name}}</option>
+        </select>
+
+        <label for="question-type" class="select-label">
+            <h3>Question Type</h3>
+        </label>
+        <select id="question-type" ng-model="question.question_type" required>
+            <option value="">Choose Question Type</option>
+            <option value="free_text">Free Text</option>
+            <option value="multiple_choice">Multiple Choice</option>
+        </select>
+
+        <div ng-if="question.type == 2">
+            <h4>Choices</h4>
+            <div class="question-choice" ng-repeat="choice in question.choices track by $index">
+                <input ng-model="question.answers[$index]" type="text" placeholder="Question Choice" required/>
+            </div>
+            <button class="add-choice" ng-click="addChoice(question)">Add Choice</button>
+        </div>
+    </div>
+    <input type="submit" class="save-button" value="Save"/>
+    <button class="add-question" ng-click="addQuestion(questions)">Add Question</button>
+</form>

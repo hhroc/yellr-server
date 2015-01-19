@@ -1,2 +1,28 @@
 @import '_assignments';
 @import '_new-assignment';
+@import '_assignment_question';
+@import '_assignment_geofence';
+
+.save-button {
+    @include primary-btn();
+
+    float: right;
+    margin: 0 0 20px 0 !important;
+    padding: .55rem 1rem !important;
+    border-radius: 5px !important;
+    width: auto;
+
+    border: solid 1px darken($background-accent, 10);
+    color: $type;
+    background-color: $background;
+
+    &:focus {
+        color: $type;
+        background-color: $background;
+    }
+
+    &:hover {
+        color: $background;
+        background-color: $secondary;
+    }
+}

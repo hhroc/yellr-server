@@ -5,22 +5,38 @@
 <div class="assignment-nav">
     <ul>
         <li>
+            <div class="form-status">
+                <i class="fa fa-times" ng-if="!createAssignment"></i>
+                <i class="fa fa-check" ng-if="createAssignment"></i>
+            </div>
             <p class="nav-label">
                 Initialize
             </p>
             <a class="nav-link" href="#/new-assignment/content">Create Assignment</a>
         </li>
         <li>
+            <div class="form-status">
+                <i class="fa fa-times" ng-if="!addQuestions"></i>
+                <i class="fa fa-check" ng-if="addQuestions"></i>
+            </div>
             <p class="nav-label">
                 Build
             </p>
             <a class="nav-link" href="#/new-assignment/questions">Add Questions</a>
         </li>
         <li>
+            <div class="form-status">
+                <i class="fa fa-times" ng-if="!geofence"></i>
+                <i class="fa fa-check" ng-if="geofence"></i>
+            </div>
             <p class="nav-label">
                 Locate
             </p>
             <a class="nav-link" href="#/new-assignment/geofence">GeoFence</a>
         </li>
     </ul>
+
+    <div class="publish non-publishable" ng-if="!canPublish">PUBLISH</div>
+    <div class="publish publishable" ng-if="canPublish" ng-click="publish()">PUBLISH</div>
 </div>
+<div class="notification" ng-class="activeNotification ? 'active-notification' : 'inactive-notification'">{{notificationMessage}}</div>

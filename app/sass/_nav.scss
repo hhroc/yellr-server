@@ -115,6 +115,10 @@
     color: $background;
     background-color: $info;
 
+    &:visited {
+        color: $background;
+    }
+
     &:hover {
         color: $type;
         background-color: $background;
