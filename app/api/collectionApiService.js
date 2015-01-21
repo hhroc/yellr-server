@@ -128,7 +128,8 @@ angular
                 method: 'GET',
                 url: url,
                 params: {
-                    token: accessToken
+                    token: accessToken,
+                    collection_id: id
                 }
             });
         };

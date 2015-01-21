@@ -1,21 +1,38 @@
+$border: darken($background-accent, 10);
+
 .main-editor-window {
     @extend .small-9;
     @extend .columns;
-    height: 100%;
-}
-
-.editor-wrapper {
-    @extend .row;
 
     height: 100%;
-}
-
-.editor {
-    height: 70%;
-    margin-top: 20px;
+    background-color: $background;
 }
 
 .tool-bar {
     @extend .small-3;
     @extend .columns;
+}
+
+.editor {
+    height: 70%;
+    margin-top: 0;
+
+    border: solid 1px $border;
+}
+
+input.article-name {
+    margin: 0;
+
+    box-shadow: none;
+    border: solid 1px $border;
+    background: $background-accent;
+
+    text-align: center;
+    font-size: 1.1em;
+    height: auto;
+
+    &:focus {
+        background-color: lighten($background-accent, 5);
+        border-color: $border;
+    }
 }
