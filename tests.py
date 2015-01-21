@@ -11,7 +11,7 @@ def log(output):
 
     print "[{0}]: {1}".format(str(datetime.datetime.now()).split('.')[0],output)
 
-def url_action(url_payload, data, method):
+def url_action(url_payload, data, method, files=None):
 
     """
         url_action(url, data, method)
@@ -43,7 +43,7 @@ def url_action(url_payload, data, method):
 
             log("URL: {0}".format(url_payload))
 
-            http_response = requests.post(url_payload, data=data).text
+            http_response = requests.post(url_payload, data=data, files=files).text
             log("HTTP Response: {0}".format(http_response))
             json_response = json.loads(http_response)
 
@@ -52,7 +52,7 @@ def url_action(url_payload, data, method):
 
     return json_response
 
-def _execute_test(url, token, data, method):
+def _execute_test(url, token, data, method, files=None):
 
     log("----")
     log("TEST: {0}".format(url))
@@ -79,7 +79,7 @@ def _execute_test(url, token, data, method):
 
                 url_payload = "{0}{1}?token={2}&".format(ROOT_DOMAIN,url,token)
 
-        response = url_action(url_payload, data, method)
+        response = url_action(url_payload, data, method, files)
 
         if response['success'] == False:
             raise Exception('ERROR: Success = False')
@@ -170,6 +170,7 @@ def run_tests():
         'admin/publish_assignment.json',
         token,
         {
+            'name': 'New Years',
             'life_time': 24*7, # 1 week
             'questions': json.dumps([question_id]),
             'top_left_lat': 43.4,
@@ -183,6 +184,23 @@ def run_tests():
     collection_id = payload['collection_id']
     log('Assignment ID: {0}'.format(assignment_id))
     log('Collection ID: {0}'.format(collection_id))
+    log('----')
+    log('')
+    log('')
+
+    random_client_id = str(uuid.uuid4())
+    success, payload = _execute_test(
+        'get_assignments.json',
+        random_client_id,
+        {
+            'language_code': 'en',
+            'lat': 43.2,
+            'lng': -77.5,
+        },
+        'GET',
+    )
+    assignments = payload['assignments']
+    log('Assignment Count: {0}'.format(len(assignments)))
     log('----')
     log('')
     log('')
@@ -460,7 +478,7 @@ def run_tests():
  
 
     #
-    # Perform a free post
+    # Perform a free post with text
     #
 
     success, payload = _execute_test(
@@ -473,8 +491,8 @@ def run_tests():
         },
         'POST',
     )
-    media_id = payload['media_id']
-    log('Media Object ID: {0}'.format(media_id))
+    text_media_id = payload['media_id']
+    log('Text Media Object ID: {0}'.format(text_media_id))
     log('----')
     log('')
     log('')
@@ -489,12 +507,52 @@ def run_tests():
             'language_code': 'en',
             'lat': 43.1,
             'lng': -77.5,
-            'media_objects': json.dumps([media_id]),
+            'media_objects': json.dumps([text_media_id]),
         },
         'POST',
     )
-    post_id = payload['post_id']
-    log('Post ID: {0}'.format(post_id))
+    text_post_id = payload['post_id']
+    log('Text Post ID: {0}'.format(text_post_id))
+    log('----')
+    log('')
+    log('')
+
+    #
+    # Perform a free post with image
+    #
+
+    success, payload = _execute_test(
+        'upload_media.json',
+        None,
+        {
+            'client_id': client_id_a,
+            'media_type': 'image',
+        },
+        'POST',
+        files={'media_file': open('./test_media/roc2.jpg','rb')},
+    )
+    image_media_id = payload['media_id']
+    log('Image Media Object ID: {0}'.format(image_media_id))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'publish_post.json',
+        None,
+        {
+            'client_id': client_id_a,
+            'assignment_id': '',
+            'title': '',
+            'language_code': 'en',
+            'lat': 43.1,
+            'lng': -77.5,
+            'media_objects': json.dumps([image_media_id]),
+        },
+        'POST',
+    )
+    image_post_id = payload['post_id']
+    log('Image Post ID: {0}'.format(image_post_id))
     log('----')
     log('')
     log('')
@@ -508,7 +566,7 @@ def run_tests():
         'GET',
     )
     total_posts = payload['posts']
-    if len(total_posts) < 3:
+    if len(total_posts) < 4:
         raise Exception("Not all posts were returned.")
     log('Total Post Count: {0}'.format(len(total_posts)))
     log('----')
