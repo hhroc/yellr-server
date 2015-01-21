@@ -24,6 +24,8 @@ compile:
 	cp -a bower_components/mapbox.js/images/. yellr-serv/yellrserv/moderator/assets/css/images/
 	# Copy EpicEditor Themes
 	cp -a bower_components/epiceditor/epiceditor/themes/. yellr-serv/yellrserv/moderator/epiceditor/themes/
+	# Copy ZeroClipboard .swf
+	cp bower_components/zeroclipboard/dist/ZeroClipboard.swf yellr-serv/yellrserv/moderator/assets/js/ZeroClipboard.swf
 	# Compile
 	./node_modules/grunt-cli/bin/grunt compile
 
