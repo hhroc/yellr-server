@@ -1,9 +1,12 @@
 'use strict';
 
 angular
-    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap'])
-    .config(['$stateProvider', '$urlRouterProvider',
-            function ($stateProvider, $urlRouterProvider) {
+    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap',
+            'ngClipboard'])
+    .config(['$stateProvider', '$urlRouterProvider', 'ngClipProvider',
+            function ($stateProvider, $urlRouterProvider, ngClipProvider) {
+
+        ngClipProvider.setPath('assets/js/ZeroClipboard.swf');
 
         $stateProvider
             .state('login', {
