@@ -1,3 +1,9 @@
+.main-editor-window {
+    @extend .small-9;
+    @extend .columns;
+    height: 100%;
+}
+
 .editor-wrapper {
     @extend .row;
 
@@ -7,4 +13,9 @@
 .editor {
     height: 70%;
     margin-top: 20px;
+}
+
+.tool-bar {
+    @extend .small-3;
+    @extend .columns;
 }

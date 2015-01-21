@@ -1,9 +1,14 @@
 'use strict';
 
-var EpicEditor = EpicEditor || {};
-
 angular
     .module('Yellr')
-    .controller('writeArticleCtrl', ['$scope', function ($scope) {
-        var editor = new EpicEditor().load();
+    .controller('writeArticleCtrl', ['$scope', '$rootScope', '$location',
+        function ($scope, $rootScope, $location) {
+
+        if($rootScope.user === undefined) {
+            $location.path('/login');
+            return;
+        }
+
+        $scope.user = $rootScope.user;
     }]);

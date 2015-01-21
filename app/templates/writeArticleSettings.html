@@ -1,0 +1,16 @@
+<div class="story-settings">
+    <div class="row">
+        <form>
+            <label for="article-name">Article Name</label>
+            <input id="article-name" type="text" ng-model="article.name" />
+            <select ng-model="article.collection">
+                <option value="">Choose Collection</option>
+                <option ng-repeat="collection in collections" value="{{collection.id}}">{{collection.name}}</option>
+            </select>
+            <input type="submit" class="start-writing" value="Start Writing"/>
+        </form>
+    </div>
+</div>
+<div class="story-nav">
+    <p>nav goes here</p>
+</div>

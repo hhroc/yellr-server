@@ -24,9 +24,18 @@ angular
             })
 
             .state('write-article',{
-                url: '/write',
                 templateUrl: 'assets/templates/writeArticle.html',
                 controller: 'writeArticleCtrl'
+            })
+            .state('write-article.settings', {
+                url: '/write',
+                templateUrl: 'assets/templates/writeArticleSettings.html',
+                controller: 'writeArticleSettingsCtrl'
+            })
+            .state('write-article.content', {
+                url: '/write-content',
+                templateUrl: 'assets/templates/writeArticleContent.html',
+                controller: 'writeArticleContentCtrl'
             })
 
             .state('new-assignment', {

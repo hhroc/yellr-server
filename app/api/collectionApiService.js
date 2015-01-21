@@ -6,6 +6,25 @@ angular
         var collectionApi = {};
 
         /**
+         * Gets a list of all current collections
+         *
+         * @param accessToken : token needed for all admin functions
+         *
+         * @return collections : list of all collections
+         */
+        collectionApi.getAllCollections = function (accessToken) {
+            var url = '/admin/get_my_collections.json';
+
+            return $http({
+                method: 'GET',
+                url: url,
+                params: {
+                    token: accessToken
+                }
+            });
+        };
+
+        /**
          * Creates a new collection.
          *
          * @param accessToken : token needed for all admin functions
@@ -113,19 +132,6 @@ angular
                 }
             });
         };
-
-        collectionApi.getAllCollections = function (accessToken) {
-            var url = '/admin/get_my_collections.json';
-
-            return $http({
-                method: 'GET',
-                url: url,
-                params: {
-                    token: accessToken
-                }
-            });
-        };
-
 
         return collectionApi;
     }]);
