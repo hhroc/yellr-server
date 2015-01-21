@@ -1,0 +1,13 @@
+.story-settings {
+    @extend .small-9;
+    @extend .columns;
+
+    .begin-writing {
+        .background-color: $primary;
+    }
+}
+
+.story-nav {
+    @extend .small-3;
+    @extend .columns;
+}

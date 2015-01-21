@@ -1,0 +1,10 @@
+<div class="main-editor-window">
+    <div class="editor-wrapper">
+        <div id="epiceditor" class="editor"></div>
+    </div>
+</div>
+<div class="tool-bar">
+    <div class="images" ng-repeat="image in images">
+        <img ng-src="/media/{{image.file_name}}" alt="" clip-copy="image.markdownLink"/>
+    </div>
+</div>
