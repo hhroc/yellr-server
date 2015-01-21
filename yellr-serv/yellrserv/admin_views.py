@@ -244,9 +244,9 @@ def admin_get_posts(request):
                 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
@@ -988,8 +988,8 @@ One or more of the following fields is missing or invalid: assignment_id. \
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
                     preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
@@ -1445,8 +1445,8 @@ One or more of the following fields is missing or invalid: collection_id. \
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
                     preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
@@ -1562,8 +1562,8 @@ One or more of the following fields is missing or invalid: client_id. \
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
                     preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
@@ -1785,8 +1785,8 @@ def admin_get_post(request):
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
                     preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
                 media_object = {
                     'media_id': media_id,
