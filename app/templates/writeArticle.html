@@ -5,6 +5,8 @@
     </select>
     <input class="article-name" type="text" ng-model="article.name" placeholder="Story Title"/>
     <div id="epiceditor" class="editor"></div>
+    <tags-input ng-model="tags"></tags-input>
+    <button ng-click="save()">Save</button>
 </div>
 <div class="tool-bar">
     <div class="images" ng-repeat="image in images">
