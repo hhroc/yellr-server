@@ -3,10 +3,10 @@
 angular
     .module('Yellr')
     .controller('newAssignmentQuestionsCtrl', ['$scope','$rootScope',
-                'userApiService',
-    function ($scope, $rootScope, userApiService) {
+                '$location', 'userApiService',
+    function ($scope, $rootScope, $location, userApiService) {
 
-        if(angular.isDefined($scope.$parent.assignment)) {
+        if (angular.isDefined($scope.$parent.assignment)) {
             $scope.questions = $scope.$parent.assignment.questions;
         } else {
             $scope.questions = [];
@@ -32,7 +32,7 @@ angular
             console.log('addaAnswer');
             console.log(question.answers);
 
-            if(!angular.isDefined(question.answers)) {
+            if (!angular.isDefined(question.answers)) {
                 question.answers = [];
             }
 
@@ -49,6 +49,7 @@ angular
             $scope.$parent.assignment.questions = questions;
             $scope.$parent.notify('Saved Questions.');
             $scope.$parent.validate();
+            $location.path('/new-assignment/geofence');
         };
 
         /**
