@@ -9,7 +9,7 @@ angular
             'collectionApiService',
          function ($scope, $rootScope, $location, assignmentApiService, collectionApiService) {
 
-        if($rootScope.user === undefined) {
+        if ($rootScope.user === undefined) {
             $location.path('/login');
             return;
         }
@@ -19,6 +19,30 @@ angular
         $scope.$parent.clear();
         $scope.$parent.feedPage = true;
 
+        var _getFirstText = function (post) {
+            for (var i = 0; i < post.media_objects.length; i++) {
+                var mediaObject = post.media_objects[i];
+                if (mediaObject.media_type_name == 'text') {
+                    return mediaObject.media_text;
+                }
+            }
+
+            return null;
+        };
+
+        var _getFirstImage = function (post) {
+            for (var i = 0; i < post.media_objects.length; i++) {
+                var mediaObject = post.media_objects[i];
+                if (mediaObject.media_type_name == 'image') {
+                    return {
+                        'background-image': 'url(/media/' +
+                            mediaObject.preview_file_name + ')'
+                    };
+                }
+            }
+            return null;
+        };
+
         /**
          * Populates feed with first 50 items
          *
@@ -26,21 +50,27 @@ angular
          */
         $scope.getFeed = function () {
             assignmentApiService.getFeed($scope.user.token)
-                .success(function (data) {
-                    var posts = [];
-                    for(var postId in data.posts) {
-                        // TODO: get title and image
-                        data.posts[postId].time = moment(data.posts[postId].post_datetime, 'YYYY-MM-DD HH:mm:ss').fromNow();
-                        data.posts[postId].description = $scope.getFirstText(data.posts[postId]);
+            .success(function (data) {
+                var posts = [];
+                for (var postId in data.posts) {
+                    // TODO: get title and image
+                    data.posts[postId].time = moment(
+                            data.posts[postId].post_datetime,
+                            'YYYY-MM-DD HH:mm:ss')
+                        .fromNow();
+                    data.posts[postId].description = _getFirstText(
+                                                    data.posts[postId]);
+                    data.posts[postId].imageUrl = _getFirstImage(
+                                                    data.posts[postId]);
 
-                        posts.push(data.posts[postId]);
-                    }
+                    posts.push(data.posts[postId]);
+                }
 
-                    $scope.posts = posts;
-                })
-                .error(function (data) {
-                    console.log('error: ', data);
-                });
+                $scope.posts = posts;
+            })
+            .error(function (data) {
+                console.log('error: ', data);
+            });
         };
 
         /**
@@ -66,7 +96,7 @@ angular
          *
          * @return void
          */
-        $scope.addPostToCollection = function(post, collection) {
+        $scope.addPostToCollection = function (post, collection) {
             console.log(post.post_id, collection.collection_id);
             collectionApiService.addPost($scope.user.token,
                                          collection.collection_id, post.post_id)
@@ -83,15 +113,6 @@ angular
          */
         $scope.deletePost = function (post) {
 
-        };
-
-        $scope.getFirstText = function (post) {
-            for(var i = 0; i < post.media_objects.length; i++) {
-                var mediaObject = post.media_objects[i];
-                if(mediaObject.media_type_name == 'text') {
-                    return mediaObject.media_text;
-                }
-            }
         };
 
         $scope.getFeed();
