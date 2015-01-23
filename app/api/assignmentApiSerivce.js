@@ -19,10 +19,32 @@ angular
             var url = '/admin/get_posts.json',
                 params = { token: accessToken };
 
-            if(start !== undefined) params.start = start;
-            if(count !== undefined) params.start = start;
-            if(start !== undefined) params.start = start;
+            if (start !== undefined) params.start = start;
+            if (count !== undefined) params.start = start;
+            if (start !== undefined) params.start = start;
 
+
+            return $http({
+                method: 'GET',
+                url: url,
+                params: params
+            });
+        };
+
+        /**
+         * Gets the contents of a specific post
+         *
+         * @param accessToken : token needed for all admin functions
+         * @param id : id of post to get
+         *
+         * @return post : js object with post data
+         */
+        assignmentApi.getPost = function (accessToken, id) {
+            var url = '/admin/get_post.json',
+                params = {
+                    token: accessToken,
+                    post_id: id
+                };
 
             return $http({
                 method: 'GET',
@@ -41,7 +63,7 @@ angular
         assignmentApi.getAssignments = function (accessToken) {
             var url = '/admin/get_assignments.json';
 
-            return  $http({
+            return $http({
                 method: 'GET',
                 url: url,
                 params: { token: accessToken }
@@ -70,7 +92,7 @@ angular
                     question_type: questionType
                 };
 
-            if(answers !== undefined) data.answers = answers;
+            if (answers !== undefined) data.answers = answers;
 
             return $http({
                 method: 'POST',
@@ -165,8 +187,8 @@ angular
             var url = '/admin/get_assignment_responses.json?token=' + accessToken,
                 params = { assignment_id: id };
 
-            if(start !== undefined) params.start = start;
-            if(count !== undefined) params.count = count;
+            if (start !== undefined) params.start = start;
+            if (count !== undefined) params.count = count;
 
             return $http({
                 method: 'POST',
