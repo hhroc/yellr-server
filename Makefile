@@ -9,6 +9,7 @@ compile:
 	mkdir -p app/sass/deps
 	mkdir -p assets/templates
 	mkdir -p yellr-serv/yellrserv/moderator/assets/css
+	mkdir -p yellr-serv/yellrserv/moderator/assets/js
 	mkdir -p yellr-serv/yellrserv/moderator/epiceditor
 	mkdir -p yellr-serv/yellrserv/moderator/epiceditor/themes
 	# Copy Foundation
