@@ -21,7 +21,7 @@ angular
         }).addTo(map);
 
         // Listener for a new shape created on map
-        map.on('draw:created', function(e) {
+        map.on('draw:created', function (e) {
             featureGroup.addLayer(e.layer);
 
             $scope.$parent.assignment.geofence = {

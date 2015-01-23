@@ -99,9 +99,9 @@ angular
         $scope.addPostToCollection = function (post, collection) {
             console.log(post.post_id, collection.collection_id);
             collectionApiService.addPost($scope.user.token,
-                                         collection.collection_id, post.post_id)
-                .success(function (data) {
-
+                                         collection.collection_id,
+                                         post.post_id)
+            .success(function (data) {
                 collection.numPosts++;
             });
         };
