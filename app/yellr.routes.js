@@ -14,6 +14,10 @@ angular
                 templateUrl: 'assets/templates/login.html',
                 controller: 'loginCtrl'
             })
+            .state('logout', {
+                url: '/logout',
+                controller: 'logoutCtrl'
+            })
 
             .state('feed', {
                 url: '/feed',
