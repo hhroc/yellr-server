@@ -14,6 +14,13 @@ angular
         }
 
         $scope.user = $rootScope.user;
+        $scope.$parent.clear();
+
+        $scope.activeNotification = false;
+        $scope.createAssignment = false;
+        $scope.addQuestions = false;
+        $scope.geofence = false;
+        $scope.canPublish = false;
         var editor = new EpicEditor().load();
 
         /**
