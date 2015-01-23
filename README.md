@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Nolski/yellr-server.png)](https://travis-ci.org/Nolski/yellr-server)
+[![Build Status](https://travis-ci.org/hhroc/yellr-server.svg)](https://travis-ci.org/hhroc/yellr-server)
 # Yellr Server
 
 This is the server and admin component of the Yellr application
