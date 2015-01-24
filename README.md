@@ -19,9 +19,26 @@ Getting server Started
 
 Prior to getting your server started make sure you setup your own virtual
 environment and then run these commands.
-```bash
-cd yellr-serv/
-$VENV/bin/python setup.py develop
-$VENV/bin/initialize_yellr-serv_db development.ini
-$VENV/bin/pserve development.ini
-```
+
+    cd yellr-serv/
+    $VENV/bin/python setup.py develop
+    $VENV/bin/initialize_yellr-serv_db development.ini
+    
+
+You will also need to install the ImageMagick tools.
+
+Ubuntu:
+
+    sudo apt-get install imagemagick
+
+Fedora:
+
+    sudo yum install imagemagick
+
+For Windows, go here for instructions: http://www.imagemagick.org/script/binary-releases.php#windows
+
+Once imagemagick is installed, and you have configured you environment, you can run the development server:
+
+    $VENV/bin/pserve development.ini
+
+
