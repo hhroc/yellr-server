@@ -168,8 +168,8 @@ def admin_get_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -244,9 +244,9 @@ def admin_get_posts(request):
                 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
@@ -269,8 +269,8 @@ def admin_get_posts(request):
 
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_posts.json => {0}".format(json.dumps(result)))
 
@@ -360,13 +360,13 @@ def admin_update_question(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        if True:
-        #try:
+        #if True:
+        try:
             language_code = request.POST['language_code']
             question_text = request.POST['question_text']
             description = request.POST['description']
             question_type = request.POST['question_type']
-        #except:
+        except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: language_code, \
 question_text, description, question_type. \
@@ -375,11 +375,11 @@ question_text, description, question_type. \
 
         # answers is a json array of strings
         answers = []
-        #try:
-        if True:
+        try:
+        #if True:
             answers = json.loads(request.POST['answers'])
-        #except:
-        #    pass
+        except:
+            pass
         # back fill with empty strings
         for i in range(len(answers),10):
             answers.append('')
@@ -988,9 +988,9 @@ One or more of the following fields is missing or invalid: assignment_id. \
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
@@ -1134,8 +1134,8 @@ def admin_get_my_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1164,8 +1164,8 @@ def admin_get_my_collection(request):
         result['collections'] = ret_collections
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
 
@@ -1445,9 +1445,9 @@ One or more of the following fields is missing or invalid: collection_id. \
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
@@ -1562,9 +1562,9 @@ One or more of the following fields is missing or invalid: client_id. \
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
@@ -1723,8 +1723,8 @@ One or more of the following fields is missing or invalid: client_id. \
 def admin_get_post(request):
 
     result = {'success': False}
-    #try:
-    if True:
+    try:
+    #if True:
         token = None
         valid_token = False
         valid, user = check_token(request)
@@ -1785,9 +1785,9 @@ def admin_get_post(request):
 
                 preview_file_name = ''
                 if not file_name == "":
-                    root_file_name = splitext(file_name)[0]
-                    file_extention = splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention),
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,
@@ -1808,8 +1808,8 @@ def admin_get_post(request):
         result['post'] = ret_posts[0]
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     return make_response(result)
 

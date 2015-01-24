@@ -73,8 +73,8 @@ angular
                     client_id: id
                 };
 
-            if(start !== undefined) params.start = start;
-            if(count !== undefined) params.count = count;
+            if (start !== undefined) params.start = start;
+            if (count !== undefined) params.count = count;
 
             $http({
                 method: 'GET',

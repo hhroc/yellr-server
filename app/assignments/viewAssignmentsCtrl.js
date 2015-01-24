@@ -6,7 +6,7 @@ angular
                 'assignmentApiService',
     function ($scope, $rootScope, $location, assignmentApiService) {
 
-        if($rootScope.user === undefined) {
+        if ($rootScope.user === undefined) {
             $location.path('/login');
             return;
         }

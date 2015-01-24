@@ -9,7 +9,7 @@ angular
                 '$timeout', 'assignmentApiService',
     function ($scope, $rootScope, $location, $timeout, assignmentApiService) {
 
-        if($rootScope.user === undefined) {
+        if ($rootScope.user === undefined) {
             $location.path('/login');
             return;
         }

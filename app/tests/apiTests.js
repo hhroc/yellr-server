@@ -34,7 +34,7 @@ describe('Calling Access Token API', function () {
 
     it('Should return a successful message when user logs in', function () {
         userApiService.getAccessToken(username, correctPassword).then(
-            function(response) {
+            function (response) {
                 expect(response.success).toEqual(true);
             });
     });
@@ -42,7 +42,7 @@ describe('Calling Access Token API', function () {
     it('Should return a failure when the user logs in with wrong pass',
     function () {
         userApiService.getAccessToken(username, correctPassword).then(
-            function(response) {
+            function (response) {
                 expect(response.success).toEqual(false);
             });
     });

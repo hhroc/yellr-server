@@ -1,15 +1,22 @@
 'use strict';
 
 angular
-    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap'])
-    .config(['$stateProvider', '$urlRouterProvider',
-            function ($stateProvider, $urlRouterProvider) {
+    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap',
+            'ngClipboard', 'ngTagsInput'])
+    .config(['$stateProvider', '$urlRouterProvider', 'ngClipProvider',
+            function ($stateProvider, $urlRouterProvider, ngClipProvider) {
+
+        ngClipProvider.setPath('assets/js/ZeroClipboard.swf');
 
         $stateProvider
             .state('login', {
                 url: '/login',
                 templateUrl: 'assets/templates/login.html',
                 controller: 'loginCtrl'
+            })
+            .state('logout', {
+                url: '/logout',
+                controller: 'logoutCtrl'
             })
 
             .state('feed', {
@@ -24,7 +31,7 @@ angular
             })
 
             .state('write-article',{
-                url: '/write',
+                url:'/write',
                 templateUrl: 'assets/templates/writeArticle.html',
                 controller: 'writeArticleCtrl'
             })

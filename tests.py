@@ -5,13 +5,14 @@ import requests
 import datetime
 import hashlib
 
-ROOT_DOMAIN = "http://127.0.0.1:5002/"
+#ROOT_DOMAIN = "http://127.0.0.1:5002/"
+ROOT_DOMAIN = "http://anna.duffnet.local:5002/"
 
 def log(output):
 
     print "[{0}]: {1}".format(str(datetime.datetime.now()).split('.')[0],output)
 
-def url_action(url_payload, data, method):
+def url_action(url_payload, data, method, files=None):
 
     """
         url_action(url, data, method)
@@ -43,7 +44,7 @@ def url_action(url_payload, data, method):
 
             log("URL: {0}".format(url_payload))
 
-            http_response = requests.post(url_payload, data=data).text
+            http_response = requests.post(url_payload, data=data, files=files).text
             log("HTTP Response: {0}".format(http_response))
             json_response = json.loads(http_response)
 
@@ -52,7 +53,7 @@ def url_action(url_payload, data, method):
 
     return json_response
 
-def _execute_test(url, token, data, method):
+def _execute_test(url, token, data, method, files=None):
 
     log("----")
     log("TEST: {0}".format(url))
@@ -79,7 +80,7 @@ def _execute_test(url, token, data, method):
 
                 url_payload = "{0}{1}?token={2}&".format(ROOT_DOMAIN,url,token)
 
-        response = url_action(url_payload, data, method)
+        response = url_action(url_payload, data, method, files)
 
         if response['success'] == False:
             raise Exception('ERROR: Success = False')
@@ -91,11 +92,31 @@ def _execute_test(url, token, data, method):
 
     return success, response
 
+def _validate(expected, response):
+
+    valid = False
+    
+    try:
+        for key in expected:
+            if not key in response:
+                raise Exception("missing key in response")
+            if not isinstance(response[key], expected[key]['type']):
+                raise Exception("Incorrect field type for '{0}'".format(key))
+            if 'value' in expected[key]:
+                if not  response[key] == expected[key]['value']:
+                    raise Exception("invalid response value for '{0}'".format(key))
+        valid = True
+    except Exception, e:
+        print "Validation Error: {0}".format(e)
+   
+    return valid
 
 def run_tests():
 
     log("Launching tests ...")
     log("")
+
+    log("Testing Assignments ...")
 
     success, payload = _execute_test(
         'admin/get_access_token.json',
@@ -106,11 +127,33 @@ def run_tests():
         },
         'GET',
     )
+    valid = _validate(
+        {
+            "organization": { 
+                "type": basestring,
+                "value": "Yellr",
+            },
+            "token": {
+                "type": basestring,
+            },
+            "first_name": {
+                "type": basestring,
+                "value": "SYSTEM",
+            },
+            "last_name": {
+                "type": basestring,
+                "value": "USER",
+            },
+            "success": {
+                "type": bool,
+                "value": True,
+            },
+        },
+        payload,
+    )
+    if not valid == True:
+        raise Exception("admin/get_access_token.json did not validate")
     token = payload['token']
-    log('Got Token: {0}'.format(token))
-    log('----')
-    log('')
-    log('')
 
     success, payload = _execute_test(
         'admin/get_languages.json',
@@ -120,15 +163,26 @@ def run_tests():
         },
         'GET',
     )
+    valid = _validate(
+        {
+            "languages": { 
+                "type": list,
+                "value": [
+                    {"code": "en","name": "English"},
+                    {"code": "es","name": "Spanish"},
+                ],
+            },
+            "success": {
+                "type": bool,
+                "value": True,
+            },
+        },
+        payload,
+    )
+    if not valid == True:
+        raise Exception("admin/get_languages.json did not validate")
     languages = payload['languages']
-    if len(languages) < 1:
-        raise Exception('Invalid number of languages returned.')
-    for language in languages:
-        log('language: {0}, code: {1}'.format(language['name'], language['code']))
-    log('----')
-    log('')
-    log('')
-
+    
     success, payload = _execute_test(
         'admin/get_question_types.json',
         token,
@@ -137,16 +191,25 @@ def run_tests():
         },
         'GET',
     )
+    valid = _validate(
+        {
+            "question_types": {
+                "type": list,
+                "values": [
+                    {"question_type_text": "free_text", "question_type_id": 1, "question_type_description": "Free form text responce."},
+                    {"question_type_text": "multiple_choice", "question_type_id": 2, "question_type_description": "Allows for up to ten multiple choice options"}
+                ],
+            },
+            "success": {
+                "type": bool,
+                "value": True,
+            },
+        },
+        payload,
+    )
+    if not valid == True:
+        raise Exception("admin/get_question_types.json did not validate")
     question_types = payload['question_types']
-    if len(languages) < 1:
-        raise Exception('Invalid number of question_types returned.')
-    for question_type in question_types:
-        log("question_type: '{0}', id: {1}".format(
-            question_type['question_type_text'], question_type['question_type_id']
-        ))
-    log('----')
-    log('')
-    log('')
 
     success, payload = _execute_test(
         'admin/create_question.json',
@@ -160,12 +223,42 @@ def run_tests():
         },
         'POST',
     )
+    valid = _validate(
+        {
+            "question_text": {
+                "type": basestring,
+                "value": "How will you be spending New Years Eve?",
+            },
+            "description": {
+                "type": basestring,
+                "value": "Will you be doing anything special for New Years?!?",
+            },
+            "answers": {
+                "type": list,
+                "value": ["", "", "", "", "", "", "", "", "", ""],
+            },
+            "question_type": {
+                "type": basestring,
+                "value": "free_text",
+            },
+            "language_code": {
+                "type": basestring,
+                "value": "en",
+            },
+            "question_id": {
+                "type": int,
+            },
+            "success": {
+                "type": bool,
+                "value": True,
+            }
+        },
+        payload,
+    )
+    if not valid == True:
+        raise Exception("admin/create_question.json did not validate")
     question_id = payload['question_id']
-    log('Question ID: {0}'.format(question_id))
-    log('----')
-    log('')
-    log('')
-
+    
     success, payload = _execute_test(
         'admin/publish_assignment.json',
         token,
@@ -180,13 +273,31 @@ def run_tests():
         },
         'POST',
     )
+    """
+    valid = _validate(
+        {
+            "life_time": {
+                "type": int,
+                "value": 168,
+            },
+            "questions": [3],
+            "top_left_lng": -77.9,
+            "top_left_lat": 43.4,
+            "bottom_right_lat": 43.0,
+            "bottom_right_lng": -77.3
+            "success": true,
+            "assignment_id": 1,
+            "collection_id": 1,
+            }
+        },
+        payload,
+    )
+    if not valid == True:
+        raise Exception("admin/publish_assignment.json did not validate")
+    """
     assignment_id = payload['assignment_id']
     collection_id = payload['collection_id']
-    log('Assignment ID: {0}'.format(assignment_id))
-    log('Collection ID: {0}'.format(collection_id))
-    log('----')
-    log('')
-    log('')
+    
 
     random_client_id = str(uuid.uuid4())
     success, payload = _execute_test(
@@ -478,7 +589,7 @@ def run_tests():
  
 
     #
-    # Perform a free post
+    # Perform a free post with text
     #
 
     success, payload = _execute_test(
@@ -491,8 +602,8 @@ def run_tests():
         },
         'POST',
     )
-    media_id = payload['media_id']
-    log('Media Object ID: {0}'.format(media_id))
+    text_media_id = payload['media_id']
+    log('Text Media Object ID: {0}'.format(text_media_id))
     log('----')
     log('')
     log('')
@@ -507,15 +618,135 @@ def run_tests():
             'language_code': 'en',
             'lat': 43.1,
             'lng': -77.5,
-            'media_objects': json.dumps([media_id]),
+            'media_objects': json.dumps([text_media_id]),
         },
         'POST',
     )
-    post_id = payload['post_id']
-    log('Post ID: {0}'.format(post_id))
+    text_post_id = payload['post_id']
+    log('Text Post ID: {0}'.format(text_post_id))
     log('----')
     log('')
     log('')
+
+    #
+    # Perform a free post with image
+    #
+
+    success, payload = _execute_test(
+        'upload_media.json',
+        None,
+        {
+            'client_id': client_id_a,
+            'media_type': 'image',
+        },
+        'POST',
+        files={'media_file': open('./test_media/roc.jpg','rb')},
+    )
+    image_media_id = payload['media_id']
+    log('Image Media Object ID: {0}'.format(image_media_id))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'publish_post.json',
+        None,
+        {
+            'client_id': client_id_a,
+            'assignment_id': '',
+            'title': '',
+            'language_code': 'en',
+            'lat': 43.1,
+            'lng': -77.5,
+            'media_objects': json.dumps([image_media_id]),
+        },
+        'POST',
+    )
+    image_1_post_id = payload['post_id']
+    log('Image Post ID: {0}'.format(image_1_post_id))
+    log('----')
+    log('')
+    log('')
+    
+    success, payload = _execute_test(
+        'admin/add_post_to_collection.json',
+        token,
+        {
+            'collection_id': collection_id,
+            'post_id': image_1_post_id,
+        },
+        'POST',
+    )
+    
+    #
+    # post another free post with image
+    #
+    
+    success, payload = _execute_test(
+        'upload_media.json',
+        None,
+        {
+            'client_id': client_id_a,
+            'media_type': 'image',
+        },
+        'POST',
+        files={'media_file': open('./test_media/roc2.jpg','rb')},
+    )
+    image_media_id = payload['media_id']
+    log('Image Media Object ID: {0}'.format(image_media_id))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'publish_post.json',
+        None,
+        {
+            'client_id': client_id_a,
+            'assignment_id': '',
+            'title': '',
+            'language_code': 'en',
+            'lat': 43.1,
+            'lng': -77.5,
+            'media_objects': json.dumps([image_media_id]),
+        },
+        'POST',
+    )
+    image_2_post_id = payload['post_id']
+    log('Image Post ID: {0}'.format(image_2_post_id))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/add_post_to_collection.json',
+        token,
+        {
+            'collection_id': collection_id,
+            'post_id': image_2_post_id,
+        },
+        'POST',
+    )
+
+    success, payload = _execute_test(
+        'admin/get_collection_posts.json',
+        token,
+        {
+            'collection_id': collection_id,
+        },
+        'GET',
+    )
+    collection_posts = payload['posts']
+    log('Collection Post Count: {0}'.format(len(collection_posts)))
+    if len(collection_posts) != 3:
+        raise Exception('Error: added post was not returned with collection posts.')
+    log('----')
+    log('')
+    log('')
+
+    #
+    # test if number of posts returned was correct
+    #
 
     success, payload = _execute_test(
         'admin/get_posts.json',
@@ -526,13 +757,18 @@ def run_tests():
         'GET',
     )
     total_posts = payload['posts']
-    if len(total_posts) < 3:
+    if len(total_posts) < 5:
         raise Exception("Not all posts were returned.")
     log('Total Post Count: {0}'.format(len(total_posts)))
     log('----')
     log('')
     log('')
 
+    
+
+    
+
+    
     #
     # Publish Story
     #

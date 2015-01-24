@@ -27,14 +27,14 @@
             <option value="multiple_choice">Multiple Choice</option>
         </select>
 
-        <div ng-if="question.type == 2">
-            <h4>Choices</h4>
-            <div class="question-choice" ng-repeat="choice in question.choices track by $index">
-                <input ng-model="question.answers[$index]" type="text" placeholder="Question Choice" required/>
+        <div ng-if="question.question_type == 'multiple_choice'">
+            <h4>Multiple Choice Answers</h4>
+            <div class="question-choice" ng-repeat="answer in question.answers track by $index">
+                <input ng-model="question.answers[$index]" type="text" placeholder="Question Answer" required/>
             </div>
-            <button class="add-choice" ng-click="addChoice(question)">Add Choice</button>
+            <button class="add-choice" ng-click="addAnswer(question)">Add Answer</button>
         </div>
     </div>
-    <input type="submit" class="save-button" value="Save"/>
+    <input type="submit" class="save-button" value="Next"/>
     <button class="add-question" ng-click="addQuestion(questions)">Add Question</button>
 </form>

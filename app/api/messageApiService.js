@@ -25,7 +25,7 @@ angular
                     text: text
                 };
 
-            if(parentMessageId !== undefined)
+            if (parentMessageId !== undefined)
                 params.parent_message_id = parentMessageId;
 
             return $http({
