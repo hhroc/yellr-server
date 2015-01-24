@@ -451,6 +451,8 @@ def run_tests():
         'GET',
     )
     client_a_post_response = payload['post']
+    if client_a_post_response['post_id'] != client_a_posts[0]['post_id']:
+        raise Exception("incorrect post returned from get_post.json")
     log('Client A Post Response ID: {0}'.format(client_a_post_response['post_id']))
     log('----')
     log('')

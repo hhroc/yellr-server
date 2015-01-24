@@ -868,13 +868,16 @@ class Posts(Base):
                 Languages,
             ).filter(
                 # Posts.assignment_id == assignment_id,
+                #Posts.post_id == post_id,
             ).order_by(
                  desc(Posts.post_datetime),
             ).group_by(
                  Posts.post_id,
             )
             total_post_count = posts_query.count()
-            posts = posts_query.all()
+            posts = posts_query.filter(
+                Posts.post_id == post_id,
+            ).all()
         return posts, total_post_count
 
     @classmethod
