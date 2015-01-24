@@ -1,2 +1,35 @@
 @import 'editor';
 @import 'settings';
+
+.write {
+    height: 100%;
+}
+
+.write-content {
+    height: 100%;
+}
+
+.tabs {
+    list-style: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+
+    li {
+        @extend .small-6;
+        @extend .columns;
+
+        display: inline-block;
+        padding: 0;
+
+        a {
+            display: block;
+            text-align: center;
+            padding: 10px;
+
+            &:hover {
+                background-color: $primary;
+            }
+        }
+    }
+}
