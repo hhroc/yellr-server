@@ -82,11 +82,6 @@ angular
             collectionApiService.getAllCollections($scope.user.token)
                 .success(function (data) {
 
-                //TODO: Remove this once #18 is resolved
-                data.collections.forEach(function (collection) {
-                    collection.numPosts = 0;
-                });
-
                 $scope.collections = data.collections;
             });
         };
@@ -102,7 +97,8 @@ angular
                                          collection.collection_id,
                                          post.post_id)
             .success(function (data) {
-                collection.numPosts++;
+                console.log(data);
+                collection.post_count++;
             });
         };
 
