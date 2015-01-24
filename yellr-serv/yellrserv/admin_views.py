@@ -69,6 +69,11 @@ def admin_get_access_token(request):
 
         user, token = Users.authenticate(DBSession, user_name, password)
 
+        fence = UserGeoFences.get_fence_from_user_id(
+            session = DBSession,
+            user_id = user.user_id,
+        )
+
         if token == None:
             result['error_text'] = 'Invalid credentials'
             raise Exception('invalid credentials')
@@ -78,6 +83,14 @@ def admin_get_access_token(request):
             result['first_name'] = user.first_name
             result['last_name'] = user.last_name
             result['organization'] = user.organization
+
+            result['fence'] = {
+                'top_left_lat': fence.top_left_lat,
+                'top_left_lng': fence.top_left_lng,
+                'bottom_right_lat': fence.bottom_right_lat,
+                'bottom_right_lng': fence.bottom_right_lng,
+            }
+
             result['success'] = True
 
     except Exception, e:

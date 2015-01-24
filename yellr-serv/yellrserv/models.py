@@ -263,8 +263,6 @@ class Users(Base):
                 Users.user_name == str(user_name),
             ).first()
 
-            the_user = session.query(Users).first()
-
             token = None
             if user != None:
                 pass_hash = hashlib.sha256('{0}{1}'.format(password, user.pass_salt)).hexdigest()
@@ -313,6 +311,19 @@ class UserGeoFences(Base):
             )
             session.add(fence)
             transaction.commit()
+        return fence
+
+    @classmethod
+    def get_fence_from_user_id(cls, session, user_id):
+        with transaction.manager:
+            fence = session.query(
+                UserGeoFences,
+            ).join(
+                Users, Users.user_geo_fence_id == \
+                    UserGeoFences.user_geo_fence_id,
+            ).filter(
+                Users.user_id == user_id,
+            ).first()
         return fence
 
 class Assignments(Base):
