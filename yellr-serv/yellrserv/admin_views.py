@@ -409,8 +409,8 @@ def admin_publish_assignment(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
 
         token = None
         valid_token = False
@@ -435,6 +435,7 @@ def admin_publish_assignment(request):
             bottom_right_lat = float(request.POST['bottom_right_lat'])
             bottom_right_lng = float(request.POST['bottom_right_lng'])
 
+            result['name'] = name
             result['life_time'] = life_time
             result['questions'] = questions
             result['top_left_lat'] = top_left_lat
@@ -498,8 +499,8 @@ bottom_right_lat, bottom_right_lng.
 
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     admin_log("HTTP: admin/publish_assignment.json => {0}".format(json.dumps(result)))
 
@@ -881,15 +882,15 @@ user_name, password, first_name, last_name, email, organization. \
             raise Exception('invalid/missing field')
 
         user_type = UserTypes.get_from_name(DBSession, user_type_text)
-        user = Users.create_new_user(
+        new_user = Users.create_new_user(
             session = DBSession,
             user_type_id = user_type.user_type_id,
             client_id = str(uuid.uuid4()),
         )
 
-        user = Users.verify_user(
+        new_user = Users.verify_user(
             session = DBSession,
-            client_id = user.client_id,
+            client_id = new_user.client_id,
             user_name = user_name,
         #    password = password,
             first_name = first_name,
@@ -897,7 +898,7 @@ user_name, password, first_name, last_name, email, organization. \
             email = email,
         )
 
-        result['user_id'] = user.user_id
+        result['user_id'] = new_user.user_id
         result['success'] = True
 
     except:
@@ -1697,7 +1698,7 @@ One or more of the following fields is missing or invalid: client_id. \
 
             verified_new_user = Users.verify_user(
                 session = DBSession,
-                client_id = user.client_id,
+                client_id = new_user.client_id,
                 user_name = user_name,
                 password = password,
                 first_name = first_name,
