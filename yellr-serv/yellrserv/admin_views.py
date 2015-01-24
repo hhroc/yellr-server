@@ -17,6 +17,7 @@ from sqlalchemy.exc import DBAPIError
 
 from .models import (
     DBSession,
+    UserGeoFences,
     UserTypes,
     Users,
     Assignments,
@@ -1639,7 +1640,7 @@ One or more of the following fields is missing or invalid: client_id. \
                 user.user_type_id == admin_user_type.user_type_id or \
                 user.user_type_id == moderator_user_type.user_type_id:
 
-            user_geo_fence = UserGeoFence.create_fence(
+            user_geo_fence = UserGeoFences.create_fence(
                 session = DBSession,
                 top_left_lat = fence_top_left_lat,
                 top_left_lng = fence_top_left_lng,
@@ -1650,6 +1651,7 @@ One or more of the following fields is missing or invalid: client_id. \
             new_user = Users.create_new_user(
                 session = DBSession,
                 user_type_id = user_type_id,
+                user_geo_fence_id = user_geo_fence.user_geo_fence_id,
                 client_id = client_id,
             )
 
