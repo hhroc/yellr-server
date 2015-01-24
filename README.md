@@ -39,6 +39,7 @@ You will also need to install the ImageMagick tools.
 
 go here for instructions: http://www.imagemagick.org/script/binary-releases.php#windows
 
+
 Once imagemagick is installed, and you have configured you environment, you can run the development server:
 
     $VENV/bin/pserve development.ini
