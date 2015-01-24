@@ -27,15 +27,17 @@ environment and then run these commands.
 
 You will also need to install the ImageMagick tools.
 
-Ubuntu:
+####Ubuntu:
 
     sudo apt-get install imagemagick
 
-Fedora:
+####Fedora:
 
     sudo yum install imagemagick
 
-For Windows, go here for instructions: http://www.imagemagick.org/script/binary-releases.php#windows
+####Windows:
+
+go here for instructions: http://www.imagemagick.org/script/binary-releases.php#windows
 
 Once imagemagick is installed, and you have configured you environment, you can run the development server:
 
