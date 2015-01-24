@@ -5,11 +5,11 @@ window.MAPBOX_API_KEY = '<your_api_key_here>';
 window.MAPBOX_MAP_ID = '<your_map_id_here>';
 
 if(window.MAPBOX_API_KEY == '<your_api_key_here>') {
-    console.err('WARNING: Mapbox API key is not set. See app/yellr.global.js' +
+    console.error('WARNING: Mapbox API key is not set. See app/yellr.global.js' +
                 'for more info.');
 }
 
 if(window.MAPBOX_MAP_ID == '<your_map_id_here>') {
-    console.err('WARNING: Mapbox map id is not set. See app/yellr.global.js' +
+    console.error('WARNING: Mapbox map id is not set. See app/yellr.global.js' +
                 'for more info.');
 }
