@@ -962,17 +962,22 @@ class Posts(Base):
                 Languages.name,
                 #CollectionPosts,
             ).join(
-                PostMediaObjects,
+                PostMediaObjects, PostMediaObjects.post_id == \
+                    Posts.post_id,
             ).join(
-                MediaObjects,
+                MediaObjects, MediaObjects.media_object_id == \
+                    PostMediaObjects.media_object_id,
             ).join(
-                MediaTypes,
+                MediaTypes, MediaTypes.media_type_id == \
+                    MediaObjects.media_type_id,
             ).join(
-                Users,Users.user_id == Posts.post_id,
+                Users,Users.user_id == Posts.user_id,
             ).join(
-                Languages,
+                Languages, Languages.language_id == \
+                    Posts.language_id,
             ).join(
-                CollectionPosts,
+                CollectionPosts, CollectionPosts.post_id == \
+                    Posts.post_id,
             ).filter(
                 CollectionPosts.collection_id == collection_id,
             ).order_by(
