@@ -744,6 +744,23 @@ def run_tests():
     log('')
     log('')
 
+    success, payload = _execute_test(
+        'admin/get_my_collections.json',
+        token,
+        {
+            # does not take any input fields
+        },
+        'GET',
+    )
+    collections = payload['collections']
+    log('Collection Count: {0}'.format(len(collections)))
+    if len(collections) != 2:
+        raise Exception("Error: Created collection was not returned.")
+    log('----')
+    log('')
+    log('')
+
+
     #
     # test if number of posts returned was correct
     #
