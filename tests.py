@@ -828,6 +828,10 @@ def run_tests():
             'last_name': 'User',
             'email': 'temp@user.com',
             'organization': 'The Temp Group',
+            'fence_top_left_lat': 43.4,
+            'fence_top_left_lng': -77.9,
+            'fence_bottom_right_lat': 43.0,
+            'fence_bottom_right_lng': -77.3,
         },
         'POST',
     )

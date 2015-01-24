@@ -20,6 +20,7 @@ from pyramid.scripts.common import parse_vars
 from ..models import (
     DBSession,
     Base,
+    UserGeoFences,
     UserTypes,
     MediaTypes,
     Languages,
@@ -123,9 +124,18 @@ def main(argv=sys.argv):
     system_user_type = UserTypes.get_from_name(DBSession,'system')
 
     # create the systme user
+    system_user_fence = UserGeoFences.create_fence(
+        session = DBSession,
+        top_left_lat = 43.4,
+        top_left_lng = -77.9,
+        bottom_right_lat = 43.0,
+        bottom_right_lng = -77.3,
+    )
+
     system_user = Users.create_new_user(
         session = DBSession,
         user_type_id = system_user_type.user_type_id,
+        user_geo_fence_id = system_user_fence.user_geo_fence_id,
         client_id = system_user_client_id,
         #verified = True,
         #user_name = '',

@@ -850,62 +850,6 @@ def admin_get_question_types(request):
 
     return make_response(result)
 
-
-@view_config(route_name='admin/create_user2.json')
-def admin_create_user2(request):
-
-    result = {'success': False}
-
-    try:
-    #if True:
-
-        token = None
-        valid_token = False
-        valid, user = check_token(request)
-        if valid == False:
-            result['error_text'] = "Missing or invalid 'token' field in request."
-            raise Exception('invalid/missing token')
-
-        try:
-            user_type_text = request.POST['user_type']
-            user_name = request.POST['user_name']
-        #    password = request.POST['password']
-            first_name = request.POST['first_name']
-            last_name = request.POST['last_name']
-            email = request.POST['email']
-            organization = request.POST['organization']
-        except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: user_type, \
-user_name, password, first_name, last_name, email, organization. \
-"""
-            raise Exception('invalid/missing field')
-
-        user_type = UserTypes.get_from_name(DBSession, user_type_text)
-        new_user = Users.create_new_user(
-            session = DBSession,
-            user_type_id = user_type.user_type_id,
-            client_id = str(uuid.uuid4()),
-        )
-
-        new_user = Users.verify_user(
-            session = DBSession,
-            client_id = new_user.client_id,
-            user_name = user_name,
-        #    password = password,
-            first_name = first_name,
-            last_name = last_name,
-            email = email,
-        )
-
-        result['user_id'] = new_user.user_id
-        result['success'] = True
-
-    except:
-        pass
-
-    return make_response(result)
-
 @view_config(route_name='admin/get_assignment_responses.json')
 def admin_get_assignment_responses(request):
 
@@ -1664,6 +1608,10 @@ def admin_create_user(request):
             last_name = request.POST['last_name']
             email = request.POST['email']
             organization = request.POST['organization']
+            fence_top_left_lat = float(request.POST['fence_top_left_lat'])
+            fence_top_left_lng = float(request.POST['fence_top_left_lng'])
+            fence_bottom_right_lat = float(request.POST['fence_bottom_right_lat'])
+            fence_bottom_right_lng = float(request.POST['fence_bottom_right_lng'])
         except:
             result['error_text'] = """\
 One or more of the following fields is missing or invalid: client_id. \
@@ -1690,6 +1638,14 @@ One or more of the following fields is missing or invalid: client_id. \
         if user.user_type_id == system_user_type.user_type_id or \
                 user.user_type_id == admin_user_type.user_type_id or \
                 user.user_type_id == moderator_user_type.user_type_id:
+
+            user_geo_fence = UserGeoFence.create_fence(
+                session = DBSession,
+                top_left_lat = fence_top_left_lat,
+                top_left_lng = fence_top_left_lng,
+                bottom_right_lat = fence_bottom_right_lat,
+                bottom_right_lng = fence_bottom_right_lng,
+            )
 
             new_user = Users.create_new_user(
                 session = DBSession,

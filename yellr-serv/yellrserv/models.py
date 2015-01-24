@@ -78,6 +78,8 @@ class Users(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
     user_type_id = Column(Integer, ForeignKey('usertypes.user_type_id'))
+    user_geo_fence_id = Column(Integer, 
+        ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
     verified = Column(Boolean)
     client_id = Column(Text)
     user_name = Column(Text)
@@ -91,14 +93,15 @@ class Users(Base):
     token_expire_datetime = Column(DateTime)
 
     @classmethod
-    def create_new_user(cls, session, user_type_id, client_id, user_name = '',
-            verified=False, first_name='', last_name='', email='',
-            organization='', pass_salt=str(uuid.uuid4()),
-            pass_hash=''):
+    def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
+            client_id, user_name = '', verified=False, first_name='', \
+            last_name='', email='', organization='', \
+            pass_salt=str(uuid.uuid4()), pass_hash=''):
         user = None
         with transaction.manager:
             user = cls(
                 user_type_id = user_type_id,
+                user_geo_fence_id = user_geo_fence_id, 
                 verified = verified,
                 client_id = client_id,
                 first_name = first_name,
@@ -177,7 +180,10 @@ class Users(Base):
                 if user == None and create_if_not_exist == True:
                     user_type = UserTypes.get_from_name(session,name='user')
                     user = cls.create_new_user(session,
-                        user_type.user_type_id,client_id)
+                        user_type_id = user_type.user_type_id,
+                        user_geo_fence_id = None,
+                        client_id = client_id
+                    )
                     created = True
         return (user, created)
 
@@ -218,6 +224,8 @@ class Users(Base):
         with transaction.manager:
             users = session.query(
                 Users.user_id,
+                Users.user_type_id,
+                Users.user_geo_fence_id,
                 Users.verified,
                 Users.client_id,
                 Users.first_name,
@@ -277,6 +285,35 @@ class Users(Base):
             if user.token_expire_datetime > datetime.datetime.now():
                 valid = True
         return valid, user
+
+class UserGeoFences(Base):
+
+    """
+    Ssy Admins, Moderators, and Subscribers all have default geo fences that they 
+    are set to.  That is, that they can not post of view outside of this fence.
+    """
+
+    __tablename__ = 'user_geo_fences'
+    user_geo_fence_id = Column(Integer, primary_key=True)
+    #user_id = Column(Integer, ForeignKey('users.user_id'))
+    top_left_lat = Column(Float)
+    top_left_lng = Column(Float)
+    bottom_right_lat = Column(Float)
+    bottom_right_lng = Column(Float)
+
+    @classmethod
+    def create_fence(cls, session, top_left_lat, top_left_lng, \
+            bottom_right_lat, bottom_right_lng):
+        with transaction.manager:
+            fence = UserGeoFences(
+               top_left_lat = top_left_lat,
+               top_left_lng = top_left_lng,
+               bottom_right_lat = bottom_right_lat,
+               bottom_right_lng = bottom_right_lng,
+            )
+            session.add(fence)
+            transaction.commit()
+        return fence
 
 class Assignments(Base):
 
