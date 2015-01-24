@@ -5,8 +5,7 @@ import requests
 import datetime
 import hashlib
 
-#ROOT_DOMAIN = "http://127.0.0.1:5002/"
-ROOT_DOMAIN = "http://anna.duffnet.local:5002/"
+ROOT_DOMAIN = "http://127.0.0.1:5002/"
 
 def log(output):
 
