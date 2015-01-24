@@ -15,6 +15,7 @@ angular
 
         assignmentApiService.getPost($rootScope.user.token, $stateParams.postId)
         .success(function (data) {
+            console.log(data.post, $stateParams.postId);
             $scope.post = data.post;
         });
     }]);
