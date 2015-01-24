@@ -1327,14 +1327,16 @@ class Collections(Base):
                 Collections.description,
                 Collections.tags,
                 Collections.enabled,
-                #func.count(Posts.post_id),
-            #).outerjoin(
-            #    CollectionPosts, CollectionPosts.collection_id == \
-            #        Collections.collection_id,
-            #).outerjoin(
-            #    Posts, Posts.post_id == CollectionPosts.post_id,
+                func.count(Posts.post_id),
+            ).outerjoin(
+                CollectionPosts, CollectionPosts.collection_id == \
+                    Collections.collection_id,
+            ).outerjoin(
+                Posts, Posts.post_id == CollectionPosts.post_id,
             ).filter(
                 Collections.user_id == user.user_id,
+            ).group_by(
+                Collections.collection_id,
             ).all()
         return collections
 

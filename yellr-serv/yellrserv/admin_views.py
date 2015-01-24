@@ -1152,7 +1152,7 @@ def admin_get_my_collection(request):
 
         ret_collections = []
         for collection_id, user_id, collection_datetime, name, description, \
-                tags, enabled, in collections: #post_count in collections:
+                tags, enabled, post_count in collections: #post_count in collections:
             ret_collections.append({
                 'collection_id': collection_id,
                 'collection_datetime': str(collection_datetime),
@@ -1160,6 +1160,7 @@ def admin_get_my_collection(request):
                 'decription': description,
                 'tags': tags,
                 'enabled': enabled,
+                'post_count': post_count,
             })
 
         result['collections'] = ret_collections
