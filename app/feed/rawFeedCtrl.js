@@ -20,19 +20,23 @@ angular
         $scope.$parent.feedPage = true;
 
         var _getFirstText = function (post) {
-            for (var i = 0; i < post.media_objects.length; i++) {
-                var mediaObject = post.media_objects[i];
+            var i, mediaObject;
+            for (i = 0; i < post.media_objects.length; i++) {
+                mediaObject = post.media_objects[i];
+
                 if (mediaObject.media_type_name == 'text') {
                     return mediaObject.media_text;
                 }
             }
 
             return null;
-        };
+        },
 
-        var _getFirstImage = function (post) {
-            for (var i = 0; i < post.media_objects.length; i++) {
-                var mediaObject = post.media_objects[i];
+        _getFirstImage = function (post) {
+            var i, mediaObject;
+            for (i = 0; i < post.media_objects.length; i++) {
+                mediaObject = post.media_objects[i];
+
                 if (mediaObject.media_type_name == 'image') {
                     return {
                         'background-image': 'url(/media/' +
@@ -51,8 +55,10 @@ angular
         $scope.getFeed = function () {
             assignmentApiService.getFeed($scope.user.token)
             .success(function (data) {
-                var posts = [];
-                for (var postId in data.posts) {
+                var postId,
+                    posts = [];
+
+                for (postId in data.posts) {
                     // TODO: get title and image
                     data.posts[postId].time = moment(
                             data.posts[postId].post_datetime,

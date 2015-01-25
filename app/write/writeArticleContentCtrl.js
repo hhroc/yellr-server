@@ -6,21 +6,20 @@ angular
     .module('Yellr')
     .controller('writeArticleContentCtrl',
     ['$scope', '$rootScope', '$location', 'collectionApiService',
-    function ($scope, $rootScope, $location, collectionApiService) {
+        'userApiService',
+    function ($scope, $rootScope, $location, collectionApiService,
+              userApiService) {
         var editor = new EpicEditor().load(),
 
-        _parseImages = function (posts) {
-            posts.forEach(function (post) {
-                post.media_objects.forEach(function (mediaObject) {
-                    if (mediaObject.media_type_name == 'image') {
-
-                        mediaObject.markdownLink = '![' + mediaObject.caption +
-                            '](/media/' + mediaObject.file_name + ')';
-                        $scope.images.push(mediaObject);
-                    }
-                });
+        _getLanguages = function () {
+            userApiService.getLanguages($rootScope.user.token)
+            .success(function (data) {
+                console.log(data);
+                $scope.languages = data.languages;
             });
         };
+
+        _getLanguages();
 
         /**
          * Gets all images for the current collection
@@ -31,9 +30,10 @@ angular
             $scope.images = [];
 
             collectionApiService.getPosts($rootScope.user.token,
-                $scope.currentCollection.collection_id)
+                $scope.article.collection.collection_id)
             .success(function (data) {
-                _parseImages(data.posts);
+                $scope.$parent.collectionId = $scope.article.collection
+                    .collection_id;
             });
         };
 

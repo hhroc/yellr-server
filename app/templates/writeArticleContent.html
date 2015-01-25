@@ -1,11 +1,14 @@
 <div class="main-editor-window">
     <h1>Create Story</h1>
-    <select ng-model="currentCollection" ng-options="collection.name for collection in collections" ng-change="getImages()">
+    <select ng-model="article.collection" ng-options="collection.name for collection in collections" ng-change="getImages()">
         <option value="">Choose Collection</option>
+    </select>
+    <select ng-model="article.language" ng-options="language.name for language in languages track by language.code">
+        <option value="">Choose Language</option>
     </select>
     <input class="article-name" type="text" ng-model="article.name" placeholder="Story Title"/>
     <div id="epiceditor" class="editor"></div>
-    <tags-input ng-model="tags"></tags-input>
+    <tags-input ng-model="article.tags"></tags-input>
     <button ng-click="save()">Save</button>
 </div>
 <div class="tool-bar">
