@@ -1,6 +1,5 @@
-<h1>Raw Feed</h1>
-
-<div class="posts">
+<h1 class="tab-title">Settings</h1>
+<div class="collection-posts">
     <div class="post-column" ng-repeat="post in posts">
         <div class="inner-post">
             <div ng-if="post.imageUrl" ng-style="post.imageUrl" class="post-image"></div>
@@ -20,21 +19,4 @@
             </div>
         </div>
     </div>
-</div>
-
-<div class="tools-column">
-    <div class="row">
-        <div class="total">
-            <p>Posts</p>
-            <h4>{{posts.length}}</h4>
-        </div>
-        <div class="total">
-            <p>Collections</p>
-            <h4>{{collections.length}}</h4>
-        </div>
-    </div>
-    <h4 class="collections">Collections</h4>
-    <ul class="collections-list">
-        <li ng-repeat="collection in collections">{{collection.name}} <span class="num-posts">{{collection.post_count}}</span></li>
-    </ul>
 </div>

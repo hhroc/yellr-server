@@ -5,8 +5,7 @@ import requests
 import datetime
 import hashlib
 
-#ROOT_DOMAIN = "http://127.0.0.1:5002/"
-ROOT_DOMAIN = "http://anna.duffnet.local:5002/"
+ROOT_DOMAIN = "http://127.0.0.1:5002/"
 
 def log(output):
 
@@ -95,7 +94,7 @@ def _execute_test(url, token, data, method, files=None):
 def _validate(expected, response):
 
     valid = False
-    
+
     try:
         for key in expected:
             if not key in response:
@@ -108,7 +107,7 @@ def _validate(expected, response):
         valid = True
     except Exception, e:
         print "Validation Error: {0}".format(e)
-   
+
     return valid
 
 def run_tests():
@@ -129,7 +128,7 @@ def run_tests():
     )
     valid = _validate(
         {
-            "organization": { 
+            "organization": {
                 "type": basestring,
                 "value": "Yellr",
             },
@@ -165,7 +164,7 @@ def run_tests():
     )
     valid = _validate(
         {
-            "languages": { 
+            "languages": {
                 "type": list,
                 "value": [
                     {"code": "en","name": "English"},
@@ -182,7 +181,7 @@ def run_tests():
     if not valid == True:
         raise Exception("admin/get_languages.json did not validate")
     languages = payload['languages']
-    
+
     success, payload = _execute_test(
         'admin/get_question_types.json',
         token,
@@ -258,7 +257,7 @@ def run_tests():
     if not valid == True:
         raise Exception("admin/create_question.json did not validate")
     question_id = payload['question_id']
-    
+
     success, payload = _execute_test(
         'admin/publish_assignment.json',
         token,
@@ -297,7 +296,7 @@ def run_tests():
     """
     assignment_id = payload['assignment_id']
     collection_id = payload['collection_id']
-    
+
 
     random_client_id = str(uuid.uuid4())
     success, payload = _execute_test(
@@ -452,6 +451,8 @@ def run_tests():
         'GET',
     )
     client_a_post_response = payload['post']
+    if client_a_post_response['post_id'] != client_a_posts[0]['post_id']:
+        raise Exception("incorrect post returned from get_post.json")
     log('Client A Post Response ID: {0}'.format(client_a_post_response['post_id']))
     log('----')
     log('')
@@ -539,7 +540,7 @@ def run_tests():
     )
     collection_post_id = payload['post_id']
     collection_collection_id = payload['collection_id']
-    
+
     if not (collection_post_id == post_id_a and collection_collection_id == \
             collection_id):
         raise Exception('Post ID and Collection ID did not match after assignment.')
@@ -586,7 +587,7 @@ def run_tests():
     log('----')
     log('')
     log('')
- 
+
 
     #
     # Perform a free post with text
@@ -667,7 +668,7 @@ def run_tests():
     log('----')
     log('')
     log('')
-    
+
     success, payload = _execute_test(
         'admin/add_post_to_collection.json',
         token,
@@ -677,11 +678,11 @@ def run_tests():
         },
         'POST',
     )
-    
+
     #
     # post another free post with image
     #
-    
+
     success, payload = _execute_test(
         'upload_media.json',
         None,
@@ -744,6 +745,23 @@ def run_tests():
     log('')
     log('')
 
+    success, payload = _execute_test(
+        'admin/get_my_collections.json',
+        token,
+        {
+            # does not take any input fields
+        },
+        'GET',
+    )
+    collections = payload['collections']
+    log('Collection Count: {0}'.format(len(collections)))
+    if len(collections) != 2:
+        raise Exception("Error: Created collection was not returned.")
+    log('----')
+    log('')
+    log('')
+
+
     #
     # test if number of posts returned was correct
     #
@@ -764,11 +782,11 @@ def run_tests():
     log('')
     log('')
 
-    
 
-    
 
-    
+
+
+
     #
     # Publish Story
     #
@@ -812,6 +830,10 @@ def run_tests():
             'last_name': 'User',
             'email': 'temp@user.com',
             'organization': 'The Temp Group',
+            'fence_top_left_lat': 43.4,
+            'fence_top_left_lng': -77.9,
+            'fence_bottom_right_lat': 43.0,
+            'fence_bottom_right_lng': -77.3,
         },
         'POST',
     )

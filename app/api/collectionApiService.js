@@ -84,10 +84,10 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                params: {
+                data: $.param({
                     collection_id: collectionId,
                     post_id: postId
-                }
+                })
             });
         };
 

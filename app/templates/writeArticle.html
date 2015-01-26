@@ -1,15 +1,7 @@
-<div class="main-editor-window">
-    <h1>Create Story</h1>
-    <select ng-model="currentCollection" ng-options="collection.name for collection in collections" ng-change="getImages()">
-        <option value="">Choose Collection</option>
-    </select>
-    <input class="article-name" type="text" ng-model="article.name" placeholder="Story Title"/>
-    <div id="epiceditor" class="editor"></div>
-    <tags-input ng-model="tags"></tags-input>
-    <button ng-click="save()">Save</button>
-</div>
-<div class="tool-bar">
-    <div class="images" ng-repeat="image in images">
-        <img ng-src="/media/{{image.file_name}}" alt="" clip-copy="image.markdownLink"/>
-    </div>
+<div class="write">
+    <ul class="tabs">
+        <li><a href="#/write">Write</a></li>
+        <li><a href="#/write/settings">Research</a></li>
+    </ul>
+    <div class="write-content" ui-view></div>
 </div>

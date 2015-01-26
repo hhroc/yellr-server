@@ -78,6 +78,8 @@ class Users(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
     user_type_id = Column(Integer, ForeignKey('usertypes.user_type_id'))
+    user_geo_fence_id = Column(Integer, 
+        ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
     verified = Column(Boolean)
     client_id = Column(Text)
     user_name = Column(Text)
@@ -91,14 +93,15 @@ class Users(Base):
     token_expire_datetime = Column(DateTime)
 
     @classmethod
-    def create_new_user(cls, session, user_type_id, client_id, user_name = '',
-            verified=False, first_name='', last_name='', email='',
-            organization='', pass_salt=str(uuid.uuid4()),
-            pass_hash=''):
+    def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
+            client_id, user_name = '', verified=False, first_name='', \
+            last_name='', email='', organization='', \
+            pass_salt=str(uuid.uuid4()), pass_hash=''):
         user = None
         with transaction.manager:
             user = cls(
                 user_type_id = user_type_id,
+                user_geo_fence_id = user_geo_fence_id, 
                 verified = verified,
                 client_id = client_id,
                 first_name = first_name,
@@ -177,7 +180,10 @@ class Users(Base):
                 if user == None and create_if_not_exist == True:
                     user_type = UserTypes.get_from_name(session,name='user')
                     user = cls.create_new_user(session,
-                        user_type.user_type_id,client_id)
+                        user_type_id = user_type.user_type_id,
+                        user_geo_fence_id = None,
+                        client_id = client_id
+                    )
                     created = True
         return (user, created)
 
@@ -218,6 +224,8 @@ class Users(Base):
         with transaction.manager:
             users = session.query(
                 Users.user_id,
+                Users.user_type_id,
+                Users.user_geo_fence_id,
                 Users.verified,
                 Users.client_id,
                 Users.first_name,
@@ -255,8 +263,6 @@ class Users(Base):
                 Users.user_name == str(user_name),
             ).first()
 
-            the_user = session.query(Users).first()
-
             token = None
             if user != None:
                 pass_hash = hashlib.sha256('{0}{1}'.format(password, user.pass_salt)).hexdigest()
@@ -277,6 +283,48 @@ class Users(Base):
             if user.token_expire_datetime > datetime.datetime.now():
                 valid = True
         return valid, user
+
+class UserGeoFences(Base):
+
+    """
+    Ssy Admins, Moderators, and Subscribers all have default geo fences that they 
+    are set to.  That is, that they can not post of view outside of this fence.
+    """
+
+    __tablename__ = 'user_geo_fences'
+    user_geo_fence_id = Column(Integer, primary_key=True)
+    #user_id = Column(Integer, ForeignKey('users.user_id'))
+    top_left_lat = Column(Float)
+    top_left_lng = Column(Float)
+    bottom_right_lat = Column(Float)
+    bottom_right_lng = Column(Float)
+
+    @classmethod
+    def create_fence(cls, session, top_left_lat, top_left_lng, \
+            bottom_right_lat, bottom_right_lng):
+        with transaction.manager:
+            fence = UserGeoFences(
+               top_left_lat = top_left_lat,
+               top_left_lng = top_left_lng,
+               bottom_right_lat = bottom_right_lat,
+               bottom_right_lng = bottom_right_lng,
+            )
+            session.add(fence)
+            transaction.commit()
+        return fence
+
+    @classmethod
+    def get_fence_from_user_id(cls, session, user_id):
+        with transaction.manager:
+            fence = session.query(
+                UserGeoFences,
+            ).join(
+                Users, Users.user_geo_fence_id == \
+                    UserGeoFences.user_geo_fence_id,
+            ).filter(
+                Users.user_id == user_id,
+            ).first()
+        return fence
 
 class Assignments(Base):
 
@@ -820,13 +868,16 @@ class Posts(Base):
                 Languages,
             ).filter(
                 # Posts.assignment_id == assignment_id,
+                #Posts.post_id == post_id,
             ).order_by(
                  desc(Posts.post_datetime),
             ).group_by(
                  Posts.post_id,
             )
             total_post_count = posts_query.count()
-            posts = posts_query.all()
+            posts = posts_query.filter(
+                Posts.post_id == post_id,
+            ).all()
         return posts, total_post_count
 
     @classmethod
@@ -1327,14 +1378,16 @@ class Collections(Base):
                 Collections.description,
                 Collections.tags,
                 Collections.enabled,
-                #func.count(Posts.post_id),
-            #).outerjoin(
-            #    CollectionPosts, CollectionPosts.collection_id == \
-            #        Collections.collection_id,
-            #).outerjoin(
-            #    Posts, Posts.post_id == CollectionPosts.post_id,
+                func.count(Posts.post_id),
+            ).outerjoin(
+                CollectionPosts, CollectionPosts.collection_id == \
+                    Collections.collection_id,
+            ).outerjoin(
+                Posts, Posts.post_id == CollectionPosts.post_id,
             ).filter(
                 Collections.user_id == user.user_id,
+            ).group_by(
+                Collections.collection_id,
             ).all()
         return collections
 

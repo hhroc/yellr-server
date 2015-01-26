@@ -21,13 +21,10 @@ $border: darken($background-accent, 10);
 }
 
 input.article-name {
-    margin: 0;
-
     box-shadow: none;
     border: solid 1px $border;
     background: $background-accent;
 
-    text-align: center;
     font-size: 1.1em;
     height: auto;
 
