@@ -33,7 +33,7 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                params: {
+                data: $.param({
                     title: title,
                     tags: tags,
                     top_text: topText,
@@ -44,7 +44,7 @@ angular
                     top_left_lng: topLeftLng,
                     bottom_right_lat: bottomRightLat,
                     bottom_right_lng: bottomRightLng
-                }
+                })
             });
         };
 

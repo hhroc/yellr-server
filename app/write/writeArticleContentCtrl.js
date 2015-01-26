@@ -6,9 +6,9 @@ angular
     .module('Yellr')
     .controller('writeArticleContentCtrl',
     ['$scope', '$rootScope', '$location', 'collectionApiService',
-        'userApiService',
+        'userApiService', 'storyApiService',
     function ($scope, $rootScope, $location, collectionApiService,
-              userApiService) {
+              userApiService, storyApiService) {
         var editor = new EpicEditor().load(),
 
         _getLanguages = function () {
@@ -20,6 +20,15 @@ angular
         };
 
         _getLanguages();
+
+        $rootScope.$on('$stateChangeStart',
+        function (event, toState, toParams, fromState, fromParams) {
+            if (fromState.url == '/write') {
+                $scope.$parent.article = $scope.article;
+                $scope.$parent.article.collection = $scope.article.collection;
+            }
+            console.log($scope.article);
+        });
 
         /**
          * Gets all images for the current collection
@@ -43,9 +52,28 @@ angular
          * @return void
          */
         $scope.save = function () {
-            var content = editor.exportFile();
+            var content = editor.exportFile(),
+                tags = $scope.article.tags.map(function (tag) {
+                    return tag.text;
+                })
+                    .join(',');
 
-            console.log('Content', content);
+            storyApiService.publishStory(
+                $rootScope.user.token,
+                $scope.article.title,
+                tags,
+                '',
+                '',
+                content,
+                $scope.article.language.code,
+                43.5,
+                78,
+                43,
+                77
+            )
+            .success(function (data) {
+                console.log(data);
+            });
         };
 
         /**
