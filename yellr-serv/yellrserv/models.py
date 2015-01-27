@@ -885,7 +885,7 @@ class Posts(Base):
         with transaction.manager:
             posts_query = session.query(
                 Posts.post_id,
-                Posts.assignment_id,
+                #Posts.assignment_id,
                 Posts.user_id,
                 Posts.title,
                 Posts.post_datetime,
@@ -903,6 +903,8 @@ class Posts(Base):
                 Users.client_id,
                 Languages.language_code,
                 Languages.name,
+                Assignments.assignment_id,
+                Assignments.name,
             ).join(
                 PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
             ).join(
@@ -913,6 +915,9 @@ class Posts(Base):
                 Users, Users.user_id == Posts.user_id,
             ).join(
                 Languages,
+            ).outerjoin(
+                Assignments, Assignments.assignment_id == \
+                    Posts.assignment_id,
             ).filter(
                 # Posts.assignment_id == assignment_id,
             ).order_by(

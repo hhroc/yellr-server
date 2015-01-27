@@ -182,8 +182,8 @@ def admin_get_posts(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
 
         token = None
         valid_token = False
@@ -226,11 +226,12 @@ def admin_get_posts(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, assignment_id, user_id, title, post_datetime, \
-                    reported, lat, lng, media_object_id, media_id, \
-                    file_name, caption, media_text, media_type_name, \
+            for post_id, user_id, title, post_datetime, reported, \
+                    lat, lng, media_object_id, media_id, file_name, \
+                    caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
-                    language_code, language_name in posts:
+                    language_code, language_name, assignment_id, \
+                    assignment_name in posts:
 
                 if (post_id not in seen_post_ids) or (index == len(posts)-1):
 
@@ -240,7 +241,6 @@ def admin_get_posts(request):
 
                     post = {
                         'post_id': post_id,
-                        'assignment_id': assignment_id,
                         'user_id': user_id,
                         'title': title,
                         'post_datetime': str(post_datetime),
@@ -251,6 +251,8 @@ def admin_get_posts(request):
                         'client_id': client_id,
                         'language_code': language_code,
                         'language_name': language_name,
+                        'assignment_id': assignment_id,
+                        'assignment_name': assignment_name,
                         'media_objects': []
                     }
 
@@ -283,8 +285,8 @@ def admin_get_posts(request):
 
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     #admin_log("HTTP: admin/get_posts.json => {0}".format(json.dumps(result)))
 
