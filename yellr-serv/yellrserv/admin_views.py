@@ -204,15 +204,15 @@ def admin_get_posts(request):
         except:
             pass
 
-        reported = False
+        deleted = False
         try:
-            reported = bool(int(request.GET['reported']))
+            deleted = bool(int(request.GET['deleted']))
         except:
             pass
 
         posts, total_post_count = Posts.get_posts(
             DBSession,
-            reported = reported,
+            deleted = deleted,
             start = start,
             count = count,
         )
@@ -226,7 +226,7 @@ def admin_get_posts(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, user_id, title, post_datetime, reported, \
+            for post_id, user_id, title, post_datetime, deleted, \
                     lat, lng, media_object_id, media_id, file_name, \
                     caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
@@ -244,7 +244,7 @@ def admin_get_posts(request):
                         'user_id': user_id,
                         'title': title,
                         'post_datetime': str(post_datetime),
-                        'reported': reported,
+                        'deleted': deleted,
                         'lat': lat,
                         'lng': lng,
                         'verified_user': bool(verified),
@@ -901,9 +901,16 @@ One or more of the following fields is missing or invalid: assignment_id. \
         except:
             pass
 
+        deleted=False
+        try:
+            deleted = bool(int(request.GET['deleted'])) 
+        except:
+            pass
+
         posts,post_count = Posts.get_all_from_assignment_id(
             session = DBSession,
             assignment_id = assignment_id,
+            deleted = deleted,
             start = start,
             count = count,
         )
@@ -918,7 +925,7 @@ One or more of the following fields is missing or invalid: assignment_id. \
             # itterate throught he list, and build our resposne
             index = 0
             for post_id, assignment_id, user_id, title, post_datetime, \
-                    reported, lat, lng, media_object_id, media_id, \
+                    deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
                     language_code, language_name in posts:
@@ -935,7 +942,7 @@ One or more of the following fields is missing or invalid: assignment_id. \
                         'user_id': user_id,
                         'title': title,
                         'post_datetime': str(post_datetime),
-                        'reported': reported,
+                        'deleted': deleted,
                         'lat': lat,
                         'lng': lng,
                         'verified_user': bool(verified),
@@ -1376,7 +1383,7 @@ One or more of the following fields is missing or invalid: collection_id. \
             # itterate throught he list, and build our resposne
             index = 0
             for post_id, assignment_id, user_id, title, post_datetime, \
-                    reported, lat, lng, media_object_id, media_id, \
+                    deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
                     language_code, language_name in posts:
@@ -1393,7 +1400,7 @@ One or more of the following fields is missing or invalid: collection_id. \
                         'user_id': user_id,
                         'title': title,
                         'post_datetime': str(post_datetime),
-                        'reported': reported,
+                        'deleted': deleted,
                         'lat': lat,
                         'lng': lng,
                         'verified_user': bool(verified),
@@ -1493,7 +1500,7 @@ One or more of the following fields is missing or invalid: client_id. \
             # itterate throught he list, and build our resposne
             index = 0
             for post_id, assignment_id, user_id, title, post_datetime, \
-                    reported, lat, lng, media_object_id, media_id, \
+                    deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
                     language_code, language_name in posts:
@@ -1510,7 +1517,7 @@ One or more of the following fields is missing or invalid: client_id. \
                         'user_id': user_id,
                         'title': title,
                         'post_datetime': str(post_datetime),
-                        'reported': reported,
+                        'deleted': deleted,
                         'lat': lat,
                         'lng': lng,
                         'verified_user': bool(verified),
@@ -1729,7 +1736,7 @@ def admin_get_post(request):
             # itterate throught he list, and build our resposne
             index = 0
             for post_id, assignment_id, user_id, title, post_datetime, \
-                    reported, lat, lng, media_object_id, media_id, \
+                    deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
                     language_code, language_name in posts:
@@ -1746,7 +1753,7 @@ def admin_get_post(request):
                         'user_id': user_id,
                         'title': title,
                         'post_datetime': str(post_datetime),
-                        'reported': reported,
+                        'deleted': deleted,
                         'lat': lat,
                         'lng': lng,
                         'verified_user': bool(verified),
@@ -1785,6 +1792,54 @@ def admin_get_post(request):
 
     except:
         pass
+
+    return make_response(result)
+
+@view_config(route_name='admin/delete_post.json')
+def admin_delete_post(request):
+
+    result = {'success': False}
+
+    try:
+    #if True:
+
+        token = None
+        valid_token = False
+        valid, user = check_token(request)
+        if valid == False:
+            result['error_text'] = "Missing or invalid 'token' field in request."
+            raise Exception('invalid/missing token')
+
+        try:
+            post_id = request.POST['post_id']
+        except:
+            result['error_text'] = """\
+One or more of the following fields is missing or invalid: post_id. \
+"""
+            raise Exception('invalid/missing field')
+
+        post = Posts.delete_post(
+            session = DBSession,
+            post_id = post_id,
+        )
+
+        notification = Notifications.create_notification(
+            session = DBSession,
+            user_id = post.user_id,
+            notification_type = 'post_deleted',
+            payload = json.dumps({
+                'organization': user.organization,
+            })
+        )
+
+        result['post_id'] = post.post_id
+        result['notification_id'] = notification.notification_id
+        result['success'] = True
+
+    except:
+        pass
+
+    admin_log("HTTP: admin/delete_post.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
