@@ -1102,8 +1102,8 @@ def admin_get_my_collection(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
 
         token = None
         valid_token = False
@@ -1119,7 +1119,8 @@ def admin_get_my_collection(request):
 
         ret_collections = []
         for collection_id, user_id, collection_datetime, name, description, \
-                tags, enabled, post_count in collections: #post_count in collections:
+                tags, enabled, assignment_name, assignment_id, post_count \
+                in collections:
             ret_collections.append({
                 'collection_id': collection_id,
                 'collection_datetime': str(collection_datetime),
@@ -1127,14 +1128,16 @@ def admin_get_my_collection(request):
                 'decription': description,
                 'tags': tags,
                 'enabled': enabled,
+                'assignment_id': assignment_id,
+                'assignment_name': assignment_name,
                 'post_count': post_count,
             })
 
         result['collections'] = ret_collections
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
 

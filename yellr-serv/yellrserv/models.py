@@ -1398,12 +1398,17 @@ class Collections(Base):
                 Collections.description,
                 Collections.tags,
                 Collections.enabled,
+                Assignments.assignment_id,
+                Assignments.name,
                 func.count(Posts.post_id),
             ).outerjoin(
                 CollectionPosts, CollectionPosts.collection_id == \
                     Collections.collection_id,
             ).outerjoin(
                 Posts, Posts.post_id == CollectionPosts.post_id,
+            ).outerjoin(
+                Assignments, Assignments.collection_id == \
+                    Collections.collection_id,
             ).filter(
                 Collections.user_id == user.user_id,
             ).group_by(
