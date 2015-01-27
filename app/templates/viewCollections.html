@@ -1,0 +1,7 @@
+<h1>View Collections</h1>
+<div class="collections">
+    <div class="collection-block" ng-repeat="collection in collections">
+        <h1>{{collection.name}}</h1>
+        <p ng-if="collection.assignment_id">Collection for assignment: {{collection.assignment_name}}</p>
+    </div>
+</div>

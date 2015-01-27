@@ -1119,7 +1119,7 @@ def admin_get_my_collection(request):
 
         ret_collections = []
         for collection_id, user_id, collection_datetime, name, description, \
-                tags, enabled, assignment_name, assignment_id, post_count \
+                tags, enabled, assignment_id, assignment_name, post_count \
                 in collections:
             ret_collections.append({
                 'collection_id': collection_id,

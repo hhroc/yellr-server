@@ -69,5 +69,11 @@ angular
                 url: '/assignments',
                 templateUrl: 'assets/templates/viewAssignments.html',
                 controller: 'viewAssignmentsCtrl'
+            })
+
+            .state('collections', {
+                url: '/collections',
+                templateUrl: 'assets/templates/viewCollections.html',
+                controller: 'viewCollectionsCtrl'
             });
     }]);
