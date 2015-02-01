@@ -21,7 +21,7 @@ angular
          *
          * @return void
          */
-        function _getAssignments {
+        function _getAssignments() {
             assignmentApiService.getAssignments($scope.user.token)
             .success(function (data) {
                 $scope.assignments = data.assignments;
