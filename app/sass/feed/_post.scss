@@ -24,7 +24,6 @@
 .inner-post {
     background-color: $background;
     border-radius: 5px;
-    height: 320px;
     margin: 10px 0;
 
     .post-image {
@@ -119,9 +118,7 @@
 }
 
 .post-column {
-    @extend .small-4;
-    @extend .columns;
-
     float: left !important;
+    width: 400px;
 }
 

@@ -2,7 +2,7 @@
 
 angular
     .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap',
-            'ngClipboard', 'ngTagsInput'])
+            'ngClipboard', 'ngTagsInput', 'wu.masonry'])
     .config(['$stateProvider', '$urlRouterProvider', 'ngClipProvider',
             function ($stateProvider, $urlRouterProvider, ngClipProvider) {
 
