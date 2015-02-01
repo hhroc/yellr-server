@@ -26,10 +26,10 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                params: {
+                data: $.param({
                     username: username,
                     password: hashedPass
-                }
+                })
             });
         };
 

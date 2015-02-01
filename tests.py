@@ -124,7 +124,7 @@ def run_tests():
             'username': 'system',
             'password': hashlib.sha256('password').hexdigest(),
         },
-        'GET',
+        'POST',
     )
     valid = _validate(
         {
@@ -936,7 +936,7 @@ def run_tests():
             'username': new_username,
             'password': new_password
         },
-        'GET',
+        'POST',
     )
     new_user_token = payload['token']
     log('Got New User Token: {0}'.format(new_user_token))
