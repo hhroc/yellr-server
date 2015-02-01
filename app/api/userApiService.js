@@ -24,7 +24,7 @@ angular
                 url = '/admin/get_access_token.json';
 
             return $http({
-                method: 'GET',
+                method: 'POST',
                 url: url,
                 params: {
                     username: username,

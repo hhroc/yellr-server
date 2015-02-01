@@ -60,8 +60,8 @@ def admin_get_access_token(request):
         user_name = ''
         password = ''
         try:
-            user_name = request.GET['username']
-            password = request.GET['password']
+            user_name = request.POST['username']
+            password = request.POST['password']
 
         except:
             result['error_text'] = "Missing 'username' or 'password' within request"
