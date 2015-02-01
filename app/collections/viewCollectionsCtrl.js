@@ -26,7 +26,7 @@ angular
             .success(function (data) {
                 $scope.collections = data.collections;
             });
-        };
+        }
 
         _getCollections();
     }]);

@@ -26,7 +26,7 @@ angular
             .success(function (data) {
                 $scope.assignments = data.assignments;
             });
-        };
+        }
 
         _getAssignments();
 
