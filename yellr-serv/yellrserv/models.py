@@ -752,7 +752,7 @@ class Posts(Base):
     title = Column(Text)
     post_datetime = Column(DateTime)
     language_id = Column(Integer, ForeignKey('languages.language_id'))
-    reported = Column(Boolean)
+    deleted = Column(Boolean)
     lat = Column(Float)
     lng = Column(Float)
 
@@ -773,7 +773,7 @@ class Posts(Base):
                 title = title,
                 post_datetime = datetime.datetime.now(),
                 language_id = language.language_id,
-                reported = False,
+                deleted = False,
                 lat = lat,
                 lng = lng,
             )
@@ -795,13 +795,13 @@ class Posts(Base):
         return (post, created)
 
     @classmethod
-    def get_all_from_user_id(cls, session, user_id, reported=False):
+    def get_all_from_user_id(cls, session, user_id, deleted=False):
         with transaction.manager:
             posts = session.query(
                 Posts.post_id,
                 Posts.title,
                 Posts.post_datetime,
-                Posts.reported,
+                Posts.deleted,
                 Posts.lat,
                 Posts.lng,
                 Posts.assignment_id,
@@ -818,7 +818,7 @@ class Posts(Base):
             ).filter(
                 Posts.user_id == Users.user_id,
                 Posts.language_id == Languages.language_id,
-                Posts.reported == reported,
+                Posts.deleted == deleted,
                 Posts.user_id == user_id,
             ).all()
         return posts
@@ -842,7 +842,7 @@ class Posts(Base):
                 Posts.user_id,
                 Posts.title,
                 Posts.post_datetime,
-                Posts.reported,
+                Posts.deleted,
                 Posts.lat,
                 Posts.lng,
                 MediaObjects.media_object_id,
@@ -881,15 +881,15 @@ class Posts(Base):
         return posts, total_post_count
 
     @classmethod
-    def get_posts(cls, session, reported=False, start=0, count=0):
+    def get_posts(cls, session, deleted=False, start=0, count=0):
         with transaction.manager:
             posts_query = session.query(
                 Posts.post_id,
-                Posts.assignment_id,
+                #Posts.assignment_id,
                 Posts.user_id,
                 Posts.title,
                 Posts.post_datetime,
-                Posts.reported,
+                Posts.deleted,
                 Posts.lat,
                 Posts.lng,
                 MediaObjects.media_object_id,
@@ -903,6 +903,8 @@ class Posts(Base):
                 Users.client_id,
                 Languages.language_code,
                 Languages.name,
+                Assignments.assignment_id,
+                Assignments.name,
             ).join(
                 PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
             ).join(
@@ -913,8 +915,12 @@ class Posts(Base):
                 Users, Users.user_id == Posts.user_id,
             ).join(
                 Languages,
+            ).outerjoin(
+                Assignments, Assignments.assignment_id == \
+                    Posts.assignment_id,
             ).filter(
                 # Posts.assignment_id == assignment_id,
+                Posts.deleted == deleted,
             ).order_by(
                  desc(Posts.post_datetime),
             ).group_by(
@@ -930,8 +936,8 @@ class Posts(Base):
 
 
     @classmethod
-    def get_all_from_assignment_id(cls, session, assignment_id, start=0,
-            count=0):
+    def get_all_from_assignment_id(cls, session, assignment_id, \
+            deleted=False, start=0, count=0):
         with transaction.manager:
             posts_query = session.query(
                 Posts.post_id,
@@ -939,7 +945,7 @@ class Posts(Base):
                 Posts.user_id,
                 Posts.title,
                 Posts.post_datetime,
-                Posts.reported,
+                Posts.deleted,
                 Posts.lat,
                 Posts.lng,
                 MediaObjects.media_object_id,
@@ -975,6 +981,7 @@ class Posts(Base):
                 #    Posts.language_id,
             ).filter(
                 Posts.assignment_id == assignment_id,
+                Posts.deleted == deleted,
             ).order_by(
                  desc(Posts.post_datetime),
             ).group_by(
@@ -997,7 +1004,7 @@ class Posts(Base):
                 Posts.user_id,
                 Posts.title,
                 Posts.post_datetime,
-                Posts.reported,
+                Posts.deleted,
                 Posts.lat,
                 Posts.lng,
                 MediaObjects.media_object_id,
@@ -1055,7 +1062,7 @@ class Posts(Base):
                 Posts.user_id,
                 Posts.title,
                 Posts.post_datetime,
-                Posts.reported,
+                Posts.deleted,
                 Posts.lat,
                 Posts.lng,
                 MediaObjects.media_object_id,
@@ -1092,6 +1099,19 @@ class Posts(Base):
             else:
                 posts = posts_query.slice(start, start+count)
         return posts, total_post_count
+
+    @classmethod
+    def delete_post(cls, session, post_id):
+        with transaction.manager:
+            post = session.query(
+                Posts,
+            ).filter(
+                Posts.post_id == post_id,
+            ).first()
+            post.deleted = True
+            session.add(post)
+            transaction.commit()
+        return post
 
 class MediaTypes(Base):
 
@@ -1378,12 +1398,17 @@ class Collections(Base):
                 Collections.description,
                 Collections.tags,
                 Collections.enabled,
+                Assignments.assignment_id,
+                Assignments.name,
                 func.count(Posts.post_id),
             ).outerjoin(
                 CollectionPosts, CollectionPosts.collection_id == \
                     Collections.collection_id,
             ).outerjoin(
                 Posts, Posts.post_id == CollectionPosts.post_id,
+            ).outerjoin(
+                Assignments, Assignments.collection_id == \
+                    Collections.collection_id,
             ).filter(
                 Collections.user_id == user.user_id,
             ).group_by(

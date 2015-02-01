@@ -17,16 +17,17 @@ angular
         $scope.$parent.assignmentsPage = true;
 
         /**
-         * Places all assignments in scope
+         * Create view assignments function
          *
          * @return void
          */
-        $scope.getAssignments = function () {
+        function _getAssignments() {
             assignmentApiService.getAssignments($scope.user.token)
             .success(function (data) {
                 $scope.assignments = data.assignments;
             });
-        };
+        }
 
-        $scope.getAssignments();
+        _getAssignments();
+
     }]);

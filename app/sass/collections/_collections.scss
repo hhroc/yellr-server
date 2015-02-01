@@ -1,0 +1,27 @@
+.collections {
+    @extend .small-12;
+    @extend .columns;
+}
+
+.collection-block {
+    background-color: $background;
+    border-radius: 5px;
+    padding: 10px 30px;
+    margin-bottom: 20px;
+ 
+    h1 {
+        margin: 0;
+    }
+
+    p {
+        color: $type-light;
+        margin: 0;
+    }
+    
+    &:hover {
+        @include transition(all, 0.2s, ease-in-out);
+
+        background-color: lighten($primary, 5);
+        cursor: pointer;
+    }
+}

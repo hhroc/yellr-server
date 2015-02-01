@@ -17,7 +17,7 @@ compile:
 	# Copy Bootstrap
 	cp -a bower_components/twbs-bootstrap-sass/assets/stylesheets/. app/sass/deps/
 	# Copy Bourbon
-	cp -a bower_components/bower-bourbon/. app/sass/deps/
+	cp -a bower_components/bourbon/app/assets/stylesheets/. app/sass/deps/
 	# Copy ng-tags-input css
 	cp bower_components/ng-tags-input/ng-tags-input.min.css yellr-serv/yellrserv/moderator/assets/css/ng-tags-input.min.css
 	# Copy Leaflet things
