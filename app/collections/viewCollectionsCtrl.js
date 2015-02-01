@@ -17,16 +17,16 @@ angular
         $scope.$parent.collectionsPage = true;
 
         /**
-         * Places all collections in scope
+         * Create get collections function
          *
          * @return void
          */
-        $scope.getCollections = function () {
+        function _getCollections() {
             collectionApiService.getAllCollections($scope.user.token)
             .success(function (data) {
                 $scope.collections = data.collections;
             });
         };
 
-        $scope.getCollections();
+        _getCollections();
     }]);
