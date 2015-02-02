@@ -1,10 +1,18 @@
 'use strict';
 var L = L || {};
 
+var map = map || {};
+
+//var drawingBox = false;
+//var topLeftCord = undefined;
+//var bottomRightCord = undefined;
+
 angular
     .module('Yellr')
     .controller('newAssignmentGeofenceCtrl', ['$scope',
     function ($scope) {
+
+        /*
 
         var map = L.mapbox.map('set-geofence-map', window.MAPBOX_MAP_ID, {
             accessToken: window.MAPBOX_API_KEY
@@ -36,4 +44,79 @@ angular
                 $scope.$parent.validate();
             });
         });
+
+        */
+ 
+        // initialize map
+        //console.log('creating map');
+
+        var main = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+             attribution: 'Map data © OpenStreetMap contributors',
+             minZoom: 10,
+             maxZoom: 16,
+        });
+
+        map = L.map('set-geofence-map', {
+            center: [43.2, -77.6],
+            zoom: 10,
+            layers: [
+                main
+            ]
+        });
+
+        map.drawingBox = false;
+        map.geoBox = false;
+
+        map.on('mousedown', function(e) {
+            if (e.originalEvent.ctrlKey) {
+                console.log('leaflet mousedown');
+                map.dragging.disable();
+                map.drawingBox = true;
+                map.topLeftCord = e.latlng;
+            }
+        });
+
+        map.on('mousemove', function(e) {
+           if ( map.drawingBox == true ) {
+               if ( map.geoBox != false ) {
+                   map.removeLayer(map.geoBox);
+                   //map.geoBox.removeFrom(map);
+               }
+               var bounds = [map.topLeftCord, e.latlng];
+               map.geoBox = L.rectangle(bounds, {color:"#ff7800", weight:1});
+               //map.geoBox.addTo(map);
+               map.addLayer(map.geoBox);
+           }
+        });
+
+        map.on('mouseup', function(e) {
+            if (e.originalEvent.ctrlKey) {
+                console.log('leaflet mouseup');
+                //var bounds = [map.topLeftCord, e.latlng];
+                //L.rectangle(bounds, {color:"#ff7800", weight:1}).addTo(map);
+                map.drawingBox = false;
+                map.dragging.enable();
+            }
+        });
+
+        
+
+        /*
+        console.log('creating areaSelect()');
+        var areaSelect = L.areaSelect({width:200, height:250});
+
+        console.log('setting on change for areaSelect');
+        areaSelect.on('change', function() {
+            var bounds = this.getBounds();
+            //$('#result .sw').val(bounds.getSouthWest().lat + ', ' + bounds.getSouthWest().lng);
+            //$('#result .ne').val(bounds.getNorthEast().lat + ', ' + bounds.getNorthEast().lng);
+            console.log(bounds);
+        });
+
+        console.log('adding areaSelect to map');
+        areaSelect.addTo(map);
+        console.log('areaSelect added to map');
+        */
+        
+
     }]);
