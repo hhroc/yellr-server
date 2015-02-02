@@ -2,6 +2,7 @@
 var L = L || {};
 
 var map = map || {};
+//var featureGroup = featureGroup || {}
 
 //var drawingBox = false;
 //var topLeftCord = undefined;
@@ -64,12 +65,16 @@ angular
             ]
         });
 
+        //featureGroup = L.featureGroup().addTo(map);
+
         map.drawingBox = false;
         map.geoBox = false;
 
         map.on('mousedown', function(e) {
             if (e.originalEvent.ctrlKey) {
-                console.log('leaflet mousedown');
+                //if ( map.geoBox != false ) {
+                    map.removeLayer(map.geoBox);
+                //}
                 map.dragging.disable();
                 map.drawingBox = true;
                 map.topLeftCord = e.latlng;
@@ -80,20 +85,39 @@ angular
            if ( map.drawingBox == true ) {
                if ( map.geoBox != false ) {
                    map.removeLayer(map.geoBox);
-                   //map.geoBox.removeFrom(map);
                }
                var bounds = [map.topLeftCord, e.latlng];
                map.geoBox = L.rectangle(bounds, {color:"#ff7800", weight:1});
-               //map.geoBox.addTo(map);
                map.addLayer(map.geoBox);
            }
         });
 
         map.on('mouseup', function(e) {
             if (e.originalEvent.ctrlKey) {
-                console.log('leaflet mouseup');
-                //var bounds = [map.topLeftCord, e.latlng];
-                //L.rectangle(bounds, {color:"#ff7800", weight:1}).addTo(map);
+                map.removeLayer(map.geoBox);
+                var bounds = [map.topLeftCord, e.latlng];
+                map.geoBox = L.rectangle(bounds, {color:"#00FF78", weight:1})
+                map.addLayer(map.geoBox);
+
+                $scope.$parent.assignment.geofence = {
+                    topLeft: [
+                        map.topLeftCord.lat,
+                        map.topLeftCord.lng
+                    ],
+                    bottomRight: [
+                        e.latlng.lat,
+                        e.latlng.lng
+                    ]
+                };
+
+                // Since this event is out of angular's standard event listener
+                // loop we need to manually apply the change.
+                $scope.$apply(function () {
+                    $scope.$parent.notify('Saved Geofence.');
+                    $scope.$parent.validate();
+                });
+
+
                 map.drawingBox = false;
                 map.dragging.enable();
             }
