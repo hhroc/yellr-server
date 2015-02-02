@@ -7,6 +7,14 @@ angular
         'collectionApiService', 'formatPosts',
     function ($scope, $rootScope, $location, $stateParams,
               collectionApiService, formatPosts) {
+
+        if ($rootScope.user === undefined) {
+            $location.path('/login');
+            return;
+        }
+
+        $scope.user = $rootScope.user;
+
         /**
          * Places collection of url id in scope
          *
@@ -15,7 +23,7 @@ angular
         collectionApiService.getAllCollections($scope.user.token)
         .success(function (data) {
             data.collections.forEach(function (collection) {
-                if (collection.collection_id === $stateParams.collectionId) {
+                if (collection.collection_id == $stateParams.collectionId) {
                     $scope.collection = collection;
                 }
             });

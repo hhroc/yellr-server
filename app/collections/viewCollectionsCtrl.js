@@ -6,6 +6,13 @@ angular
     ['$scope', '$rootScope', '$location', 'collectionApiService',
     function ($scope, $rootScope, $location, collectionApiService) {
 
+        if ($rootScope.user === undefined) {
+            $location.path('/login');
+            return;
+        }
+
+        $scope.user = $rootScope.user;
+
         /**
          * Create get collections function
          *
