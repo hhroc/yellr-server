@@ -91,9 +91,9 @@ angular
                 content,
                 $scope.article.language.code,
                 43.5,
-                78,
+                -78,
                 43,
-                77
+                -77
             )
             .success(function (data) {
                 console.log(data);
