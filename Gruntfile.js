@@ -10,7 +10,7 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    'yellr-serv/yellrserv/moderator/assets/js/scripts.js' : [
+                    'yellr-serv/yellrserv/moderator/assets/js/scripts.js': [
                         'bower_components/cryptojslib/rollups/hmac-sha256.js',
                         'bower_components/jquery/dist/jquery.js',
                         'bower_components/angular/angular.js',
@@ -20,6 +20,8 @@ module.exports = function (grunt) {
                         'bower_components/mapbox.js/mapbox.js',
                         'bower_components/epiceditor/epiceditor/js/epiceditor.js',
                         'bower_components/async/lib/async.js',
+                        'bower_components/masonry/dist/masonry.pkgd.min.js',
+                        'bower_components/angular-masonry/angular-masonry.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
                         'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
                         'bower_components/angular-mocks/angular-mocks.js',
@@ -28,7 +30,7 @@ module.exports = function (grunt) {
                         'app/**/*.js', // then everything else
                         '!app/tests/**/*.js' // ignore tests
                     ]
-                },
+                }
             }
         },
 
@@ -40,10 +42,10 @@ module.exports = function (grunt) {
         },
 
         uglify: {
-            options : {
-                sourceMap : true,
-                sourceMapIncludeSources : true,
-                sourceMapIn : 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map',
+            options: {
+                sourceMap: true,
+                sourceMapIncludeSources: true,
+                sourceMapIn: 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map',
                 sourceMapName: 'yellr-serv/yellrserv/moderator/assets/js/scripts.min.js.map'
             },
             dist: {
@@ -55,7 +57,7 @@ module.exports = function (grunt) {
         sass: {
             dist: {
                 options: {
-                    style: 'compress',
+                    style: 'compress'
                 },
                 files: {
                     'yellr-serv/yellrserv/moderator/assets/css/site.css': 'app/sass/site.scss'
@@ -94,7 +96,7 @@ module.exports = function (grunt) {
                     src: [
                         '**/*.html'
                     ],
-                    dest: 'yellr-serv/yellrserv/moderator/assets/templates/',
+                    dest: 'yellr-serv/yellrserv/moderator/assets/templates/'
                 }],
                 verbose: true,
                 flatten: true
@@ -124,7 +126,7 @@ module.exports = function (grunt) {
         },
 
         clean: {
-            js: ['yellr-serv/yellrserv/moderator/assets/js/scripts.js', 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map', 'moderator/'],
+            js: ['yellr-serv/yellrserv/moderator/assets/js/scripts.js', 'yellr-serv/yellrserv/moderator/assets/js/scripts.js.map', 'moderator/']
         }
     });
 

@@ -17,6 +17,20 @@ angular
                 console.log(data);
                 $scope.languages = data.languages;
             });
+        },
+
+        _getImagesFromPost = function (post) {
+            var images = [];
+
+            post.media_objects.forEach(function (mediaObject) {
+                if (mediaObject.media_type_name == 'image') {
+                    mediaObject.markdownLink = '![' + mediaObject.media_text +
+                        '](/media/' + mediaObject.file_name + ')';
+                    images.push(mediaObject);
+                }
+            });
+
+            return images;
         };
 
         _getLanguages();
@@ -27,7 +41,6 @@ angular
                 $scope.$parent.article = $scope.article;
                 $scope.$parent.article.collection = $scope.article.collection;
             }
-            console.log($scope.article);
         });
 
         /**
@@ -43,6 +56,11 @@ angular
             .success(function (data) {
                 $scope.$parent.collectionId = $scope.article.collection
                     .collection_id;
+
+                data.posts.forEach(function (post) {
+                    var postImages = _getImagesFromPost(post);
+                    $scope.images = $scope.images.concat(postImages);
+                });
             });
         };
 
