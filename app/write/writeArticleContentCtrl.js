@@ -33,12 +33,18 @@ angular
             return images;
         };
 
-        _getLanguages();
+        $scope.article = $scope.$parent.article;
+        if (angular.isDefined($scope.$parent.languages)) {
+            $scope.languages = $scope.$parent.languages;
+        } else {
+            _getLanguages();
+        }
 
         $rootScope.$on('$stateChangeStart',
         function (event, toState, toParams, fromState, fromParams) {
             if (fromState.url == '/write') {
                 $scope.$parent.article = $scope.article;
+                $scope.$parent.languages = $scope.languages;
                 $scope.$parent.article.collection = $scope.article.collection;
             }
         });
@@ -85,9 +91,9 @@ angular
                 content,
                 $scope.article.language.code,
                 43.5,
-                78,
+                -78,
                 43,
-                77
+                -77
             )
             .success(function (data) {
                 console.log(data);

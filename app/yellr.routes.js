@@ -72,10 +72,20 @@ angular
                 templateUrl: 'assets/templates/viewAssignments.html',
                 controller: 'viewAssignmentsCtrl'
             })
+            .state('view-assignment', {
+                url: '/assignments/:assignmentId',
+                templateUrl: 'assets/templates/viewAssignment.html',
+                controller: 'viewAssignmentCtrl'
+            })
 
             .state('collections', {
                 url: '/collections',
                 templateUrl: 'assets/templates/viewCollections.html',
                 controller: 'viewCollectionsCtrl'
+            })
+            .state('view-collection', {
+                url: '/collections/:collectionId',
+                templateUrl: 'assets/templates/viewCollection.html',
+                controller: 'viewCollectionCtrl'
             });
     }]);
