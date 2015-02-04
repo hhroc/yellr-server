@@ -38,7 +38,7 @@ angular
         });
 
         map.on('mousedown', function(e) {
-            if (map.enableDrawing == true) {
+            if (map.enableDrawing) {
                 map.removeLayer(map.geoBox);
                 map.dragging.disable();
                 map.drawingBox = true;
@@ -47,7 +47,7 @@ angular
         });
 
         map.on('mousemove', function(e) {
-           if ( map.enableDrawing == true && map.drawingBox == true ) {
+           if ( map.enableDrawing && map.drawingBox ) {
                if ( map.geoBox != false ) {
                    map.removeLayer(map.geoBox);
                }
@@ -58,7 +58,7 @@ angular
         });
 
         map.on('mouseup', function(e) {
-            if ( map.enableDrawing == true && map.drawingBox == true ) {
+            if ( map.enableDrawing && map.drawingBox ) {
                 map.removeLayer(map.geoBox);
                 var bounds = [map.topLeftCord, e.latlng];
                 map.geoBox = L.rectangle(bounds, {color:"#00FF78", weight:1})
