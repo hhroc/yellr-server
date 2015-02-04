@@ -1,7 +1,13 @@
 <h1>View Collections</h1>
 <div class="collections">
-    <div class="collection-block" ng-repeat="collection in collections">
-        <h1><a href="#/collections/{{collection.collection_id}}">{{collection.name}}</a></h1>
-        <p ng-if="collection.assignment_id">Collection for assignment: {{collection.assignment_name}}</p>
+    <div ng-if="!collections.length">
+        <h4>No collections yet.</h4>
+        <a href="">Create a Collection</a>
+    </div>
+    <div ng-if="collections.length">
+        <div class="collection-block" ng-repeat="collection in collections">
+            <h1><a href="#/collections/{{collection.collection_id}}">{{collection.name}}</a></h1>
+            <p ng-if="collection.assignment_id">Collection for assignment: {{collection.assignment_name}}</p>
+        </div>
     </div>
 </div>
