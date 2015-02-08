@@ -556,29 +556,30 @@ def publish_post(request):
 
     result = {'success': False}
 
-    if True:
-    #try:
+    #if True:
+    try:
 
-        if True:
-        #try:
+        #if True:
+        try:
             client_id = request.POST['client_id']
             assignment_id = request.POST['assignment_id']
-            title = request.POST['title']
+            #title = request.POST['title']
             language_code = request.POST['language_code']
             lat = request.POST['lat']
             lng = request.POST['lng']
             media_objects = json.loads(urllib.unquote(
                 request.POST['media_objects']).decode('utf8')
             )
-        #except:
-        #    result['error_text'] = 'Missing or invalid field'
-        #    raise Exception('missing/invalid field')
+
+        except:
+            result['error_text'] = 'Missing or invalid field'
+            raise Exception('missing/invalid field')
 
         post,created = Posts.create_from_http(
             session = DBSession,
             client_id = client_id,
             assignment_id = assignment_id,
-            title = title,
+            title = '', #title,
             language_code = language_code,
             lat = lat,
             lng = lng,
@@ -615,8 +616,9 @@ def publish_post(request):
             }
             client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
 
-    #except:
-    #   pass
+    except Exception, e:
+       result['server_exception'] = str(e)
+       pass
 
     #resp = json.dumps(result)
     #return Response(resp,content_type='application/json')
