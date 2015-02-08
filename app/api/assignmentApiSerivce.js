@@ -115,12 +115,13 @@ angular
          * @return response : either error or sucess response with assignment
          *                    id
          */
-        assignmentApi.publishAssignment = function (accessToken, lifeTime, questions,
-                                               topLeftLat, topLeftLng,
+        assignmentApi.publishAssignment = function (accessToken, name, lifeTime, 
+                                               questions, topLeftLat, topLeftLng,
                                                bottomRightLat, bottomRightLng) {
 
             var url = '/admin/publish_assignment.json?token=' + accessToken,
                 data = {
+                    name: name,
                     life_time: lifeTime,
                     questions: JSON.stringify(questions),
                     top_left_lat: topLeftLat,

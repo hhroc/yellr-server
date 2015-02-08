@@ -478,12 +478,15 @@ class Assignments(Base):
                 Questions.answer8,
                 Questions.answer9,
                 func.count(Posts.post_id),
-            ).join(
-                Users
+            ).outerjoin(
+                Users, Users.user_id == Assignments.user_id,
             ).join(
                 QuestionAssignments,
+                QuestionAssignments.assignment_id == \
+                    Assignments.assignment_id,
             ).join(
-                Questions,
+                Questions,Questions.question_id == \
+                    QuestionAssignments.question_id,
             ).outerjoin(
                 Posts,Posts.assignment_id == Assignments.assignment_id,
             ).filter(
@@ -494,6 +497,8 @@ class Assignments(Base):
                 Assignments.bottom_right_lng + 180 > lng + 180,
                 Questions.language_id == language.language_id,
                 Assignments.expire_datetime >= datetime.datetime.now(), #Assignments.publish_datetime,
+            ).group_by(
+                Assignments.assignment_id,
             ).order_by(
                 desc(Assignments.publish_datetime),
             ).all()
@@ -786,6 +791,8 @@ class Posts(Base):
                     session,
                     media_id,
                 )
+                if media_object == None:
+                    raise Exception("Invalid media_object_id within media_objects array")
                 post_media_object = PostMediaObjects(
                     post_id = post.post_id,
                     media_object_id = media_object.media_object_id,

@@ -1,5 +1,11 @@
 <h1>Raw Feed</h1>
-<div ng-include src="'assets/templates/posts.html'"></div>
+<div ng-if="!posts.length">
+    <h4>No posts yet.</h4>
+</div>
+
+<div ng-if="posts.length">
+    <div ng-include src="'assets/templates/posts.html'"></div>
+</div>
 <div class="tools-column">
     <div class="row">
         <div class="total">

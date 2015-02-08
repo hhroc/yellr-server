@@ -1,6 +1,6 @@
 <div class="posts">
     <div masonry load-images="false" masonry-options="{isFitWidth: true, gutter: 10, position: 'relative'}">
-        <div ng-show="!posts.length">
+        <div ng-show="!posts.length === 0">
             <h4>No posts yet.</h4>
         </div>
         <div ng-show="posts.length" class="post-column masonry-brick" ng-repeat="post in posts">

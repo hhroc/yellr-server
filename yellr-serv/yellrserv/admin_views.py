@@ -435,8 +435,12 @@ def admin_publish_assignment(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        #if True:
-        try:
+        print "\n\n"
+        print request.POST
+        print "\n\n"
+
+        if True:
+        #try:
             name = request.POST['name']
             life_time = 0
             try:
@@ -446,10 +450,19 @@ def admin_publish_assignment(request):
             if life_time == 0:
                 life_time = 168 # set to 1 week if blank
             questions = json.loads(request.POST['questions'])
-            top_left_lat = float(request.POST['top_left_lat'])
-            top_left_lng = float(request.POST['top_left_lng'])
-            bottom_right_lat = float(request.POST['bottom_right_lat'])
-            bottom_right_lng = float(request.POST['bottom_right_lng'])
+            if request.POST['top_left_lat'] == "" or \
+                    request.POST['top_left_lng'] == "" or \
+                    request.POST['bottom_right_lat'] == "" or \
+                    request.POST['bottom_right_lng'] == "":
+                top_left_lat = 43.4
+                top_left_lng = -77.9
+                bottom_right_lat = 43.0
+                bottom_right_lng = 43.0
+            else:
+                top_left_lat = float(request.POST['top_left_lat'])
+                top_left_lng = float(request.POST['top_left_lng'])
+                bottom_right_lat = float(request.POST['bottom_right_lat'])
+                bottom_right_lng = float(request.POST['bottom_right_lng'])
 
             result['name'] = name
             result['life_time'] = life_time
@@ -459,13 +472,13 @@ def admin_publish_assignment(request):
             result['bottom_right_lat'] = bottom_right_lat
             result['bottom_right_lng'] = bottom_right_lng
 
-        except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: life_time,\
-questions (JSON list of question id's), top_left_lat, top_left_lng, \
-bottom_right_lat, bottom_right_lng.
-"""
-            raise Exception('invalid/missing field')
+#        except:
+#            result['error_text'] = """\
+#One or more of the following fields is missing or invalid: life_time,\
+#questions (JSON list of question id's), top_left_lat, top_left_lng, \
+#bottom_right_lat, bottom_right_lng.
+#"""
+#            raise Exception('invalid/missing field')
 
         #geo_fence = {
         #    'top_left_lat': top_left_lat,

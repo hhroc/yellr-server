@@ -111,7 +111,7 @@ angular
             },
             function (error, questionIds) {
                 assignmentApiService.publishAssignment($rootScope.user.token,
-                    timeDiff, questionIds,
+                    $scope.assignment.name, timeDiff, questionIds,
                     $scope.assignment.geofence.topLeft.lat,
                     $scope.assignment.geofence.topLeft.lng,
                     $scope.assignment.geofence.bottomRight.lat,
@@ -120,5 +120,8 @@ angular
                     console.log(data);
                 });
             });
+
+            $location.path('/');
+            $scope.notify('Assignment Published');
         };
     }]);
