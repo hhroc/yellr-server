@@ -1,6 +1,8 @@
 [![Build Status](https://travis-ci.org/hhroc/yellr-server.svg)](https://travis-ci.org/hhroc/yellr-server)
 # Yellr Server
 
+[![Join the chat at https://gitter.im/hhroc/yellr-server](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/hhroc/yellr-server?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is the server and admin component of the Yellr application
 
 Setting up the moderator dev environment.
