@@ -1,4 +1,8 @@
 [![Build Status](https://travis-ci.org/hhroc/yellr-server.svg)](https://travis-ci.org/hhroc/yellr-server)
+
+
+Chat about yellr-server on Gitter! [Chat Now](https://gitter.im/hhroc/yellr-server)
+
 # Yellr Server
 
 This is the server and admin component of the Yellr application
