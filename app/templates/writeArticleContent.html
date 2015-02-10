@@ -6,7 +6,7 @@
     <select ng-model="article.language" ng-options="language.name for language in languages track by language.code">
         <option value="">Choose Language</option>
     </select>
-    <input class="article-name" type="text" ng-model="article.name" placeholder="Story Title"/>
+    <input class="article-name" type="text" ng-model="article.title" placeholder="Story Title"/>
     <div id="epiceditor" class="editor"></div>
     <tags-input ng-model="article.tags"></tags-input>
     <button ng-click="save()">Save</button>
