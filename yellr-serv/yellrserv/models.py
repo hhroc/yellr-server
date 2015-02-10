@@ -406,7 +406,7 @@ class Assignments(Base):
                 Assignments.bottom_right_lng,
                 Assignments.use_fence,
                 Assignments.collection_id,
-                #Users.organization,
+                Users.organization,
                 Questions.question_text,
                 Questions.question_type_id,
                 Questions.answer0,
@@ -420,8 +420,8 @@ class Assignments(Base):
                 Questions.answer8,
                 Questions.answer9,
                 func.count(Posts.post_id),
-            #).outerjoin(
-            #    Users
+            ).outerjoin(
+                Users, Users.user_id == Assignments.user_id,
             ).join(
                 QuestionAssignments,
                 QuestionAssignments.assignment_id == \
@@ -431,16 +431,13 @@ class Assignments(Base):
                     QuestionAssignments.question_id,
             ).outerjoin(
                 Posts,Posts.assignment_id == Assignments.assignment_id,
-            ).filter(
-                #Assignments.user_id == user.user_id,
-                Assignments.expire_datetime >= datetime.datetime.now(),
-            ).order_by(
-                desc(Assignments.publish_datetime),
             ).group_by(
                 Assignments.assignment_id,
+            ).order_by(
+                desc(Assignments.publish_datetime),
             )
-            total_assignment_count = assignments_query.count()
             assignments = assignments_query.all()
+            total_assignment_count = assignments_query.count()
             #if start == 0 and count == 0:
             #    assignments = assignments_query.all()
             #else:

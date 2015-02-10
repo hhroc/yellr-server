@@ -435,10 +435,6 @@ def admin_publish_assignment(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        print "\n\n"
-        print request.POST
-        print "\n\n"
-
         if True:
         #try:
             name = request.POST['name']
@@ -503,7 +499,7 @@ def admin_publish_assignment(request):
         collection = Collections.create_new_collection_from_http(
             session = DBSession,
             token = user.token,
-            name = "{0} - Collection".format(name),
+            name = "{0} (Assignment #{1})".format(name, assignment.assignment_id),
             description = "",
             tags = "",
         )
@@ -630,6 +626,10 @@ def admin_get_my_assignments(request):
             count = count,
         )
 
+        print "\n\nASSIGNMENTS\n\n"
+        print assignments
+        print "\n\n"
+
         ret_assignments = []
         # this is for development.ini ... sqlite was puking on the query
         if assignment_count != 0 and len(assignments) > 0 and assignments[0][0] != None:
@@ -642,7 +642,7 @@ def admin_get_my_assignments(request):
             index = 0
             for assignment_id, publish_datetime, expire_datetime, name, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
-                    bottom_right_lng, use_fence, collection_id, \
+                    bottom_right_lng, use_fence, collection_id, organization, \
                     question_text, question_type_id, answer0, answer1, answer2, \
                     answer3, answer4, answer5, answer6, answer7, answer8, \
                     answer9, post_count in assignments:
@@ -652,7 +652,6 @@ def admin_get_my_assignments(request):
                     # add our existing assignment to the list of assignments
                     # to return
                     if assignment:
-
                         ret_assignments.append(assignment)
 
                     # build our assignment with no question(s)
@@ -666,7 +665,7 @@ def admin_get_my_assignments(request):
                         'bottom_right_lat': bottom_right_lat,
                         'bottom_right_lng': bottom_right_lng,
                         #'use_fence': use_fence,
-                        #'organization': organization,
+                        'organization': organization,
                         'questions': [],
                     }
 
@@ -692,7 +691,7 @@ def admin_get_my_assignments(request):
                 # add the question to the current assignment
                 assignment['questions'].append(question)
 
-                if index == 0 and index == len(assignments)-1:
+                if index == len(assignments)-1:
                     ret_assignments.append(assignment)
 
                 index += 1
