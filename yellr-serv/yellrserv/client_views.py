@@ -913,6 +913,13 @@ def get_profile(request):
             client_id = client_id,
         )
 
+        post_count = Posts.get_count_from_user_id(
+            session = DBSession,
+            user_id = user.user_id,
+        )
+
+        """
+
         posts,post_count = Posts.get_all_from_client_id(
             session = DBSession,
             client_id = client_id,
@@ -959,12 +966,19 @@ def get_profile(request):
                 }
 
         result['posts'] = ret_posts
-        result['post_count'] = post_count
+
+        """
+
         result['first_name'] = user.first_name
         result['last_name'] = user.last_name
         result['organization'] = user.organization
         result['email'] = user.email
         result['verified']  = user.verified
+
+        result['post_count'] = post_count
+        result['post_view_count'] = user.post_view_count
+        result['post_used_cout'] = user.post_used_count
+
         result['success'] = True
 
 #    except:

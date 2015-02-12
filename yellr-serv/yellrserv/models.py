@@ -78,10 +78,9 @@ class Users(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
     user_type_id = Column(Integer, ForeignKey('usertypes.user_type_id'))
-    user_geo_fence_id = Column(Integer, 
-        ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
-    verified = Column(Boolean)
+    
     client_id = Column(Text)
+
     user_name = Column(Text)
     first_name = Column(Text)
     last_name = Column(Text)
@@ -89,8 +88,15 @@ class Users(Base):
     email = Column(Text)
     pass_salt = Column(Text)
     pass_hash = Column(Text)
-    token = Column(Text)
-    token_expire_datetime = Column(DateTime)
+    verified = Column(Boolean)
+    user_geo_fence_id = Column(Integer,
+        ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
+
+    token = Column(Text, nullable=True)
+    token_expire_datetime = Column(DateTime, nullable=True)
+
+    post_view_count = Column(Integer)
+    post_used_count = Column(Integer)
 
     @classmethod
     def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
@@ -110,6 +116,10 @@ class Users(Base):
                 email = email,
                 pass_salt = pass_salt,
                 pass_hash = pass_hash,
+                token = None,
+                token_expire_datetime = None,
+                post_view_count = 0,
+                post_used_count = 0,
             )
             session.add(user)
             transaction.commit()
@@ -119,7 +129,7 @@ class Users(Base):
             from_user_id = system_user.user_id,
             to_user_id = user.user_id,
             subject = 'Welcome to Yellr!',
-            text = "Congratulations, you are now a part of Yellr!  You can start posting content right away!",
+            text = "Congratulations, you are now using Yellr!  You can start posting content right away!",
         )
         return user
 
@@ -836,6 +846,16 @@ class Posts(Base):
                 Posts.post_id == post_id,
             ).first()
         return post
+
+    @classmethod
+    def get_count_from_user_id(cls, session, user_id):
+        with transaction.manager:
+            post_count = session.query(
+                Posts.user_id,
+            ).filter(
+                Posts.user_id == user_id,
+            ).count()
+        return post_count 
 
     @classmethod
     def get_with_media_objects_from_post_id(cls, session, post_id):
