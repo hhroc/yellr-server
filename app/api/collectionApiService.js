@@ -41,11 +41,11 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                params: {
+                data: $.param({
                     name: name,
                     description: description,
                     tags: tags
-                }
+                })
             });
         };
 

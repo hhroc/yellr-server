@@ -1,7 +1,7 @@
 'use strict';
 
 angular
-    .module('Yellr', ['mm.foundation', 'ui.router', 'ui.bootstrap',
+    .module('Yellr', ['mm.foundation', 'ui.router',
             'ngClipboard', 'ngTagsInput', 'wu.masonry'])
     .config(['$stateProvider', '$urlRouterProvider', 'ngClipProvider',
             function ($stateProvider, $urlRouterProvider, ngClipProvider) {

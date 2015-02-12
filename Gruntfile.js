@@ -23,9 +23,9 @@ module.exports = function (grunt) {
                         'bower_components/masonry/dist/masonry.pkgd.min.js',
                         'bower_components/angular-masonry/angular-masonry.js',
                         'bower_components/angular-ui-router/release/angular-ui-router.js',
-                        'bower_components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.min.js',
                         'bower_components/angular-mocks/angular-mocks.js',
                         'bower_components/angular-foundation/mm-foundation-tpls.js',
+                        'bower_components/foundation-datepicker/js/foundation-datepicker.js',
                         'app/*.js', // root files first
                         'app/**/*.js', // then everything else
                         '!app/tests/**/*.js' // ignore tests

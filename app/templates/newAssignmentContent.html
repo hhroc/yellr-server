@@ -6,7 +6,7 @@
             <h3>Expiration Date</h3>
         </label>
         <div id="exp-datepicker" class="expire-datepicker">
-            <datepicker required ng-model="assignment.expireDate" format="format" min-date="minDate" class="well well-sm" required></datepicker>
+            <input type="text" value="" id="due-date-datepicker" style="width: 130px;" ng-model="assignment.expireDate">
         </div>
     </div>
     <input type="submit" class="save-button" value="Next"/>

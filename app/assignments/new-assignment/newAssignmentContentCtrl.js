@@ -4,11 +4,9 @@ angular
     .module('Yellr')
     .controller('newAssignmentContentCtrl', ['$scope', '$location',
     function ($scope, $location) {
-        $scope.format = 'dd-MM-yyyy';
-        $scope.dateOptions = {
-            formatYear: 'yy',
-            startingDay: 1
-        };
+        $('#due-date-datepicker').fdatepicker({
+            format: 'mm-dd-yyyy'
+        });
 
         $scope.save = function (assignment) {
             angular.extend($scope.$parent.assignment, assignment);
