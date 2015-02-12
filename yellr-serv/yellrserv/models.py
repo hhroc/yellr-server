@@ -442,7 +442,7 @@ class Assignments(Base):
             #    assignments = assignments_query.all()
             #else:
             #    assignments = assignments_query.slice(start, start+count)
-        return assignments,total_assignment_count
+        return assignments, total_assignment_count
 
     @classmethod
     def get_all_open_with_questions(cls, session, language_code, lat, lng):
