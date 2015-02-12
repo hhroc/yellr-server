@@ -977,7 +977,7 @@ def get_profile(request):
 
         result['post_count'] = post_count
         result['post_view_count'] = user.post_view_count
-        result['post_used_cout'] = user.post_used_count
+        result['post_used_count'] = user.post_used_count
 
         result['success'] = True
 
