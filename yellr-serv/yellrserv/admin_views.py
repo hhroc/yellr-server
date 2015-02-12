@@ -626,10 +626,6 @@ def admin_get_my_assignments(request):
             count = count,
         )
 
-        print "\n\nASSIGNMENTS\n\n"
-        print assignments
-        print "\n\n"
-
         ret_assignments = []
         # this is for development.ini ... sqlite was puking on the query
         if assignment_count != 0 and len(assignments) > 0 and assignments[0][0] != None:
@@ -667,6 +663,7 @@ def admin_get_my_assignments(request):
                         #'use_fence': use_fence,
                         'organization': organization,
                         'questions': [],
+                        'post_count': post_count,
                     }
 
                     # record that we have seen the assignment_id
@@ -1652,7 +1649,7 @@ def admin_create_user(request):
             fence_bottom_right_lng = float(request.POST['fence_bottom_right_lng'])
         except:
             result['error_text'] = """\
-One or more of the following fields is missing or invalid: client_id. \
+One or more of the following fields is missing or invalid: user_type_id, client_id, user_name, password, first_name, last_name, email, organization, fence_top_left_lat, fence_top_left_lng, fence_bottom_right_lat, fence_bottom_right_lng. \
 """
             raise Exception('Missing or invalid field.')
 

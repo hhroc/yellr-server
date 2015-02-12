@@ -508,6 +508,7 @@ def get_stories(request):
                 'tags': tags,
                 'top_text': top_text,
                 'contents': contents,
+                'contents_rendered': markdown.markdown(contents),
                 'top_left_lat': top_left_lat,
                 'top_left_lng': top_left_lng,
                 'bottom_right_lat': bottom_right_lat,
