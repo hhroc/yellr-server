@@ -4,14 +4,15 @@
             <h4>No posts yet.</h4>
         </div>
         <div ng-show="posts.length" class="post-column masonry-brick" ng-repeat="post in posts">
-            <div class="inner-post">
+            <div ng-class="{'inner-post assignment-response-border': !(post.assignment_name == null), 'inner-post free-post-border': (post.assignment_name.length == null)}">
                 <div ng-if="post.imageUrl" ng-style="post.imageUrl" ng-class="post.description ? 'post-image' : 'full-image'"></div>
                 <div ng-if="!post.imageUrl" class="post-image post-image-blank">
                     <h2>Yellr</h2>
                 </div>
                 <div class="post-body">
-                    <h4 class="post-header" ng-if="post.title">{{post.title}}</h4>
-                    <p class="post-description" ng-if="post.description">{{post.description}}</p>
+                    <p class="post-assignment-name" ng-if="post.assignment_name">Assignment: {{post.assignment_name}}</p>
+                    <p class="post-assignment-name" ng-if="!post.assignment_name">Free Post</p>
+                    <h4 class="post-text" ng-if="post.text">{{post.text}}</h4>
                     <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>
                     <button class="delete-post"><i class="fa fa-trash"></i></button>
                     <button class="add-post" dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
