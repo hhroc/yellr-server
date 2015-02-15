@@ -13,6 +13,10 @@ angular
                 if (mediaObject.media_type_name == 'text') {
                     post.contentTypes.push('text');
                     return mediaObject.media_text;
+                } else if (mediaObject.media_type_name == 'image') {
+                    if ( mediaObject.caption !== '' ) {
+                        return mediaObject.caption;
+                    }
                 }
             }
 
@@ -42,7 +46,7 @@ angular
                         posts[postId].post_datetime,
                         'YYYY-MM-DD HH:mm:ss')
                     .fromNow();
-                posts[postId].description = _getFirstText(
+                posts[postId].text = _getFirstText(
                                                 posts[postId]);
                 posts[postId].imageUrl = _getFirstImage(
                                                 posts[postId]);
@@ -53,3 +57,4 @@ angular
 
         return formatPosts;
     });
+

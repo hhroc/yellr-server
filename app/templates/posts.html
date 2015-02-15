@@ -6,7 +6,7 @@
         <div ng-show="posts.length" class="post-column masonry-brick"
             ng-repeat="post in posts | filter:search | postType:selectedType">
             <div class="inner-post">
-                <div ng-if="post.imageUrl" ng-style="post.imageUrl" ng-class="post.description ? 'post-image' : 'full-image'"></div>
+                <div ng-if="post.imageUrl" ng-style="post.imageUrl" ng-class="post.text ? 'post-image' : 'full-image'"></div>
                 <div ng-if="!post.imageUrl" class="post-image post-image-blank">
                     <h2>Yellr</h2>
                 </div>
@@ -27,4 +27,5 @@
         </div>
     </div>
 </div>
+
 
