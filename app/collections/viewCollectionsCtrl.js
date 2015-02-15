@@ -14,6 +14,8 @@ angular
         }
 
         $scope.user = $rootScope.user;
+        $scope.$parent.clear();
+        $scope.$parent.collectionsPage = true;
 
         /**
          * Create get collections function
@@ -25,20 +27,14 @@ angular
             $scope.collections = data.collections;
         });
 
-        if ($rootScope.user === undefined) {
-            $location.path('/login');
-            return;
-        }
-
-        $scope.user = $rootScope.user;
-
-        $scope.$parent.clear();
-        $scope.$parent.collectionsPage = true;
-
         $scope.openModal = function () {
-            $modal.open({
+            var modalInstance = $modal.open({
                 templateUrl: 'assets/templates/newCollectionModal.html',
                 controller: 'newCollectionModalCtrl'
+            });
+
+            modalInstance.result.then(function (result) {
+                $scope.collections.push(result);
             });
         };
     }])
@@ -50,7 +46,8 @@ angular
             collectionApiService.createCollection($rootScope.user.token,
                 collection.name, collection.description)
             .success(function (data) {
-                console.log(data);
+                collection.collection_id = data.collection_id;
+                $modalInstance.close(collection);
             });
         };
     }]);
