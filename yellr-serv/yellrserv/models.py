@@ -153,6 +153,21 @@ class Users(Base):
         return user
 
     @classmethod
+    def check_exists(cls, session, user_name, email, client_id):
+        with transaction.manager:
+            user = session.query(
+                Users,
+            ).filter(
+                Users.user_name == user_name or \
+                    Users.email == email or \
+                    Users.client_id == client_id
+            ).first()
+            exists = False
+            if not user == None:
+                exists = True
+        return exists
+
+    @classmethod
     def get_organization_from_user_id(cls, session, user_id):
         with transaction.manager:
             user = session.query(
@@ -806,6 +821,12 @@ class Posts(Base):
                 )
                 session.add(post_media_object)
             transaction.commit()
+        Notifications.create_notification(
+            session,
+            user.user_id,
+            'post_successful',
+            json.dumps({'post_id': post.post_id, 'post_text': ''}),
+        )
         return (post, created)
 
     @classmethod
@@ -1435,6 +1456,8 @@ class Collections(Base):
                     Collections.collection_id,
             ).filter(
                 Collections.user_id == user.user_id,
+            ).order_by(
+                desc(Collections.collection_datetime),
             ).group_by(
                 Collections.collection_id,
             ).all()
@@ -1573,8 +1596,9 @@ class Notifications(Base):
                 Notifications.payload,
             ).filter(
                 Notifications.user_id == user.user_id,
-            ).all() #.limit(25).all()
-            # update table
+            ).order_by(
+                desc(Notifications.notification_datetime),
+            ).all() #.limit(25)
         return notifications, created
 
     @classmethod

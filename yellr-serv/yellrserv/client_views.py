@@ -378,10 +378,6 @@ def create_response_message(request):
             text = request.POST['text']
         except:
             result['error_text'] = 'Missing or invalid field'
-#            result['error_text'] = """\
-#One or more of the following fields is missing or invalid: client_id, \
-#parent_message_id, subject, text.\
-#"""
             raise Exception("missing/invalid field")
 
         message = Messages.create_response_message_from_http(
@@ -649,6 +645,10 @@ def upload_media(request):
     #error_text = ''
     try:
     #if True:
+
+        print "\n\nPOST\n\n"
+        print request.POST
+        print "\n\n"
 
         #if True:
         try:
@@ -992,6 +992,59 @@ def get_profile(request):
         'result': result,
     }
     client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
+
+    return make_response(result)
+
+@view_config(route_name='verify_user.json')
+def verify_user(request):
+
+    result = {'success': False}
+
+    try:
+    #if True:
+
+        try:
+        #if True:
+            client_id = request.POST['client_id']
+            user_name = request.POST['username']
+            password = request.POST['password']
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            email = ""
+            try:
+                email = request.POST['email']
+            except:
+                pass
+        except:
+            result['error_text'] = 'Missing or invalid field'
+            raise Exception("missing/invalid field")
+
+        exists = Users.check_exists(
+            session = DBSession,
+            user_name = user_name,
+            email = email,
+            client_id = client_id,
+        )
+        
+        if exists == True:
+            result['error_text'] = "Username, email, and/or client ID already registered"
+            raise Exception("username, email, and/or client ID already registered")
+        else:
+            verified_new_user = Users.verify_user(
+                session = DBSession,
+                client_id = client_id,
+                user_name = user_name,
+                password = password,
+                first_name = first_name,
+                last_name = last_name,
+                email = email,
+            )
+            result['verfied_user_id'] = verified_new_user.user_id
+            
+            result['success'] = True
+
+    except:
+        pass
 
     return make_response(result)
 
