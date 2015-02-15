@@ -78,10 +78,9 @@ class Users(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
     user_type_id = Column(Integer, ForeignKey('usertypes.user_type_id'))
-    user_geo_fence_id = Column(Integer, 
-        ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
-    verified = Column(Boolean)
+    
     client_id = Column(Text)
+
     user_name = Column(Text)
     first_name = Column(Text)
     last_name = Column(Text)
@@ -89,8 +88,15 @@ class Users(Base):
     email = Column(Text)
     pass_salt = Column(Text)
     pass_hash = Column(Text)
-    token = Column(Text)
-    token_expire_datetime = Column(DateTime)
+    verified = Column(Boolean)
+    user_geo_fence_id = Column(Integer,
+        ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
+
+    token = Column(Text, nullable=True)
+    token_expire_datetime = Column(DateTime, nullable=True)
+
+    post_view_count = Column(Integer)
+    post_used_count = Column(Integer)
 
     @classmethod
     def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
@@ -110,6 +116,10 @@ class Users(Base):
                 email = email,
                 pass_salt = pass_salt,
                 pass_hash = pass_hash,
+                token = None,
+                token_expire_datetime = None,
+                post_view_count = 0,
+                post_used_count = 0,
             )
             session.add(user)
             transaction.commit()
@@ -119,7 +129,7 @@ class Users(Base):
             from_user_id = system_user.user_id,
             to_user_id = user.user_id,
             subject = 'Welcome to Yellr!',
-            text = "Congratulations, you are now a part of Yellr!  You can start posting content right away!",
+            text = "Congratulations, you are now using Yellr!  You can start posting content right away!",
         )
         return user
 
@@ -141,6 +151,21 @@ class Users(Base):
             session.add(user)
             transaction.commit()
         return user
+
+    @classmethod
+    def check_exists(cls, session, user_name, email, client_id):
+        with transaction.manager:
+            user = session.query(
+                Users,
+            ).filter(
+                Users.user_name == user_name or \
+                    Users.email == email or \
+                    Users.client_id == client_id
+            ).first()
+            exists = False
+            if not user == None:
+                exists = True
+        return exists
 
     @classmethod
     def get_organization_from_user_id(cls, session, user_id):
@@ -442,7 +467,7 @@ class Assignments(Base):
             #    assignments = assignments_query.all()
             #else:
             #    assignments = assignments_query.slice(start, start+count)
-        return assignments,total_assignment_count
+        return assignments, total_assignment_count
 
     @classmethod
     def get_all_open_with_questions(cls, session, language_code, lat, lng):
@@ -796,6 +821,12 @@ class Posts(Base):
                 )
                 session.add(post_media_object)
             transaction.commit()
+        Notifications.create_notification(
+            session,
+            user.user_id,
+            'post_successful',
+            json.dumps({'post_id': post.post_id, 'post_text': ''}),
+        )
         return (post, created)
 
     @classmethod
@@ -836,6 +867,16 @@ class Posts(Base):
                 Posts.post_id == post_id,
             ).first()
         return post
+
+    @classmethod
+    def get_count_from_user_id(cls, session, user_id):
+        with transaction.manager:
+            post_count = session.query(
+                Posts.user_id,
+            ).filter(
+                Posts.user_id == user_id,
+            ).count()
+        return post_count 
 
     @classmethod
     def get_with_media_objects_from_post_id(cls, session, post_id):
@@ -1415,6 +1456,8 @@ class Collections(Base):
                     Collections.collection_id,
             ).filter(
                 Collections.user_id == user.user_id,
+            ).order_by(
+                desc(Collections.collection_datetime),
             ).group_by(
                 Collections.collection_id,
             ).all()
@@ -1553,8 +1596,9 @@ class Notifications(Base):
                 Notifications.payload,
             ).filter(
                 Notifications.user_id == user.user_id,
-            ).all() #.limit(25).all()
-            # update table
+            ).order_by(
+                desc(Notifications.notification_datetime),
+            ).all() #.limit(25)
         return notifications, created
 
     @classmethod

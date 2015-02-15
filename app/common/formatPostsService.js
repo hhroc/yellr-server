@@ -18,7 +18,6 @@ angular
 
             return null;
         },
-
         _getFirstImage = function (post) {
             var i, mediaObject;
             for (i = 0; i < post.media_objects.length; i++) {
@@ -38,7 +37,7 @@ angular
         formatPosts = function (posts) {
             for (var postId in posts) {
                 posts[postId].contentTypes = [];
-                // TODO: get title and image
+
                 posts[postId].time = moment(
                         posts[postId].post_datetime,
                         'YYYY-MM-DD HH:mm:ss')

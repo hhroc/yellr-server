@@ -182,8 +182,8 @@ def admin_get_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -285,8 +285,8 @@ def admin_get_posts(request):
 
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_posts.json => {0}".format(json.dumps(result)))
 
@@ -425,8 +425,8 @@ def admin_publish_assignment(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -435,8 +435,8 @@ def admin_publish_assignment(request):
             result['error_text'] = "Missing or invalid 'token' field in request."
             raise Exception('invalid/missing token')
 
-        if True:
-        #try:
+        #if True:
+        try:
             name = request.POST['name']
             life_time = 0
             try:
@@ -468,13 +468,13 @@ def admin_publish_assignment(request):
             result['bottom_right_lat'] = bottom_right_lat
             result['bottom_right_lng'] = bottom_right_lng
 
-#        except:
-#            result['error_text'] = """\
-#One or more of the following fields is missing or invalid: life_time,\
-#questions (JSON list of question id's), top_left_lat, top_left_lng, \
-#bottom_right_lat, bottom_right_lng.
-#"""
-#            raise Exception('invalid/missing field')
+        except:
+            result['error_text'] = """\
+One or more of the following fields is missing or invalid: life_time,\
+questions (JSON list of question id's), top_left_lat, top_left_lng, \
+bottom_right_lat, bottom_right_lng.
+"""
+            raise Exception('invalid/missing field')
 
         #geo_fence = {
         #    'top_left_lat': top_left_lat,
@@ -524,8 +524,8 @@ def admin_publish_assignment(request):
 
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/publish_assignment.json => {0}".format(json.dumps(result)))
 
@@ -626,10 +626,6 @@ def admin_get_my_assignments(request):
             count = count,
         )
 
-        print "\n\nASSIGNMENTS\n\n"
-        print assignments
-        print "\n\n"
-
         ret_assignments = []
         # this is for development.ini ... sqlite was puking on the query
         if assignment_count != 0 and len(assignments) > 0 and assignments[0][0] != None:
@@ -667,6 +663,7 @@ def admin_get_my_assignments(request):
                         #'use_fence': use_fence,
                         'organization': organization,
                         'questions': [],
+                        'post_count': post_count,
                     }
 
                     # record that we have seen the assignment_id
@@ -1114,8 +1111,8 @@ def admin_get_my_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1148,8 +1145,8 @@ def admin_get_my_collection(request):
         result['collections'] = ret_collections
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
 
@@ -1652,7 +1649,7 @@ def admin_create_user(request):
             fence_bottom_right_lng = float(request.POST['fence_bottom_right_lng'])
         except:
             result['error_text'] = """\
-One or more of the following fields is missing or invalid: client_id. \
+One or more of the following fields is missing or invalid: user_type_id, client_id, user_name, password, first_name, last_name, email, organization, fence_top_left_lat, fence_top_left_lng, fence_bottom_right_lat, fence_bottom_right_lng. \
 """
             raise Exception('Missing or invalid field.')
 

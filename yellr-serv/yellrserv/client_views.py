@@ -378,10 +378,6 @@ def create_response_message(request):
             text = request.POST['text']
         except:
             result['error_text'] = 'Missing or invalid field'
-#            result['error_text'] = """\
-#One or more of the following fields is missing or invalid: client_id, \
-#parent_message_id, subject, text.\
-#"""
             raise Exception("missing/invalid field")
 
         message = Messages.create_response_message_from_http(
@@ -508,6 +504,7 @@ def get_stories(request):
                 'tags': tags,
                 'top_text': top_text,
                 'contents': contents,
+                'contents_rendered': markdown.markdown(contents),
                 'top_left_lat': top_left_lat,
                 'top_left_lng': top_left_lng,
                 'bottom_right_lat': bottom_right_lat,
@@ -649,6 +646,10 @@ def upload_media(request):
     try:
     #if True:
 
+        print "\n\nPOST\n\n"
+        print request.POST
+        print "\n\n"
+
         #if True:
         try:
             client_id = request.POST['client_id']
@@ -680,7 +681,7 @@ def upload_media(request):
 
             # generate a unique file name to store the file to
             unique = uuid.uuid4()
-            file_name = '{0}.{1}'.format(unique,media_extention)
+            file_name = '{0}'.format(unique) #,media_extention)
             file_path = os.path.join(system_config['upload_dir'], file_name)
 
             # write file to temp location, and then to disk
@@ -698,54 +699,54 @@ def upload_media(request):
             output_file.close()
 
             #decode media type of written file
-            #more file types can be added, but these should cover most for now
-            #TODO: client side validation so they don't lose content when they upload incorrect files?
-            #TODO: better error messages
-            #TODO: delete / handle (in some way) files that do not validate?
-            mimetype = magic.from_file(temp_file_path, mime=True)
-            #process image files
             if media_type == 'image':
 
-                #jpeg
-                if mimetype == "image/jpeg":
-                    media_extention  = 'jpg'
-                    #print "media_Extension is: " + media_extention
+                # type incoming file
+                mime_type = magic.from_file(temp_file_path, mime=True)
+                allowed_image_types = [
+                    'image/jpeg',
+                    'image/png',
+                    'image/x-ms-bmp',
+                    'image/tiff',
+                ]
 
-                #png
-                elif mimetype == "image/png":
-                    media_extention  = 'png'
-                    #print "media_Extension is: " + media_extention
+                if not mime_type in allowed_image_types:
+                    raise Exception("Unsupported Image Type")
 
-                #not jpeg or png
-                else:
-                    error_text = 'invalid image file'
-                    raise Exception('')
+                # convert to jpeg from whatever format it was
+                try:
+                    
+                    subprocess.call(['convert', temp_file_path, '{0}.jpg'.format(temp_file_path)])
+                    temp_file_path = '{0}.jpg'.format(temp_file_path)
+
+                except Exception, ex:
+                    error_text = "Error converting image: {0}".format(ex)
+                    raise Exception(error_text)
 
                 #strip metadata from images with ImageMagick's mogrify
-                #TODO: dynamically find mogrify (but I think it's usually /usr/bin)
-                if True:
-                #try:
+                try:
 
                     # strip meta data
                     subprocess.call(['mogrify', '-strip', temp_file_path])
                     
-                    preview_file_name = '{0}p.{1}'.format(unique,media_extention)
-                    file_path_image_preview = os.path.join(system_config['upload_dir'], preview_file_name)
+                except Exception, ex:
+                    error_text = "Error removing metadata: {0}".format(ex)
+                    raise Exception(error_text)
 
-                    # generate preview image
-                    #subprocess.call(['convert', temp_file_path, '-resize', '320x100', '-background', 'white', \
-                    #        'gravity', 'center', 'extent', '320x100', file_path_image_preview])
-                    #subprocess.call(['convert', temp_file_path, '-resize', '320x100', '-size', '320x100', \
-                    #        'xc:white', '+swap', '-gravity', 'center', '-composite', file_path_image_preview])
+                # create preview image 
+                try:
+
+                    preview_file_name = '{0}p.jpg'.format(unique)
+                    file_path_image_preview = os.path.join(system_config['upload_dir'], preview_file_name)
 
                     subprocess.call(['convert', temp_file_path, '-resize', '450', '-size', '450', \
                         file_path_image_preview])
 
-                    # subprocess.call(['/usr/bin/mogrify', '-strip', temp_file_path])
-                    # subprocess.call(['/usr/local/bin/mogrify', '-strip', temp_file_path])
-                #except:
-                #    error_text = "Mogrify is missing, or in an unexpected place."
-                #    raise Exception('')
+                except Exception, ex:
+                    error_text = "Error generating preview image: {0}".format(ex)
+                    raise Exception(error_text)
+
+                file_path = "{0}.jpg".format(file_path)
 
             #process video files
             elif media_type == 'video':
@@ -809,7 +810,7 @@ def upload_media(request):
 
             #the file has been validated and processed, so we adjust the file path
             #to the mimetype-dictated file extension
-            file_path = file_path.replace("processing", media_extention)
+            #file_path = file_path.replace("processing", media_extention)
 
             # rename once we are valid
             os.rename(temp_file_path, file_path)
@@ -912,6 +913,13 @@ def get_profile(request):
             client_id = client_id,
         )
 
+        post_count = Posts.get_count_from_user_id(
+            session = DBSession,
+            user_id = user.user_id,
+        )
+
+        """
+
         posts,post_count = Posts.get_all_from_client_id(
             session = DBSession,
             client_id = client_id,
@@ -958,12 +966,19 @@ def get_profile(request):
                 }
 
         result['posts'] = ret_posts
-        result['post_count'] = post_count
+
+        """
+
         result['first_name'] = user.first_name
         result['last_name'] = user.last_name
         result['organization'] = user.organization
         result['email'] = user.email
         result['verified']  = user.verified
+
+        result['post_count'] = post_count
+        result['post_view_count'] = user.post_view_count
+        result['post_used_count'] = user.post_used_count
+
         result['success'] = True
 
 #    except:
@@ -977,6 +992,59 @@ def get_profile(request):
         'result': result,
     }
     client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
+
+    return make_response(result)
+
+@view_config(route_name='verify_user.json')
+def verify_user(request):
+
+    result = {'success': False}
+
+    try:
+    #if True:
+
+        try:
+        #if True:
+            client_id = request.POST['client_id']
+            user_name = request.POST['username']
+            password = request.POST['password']
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            email = ""
+            try:
+                email = request.POST['email']
+            except:
+                pass
+        except:
+            result['error_text'] = 'Missing or invalid field'
+            raise Exception("missing/invalid field")
+
+        exists = Users.check_exists(
+            session = DBSession,
+            user_name = user_name,
+            email = email,
+            client_id = client_id,
+        )
+        
+        if exists == True:
+            result['error_text'] = "Username, email, and/or client ID already registered"
+            raise Exception("username, email, and/or client ID already registered")
+        else:
+            verified_new_user = Users.verify_user(
+                session = DBSession,
+                client_id = client_id,
+                user_name = user_name,
+                password = password,
+                first_name = first_name,
+                last_name = last_name,
+                email = email,
+            )
+            result['verfied_user_id'] = verified_new_user.user_id
+            
+            result['success'] = True
+
+    except:
+        pass
 
     return make_response(result)
 

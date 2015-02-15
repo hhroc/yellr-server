@@ -21,6 +21,14 @@
     top: -11px;
 }
 
+.assignment-response-border {
+    border: 2px solid purple;
+}
+
+.free-post-border {
+    border: 2px solid red;
+}
+
 .inner-post {
     background-color: $background;
     border-radius: 5px;
@@ -112,8 +120,8 @@
             }
         }
 
-        .post-description {
-            margin: 5px 0 10px 0;
+        .post-text {
+            margin: 15px 10px 15px 10px;
         }
 
         .post-time {
