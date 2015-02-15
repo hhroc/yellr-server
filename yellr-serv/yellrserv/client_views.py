@@ -1000,30 +1000,35 @@ def verify_user(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
-        #try:
-        if True:
+        try:
+        #if True:
             client_id = request.POST['client_id']
             user_name = request.POST['username']
             password = request.POST['password']
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
-            email = request.POST['email']
-        #except:
-        #    result['error_text'] = 'Missing or invalid field'
-        #    raise Exception("missing/invalid field")
+            email = ""
+            try:
+                email = request.POST['email']
+            except:
+                pass
+        except:
+            result['error_text'] = 'Missing or invalid field'
+            raise Exception("missing/invalid field")
 
         exists = Users.check_exists(
             session = DBSession,
             user_name = user_name,
             email = email,
+            client_id = client_id,
         )
         
         if exists == True:
-            result['error_text'] = "Username and/or email already registered"
-            raise Exception("username and/or email already registered")
+            result['error_text'] = "Username, email, and/or client ID already registered"
+            raise Exception("username, email, and/or client ID already registered")
         else:
             verified_new_user = Users.verify_user(
                 session = DBSession,
@@ -1038,8 +1043,8 @@ def verify_user(request):
             
             result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     return make_response(result)
 

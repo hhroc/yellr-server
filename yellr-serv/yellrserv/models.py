@@ -153,13 +153,14 @@ class Users(Base):
         return user
 
     @classmethod
-    def check_exists(cls, session, user_name, email):
+    def check_exists(cls, session, user_name, email, client_id):
         with transaction.manager:
             user = session.query(
                 Users,
             ).filter(
                 Users.user_name == user_name or \
-                    Users.email == email
+                    Users.email == email or \
+                    Users.client_id == client_id
             ).first()
             exists = False
             if not user == None:
