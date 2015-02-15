@@ -11,6 +11,7 @@ angular
                 mediaObject = post.media_objects[i];
 
                 if (mediaObject.media_type_name == 'text') {
+                    post.contentTypes.push('text');
                     return mediaObject.media_text;
                 }
             }
@@ -24,6 +25,7 @@ angular
                 mediaObject = post.media_objects[i];
 
                 if (mediaObject.media_type_name == 'image') {
+                    post.contentTypes.push('image');
                     return {
                         'background-image': 'url(/media/' +
                             mediaObject.preview_file_name + ')'
@@ -35,6 +37,7 @@ angular
 
         formatPosts = function (posts) {
             for (var postId in posts) {
+                posts[postId].contentTypes = [];
                 // TODO: get title and image
                 posts[postId].time = moment(
                         posts[postId].post_datetime,
