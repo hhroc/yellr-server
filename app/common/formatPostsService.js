@@ -10,16 +10,11 @@ angular
             for (i = 0; i < post.media_objects.length; i++) {
                 mediaObject = post.media_objects[i];
 
-                console.log(mediaObject);
-
                 if (mediaObject.media_type_name == 'text') {
                     post.contentTypes.push('text');
                     return mediaObject.media_text;
                 } else if (mediaObject.media_type_name == 'image') {
-                    console.log("mediaObject is type image");
-                    console.log("mediaObject.caption == " + mediaObject.caption);
-                    if ( mediaObject.caption != "" ) {
-                        console.log("returning mediaObject.caption");
+                    if ( mediaObject.caption !== '' ) {
                         return mediaObject.caption;
                     }
                 }
