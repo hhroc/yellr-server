@@ -1,2 +1,10 @@
 @import 'post';
 @import 'tools';
+
+.filter-controls {
+
+    .filter-control {
+        @extend .small-4;
+        @extend .columns;
+    }
+}

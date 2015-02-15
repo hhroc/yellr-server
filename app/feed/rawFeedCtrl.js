@@ -19,6 +19,19 @@ angular
 
         $scope.$parent.clear();
         $scope.$parent.feedPage = true;
+        $scope.responses = [
+            { name: 'Free Post', type: 'free_text' }
+        ];
+
+        $scope.responseTypes = [
+            { name: 'All', type: 'all' },
+            { name: 'Text Post', type: 'text' },
+            { name: 'Image Post', type: 'image' },
+            { name: 'Audio Post', type: 'audio' },
+            { name: 'Video Post', type: 'video' }
+        ];
+
+        $scope.selectedType = 'all';
 
         /**
          * Populates feed with first 50 items
