@@ -31,6 +31,11 @@ angular
             else if ( mediaObject.media_type_name == 'image' ) {
                 retText = mediaObject.caption;
             }
+
+            if ( retText.length > 128 ) {
+                retText = retText.substring(0,128);
+            }
+
             return retText;
         },
 
