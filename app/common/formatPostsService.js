@@ -46,7 +46,7 @@ angular
                         posts[postId].post_datetime,
                         'YYYY-MM-DD HH:mm:ss')
                     .fromNow();
-                posts[postId].text = _getFirstText(
+                posts[postId].description = _getFirstText(
                                                 posts[postId]);
                 posts[postId].imageUrl = _getFirstImage(
                                                 posts[postId]);
