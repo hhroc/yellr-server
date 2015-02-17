@@ -14,6 +14,15 @@ angular
         }
 
         $scope.user = $rootScope.user;
+        $scope.responseTypes = [
+            { name: 'All', type: 'all' },
+            { name: 'Text Post', type: 'text' },
+            { name: 'Image Post', type: 'image' },
+            { name: 'Audio Post', type: 'audio' },
+            { name: 'Video Post', type: 'video' }
+        ];
+
+        $scope.selectedType = 'all';
 
         /**
          * Places collection of url id in scope
@@ -38,12 +47,7 @@ angular
         collectionApiService.getPosts($rootScope.user.token,
                                       $stateParams.collectionId)
         .success(function (data) {
-            console.log(data);
             $scope.posts = formatPosts(data.posts);
         });
 
-        if ($rootScope.user === undefined) {
-            $location.path('/login');
-            return;
-        }
     }]);

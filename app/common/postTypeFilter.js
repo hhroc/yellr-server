@@ -6,6 +6,9 @@ angular
         return function (posts, type) {
             var filtered = [];
 
+            if (!angular.isDefined(posts) || !angular.isDefined(type))
+                return [];
+
             if (type == 'all') {
                 return posts;
             }

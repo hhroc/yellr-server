@@ -3,7 +3,8 @@
         <div ng-show="!posts.length === 0">
             <h4>No posts yet.</h4>
         </div>
-        <div ng-show="posts.length" class="post-column masonry-brick"
+        <div class="post-column masonry-brick"
+            ng-if="posts"
             ng-repeat="post in posts | filter:search | postType:selectedType">
             <div class="inner-post">
                 <div ng-if="post.imageUrl" ng-style="post.imageUrl" ng-class="post.text ? 'post-image' : 'full-image'"></div>
