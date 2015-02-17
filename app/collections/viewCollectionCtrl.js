@@ -3,9 +3,9 @@
 angular
     .module('Yellr')
     .controller('viewCollectionCtrl',
-    ['$scope', '$rootScope', '$location', '$stateParams',
+    ['$scope', '$rootScope', '$location', '$stateParams', '$modal',
         'collectionApiService', 'formatPosts',
-    function ($scope, $rootScope, $location, $stateParams,
+    function ($scope, $rootScope, $location, $stateParams, $modal,
               collectionApiService, formatPosts) {
 
         if ($rootScope.user === undefined) {
@@ -23,6 +23,15 @@ angular
         ];
 
         $scope.selectedType = 'all';
+
+        $scope.openPost = function (postId) {
+            $scope.postId = postId;
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/templates/viewPost.html',
+                controller: 'viewPostModalCtrl',
+                scope: $scope
+            });
+        };
 
         /**
          * Places collection of url id in scope

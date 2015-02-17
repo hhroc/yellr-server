@@ -22,7 +22,7 @@
                     <ul id="drop-{{post.post_id}}" class="f-dropdown add-post-dropdown">
                         <li ng-repeat="collection in collections" ng-click="addPostToCollection(post, collection)">{{collection.name}}</li>
                     </ul>
-                    <a class="view-post" href="#/view/{{post.post_id}}">VIEW POST</a>
+                    <button class="view-post" ng-click="openPost(post.post_id)">VIEW POST</button>
                 </div>
             </div>
         </div>
