@@ -351,6 +351,37 @@ class UserGeoFences(Base):
             ).first()
         return fence
 
+class Clients(Base):
+
+    """
+    Clients are users of the mobile app(s)
+    """
+
+    __tablename__ = 'clients'
+    client_id = Column(Integer, primary_key=True)
+    unique_id = Column(Text)
+    
+    first_name = Column(Text, nullable=True)
+    last_name = Column(Text, nullable=True)
+    email = Column(Text, nullable=True)
+    passhash = Column(Text, nullable=True)
+    passsalt = Column(Text, nullable=True)
+    verified = Column(Boolean)
+
+    creation_datetime = Column(DateTime)
+    last_checkin_datetime = Column(DateTime)
+
+    last_checkin_lat = Column(Float)
+    last_checkin_lng = Column(Float)
+
+    @classmethod
+    def create_new_client(cls, session, unique_id, lat, lng):
+        with transaction.manager:
+            client = Clients(
+            
+)
+        return client
+
 class Assignments(Base):
 
     """
@@ -972,11 +1003,11 @@ class Posts(Base):
                  Posts.post_id,
             )
             total_post_count = posts_query.count()
-            posts = posts_query.limit(256).all()
-            #if start == 0 and count == 0:
-            #    posts = posts_query.all()
-            #else:
-            #    posts = posts_query.slice(start, start+count)
+            #posts = posts_query.limit(256).all()
+            if start == 0 and count == 0:
+                posts = posts_query.all()
+            else:
+                posts = posts_query.slice(start, start+count).all()
         return posts, total_post_count
 
 
