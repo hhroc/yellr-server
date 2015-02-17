@@ -351,6 +351,7 @@ class UserGeoFences(Base):
             ).first()
         return fence
 
+'''
 class Clients(Base):
 
     """
@@ -381,6 +382,7 @@ class Clients(Base):
             
 )
         return client
+'''
 
 class Assignments(Base):
 
