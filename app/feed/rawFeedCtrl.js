@@ -23,9 +23,6 @@ angular
 
         $scope.$parent.clear();
         $scope.$parent.feedPage = true;
-        $scope.responses = [
-            { name: 'Free Post', type: 'free_text' }
-        ];
 
         $scope.responseTypes = [
             { name: 'All', type: 'all' },

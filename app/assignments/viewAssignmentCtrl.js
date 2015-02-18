@@ -13,6 +13,15 @@ angular
             return;
         }
 
+        $scope.responseTypes = [
+            { name: 'All', type: 'all' },
+            { name: 'Text Post', type: 'text' },
+            { name: 'Image Post', type: 'image' },
+            { name: 'Audio Post', type: 'audio' },
+            { name: 'Video Post', type: 'video' }
+        ];
+        $scope.selectedType = 'all';
+
         /**
          * Create view assignments function
          *
@@ -30,6 +39,7 @@ angular
         assignmentApiService.getAssignmentResponses($rootScope.user.token,
                                       $stateParams.assignmentId)
         .success(function (data) {
+            console.log(formatPosts(data.posts));
             $scope.posts = formatPosts(data.posts);
         });
     }]);
