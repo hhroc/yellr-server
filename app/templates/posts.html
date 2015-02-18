@@ -30,6 +30,5 @@
     <div ng-show="filteredPosts.length === 0">
         <h3>No Posts Found</h3>
     </div>
+    <button ng-if="filteredPosts.length > 0" ng-click="loadMore()">Load More Posts</button>
 </div>
-
-

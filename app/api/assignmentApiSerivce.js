@@ -20,9 +20,8 @@ angular
                 params = { token: accessToken };
 
             if (start !== undefined) params.start = start;
-            if (count !== undefined) params.start = start;
-            if (start !== undefined) params.start = start;
-
+            if (count !== undefined) params.count = count;
+            if (start !== undefined) params.reported = reported;
 
             return $http({
                 method: 'GET',
@@ -115,7 +114,7 @@ angular
          * @return response : either error or sucess response with assignment
          *                    id
          */
-        assignmentApi.publishAssignment = function (accessToken, name, lifeTime, 
+        assignmentApi.publishAssignment = function (accessToken, name, lifeTime,
                                                questions, topLeftLat, topLeftLng,
                                                bottomRightLat, bottomRightLng) {
 
