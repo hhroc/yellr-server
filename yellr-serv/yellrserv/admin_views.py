@@ -46,7 +46,12 @@ def check_token(request):
         token = request.GET['token']
         valid, user = Users.validate_token(DBSession, token)
     except:
-        pass
+        try:
+            token = request.session['token']
+            valid, user = Users.validate_token(DBSession, token)
+        except:
+            pass
+
     return valid, user
 
 @view_config(route_name='admin/get_access_token.json')
@@ -1404,8 +1409,8 @@ def admin_get_user_posts(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
 
         token = None
         valid_token = False
@@ -1416,7 +1421,13 @@ def admin_get_user_posts(request):
 
         try:
         #if True:
+            #
+            # TODO: convert this over from client_id to cuid
+            #
             client_id = request.GET['client_id']
+
+            cuid = client_id
+
         except:
             result['error_text'] = "Missing field"
             raise Exception('Missing or invalid field.')
@@ -1433,9 +1444,9 @@ def admin_get_user_posts(request):
         except:
             pass
 
-        posts,post_count = Posts.get_all_from_client_id(
+        posts,post_count = Posts.get_all_from_cuid(
             session = DBSession,
-            client_id = client_id,
+            cuid = cuid,
             start = start,
             count = count,
         )
@@ -1506,8 +1517,8 @@ def admin_get_user_posts(request):
         result['client_id'] = client_id
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     #admin_log("HTTP: admin/get_user_posts.json => {0}".format(json.dumps(result)))
 
