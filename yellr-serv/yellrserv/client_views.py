@@ -26,6 +26,7 @@ from .models import (
     DBSession,
     UserTypes,
     Users,
+    Clients,
     Assignments,
     Questions,
     QuestionAssignments,
@@ -35,7 +36,7 @@ from .models import (
     MediaObjects,
     PostMediaObjects,
     Stories,
-    EventLogs,
+    ClientLogs,
     Collections,
     CollectionPosts,
     Messages,
@@ -57,8 +58,6 @@ def index(request):
 
     #try:
     if True:
-
-
 
         latest_stories,dummy = Stories.get_stories(
             session = DBSession,
@@ -108,158 +107,55 @@ def index(request):
 def submit_tip(request):
     return dict(title='Submit Tip', data_page='submit-tip')
 
+def register_client(request):
 
-#@view_config(route_name='index.html')
-#def index(request):
-#
-#    resp = """
-#           Welcome to Yellr!<br><br>Head over to the github repo
-#           <a href="https://github.com/hhroc/yellr">here</a>.
-#           """
-#    return Response(resp)
+    success = False
+    error_text = ''
+    language_code = ''
+    lat = 0
+    lng = 0
+    client = None
+    try:
+        cuid = request.GET['cuid']
+        language_code = request.GET['language_code']
+        lat = float(request.GET['lat'])
+        lng = float(request.GET['lng'])
 
-#@view_config(route_name='server_info.json')
-#def get_users(request):
-#
-#    """ Allows clients to get version information about the server
-#    """
-#
-#    result = {'success': False}
-#
-#    try:
-#    #if True:
-#
-#        result['server_version'] = SERVER_VERSION
-#        result['required_client_version'] = REQUIRED_CLIENT_VERSION
-#        result['success'] = True
-#
-#    except:
-#        pass
-#
-#    resp = json.dumps(result)
-#    return Response(resp,content_type='application/json')
+        client = Clients.get_client_by_cuid(
+            session = DBSession,
+            cuid = cuid,
+        )
+        if client == None:
+            client = Clients.create_new_client(
+                session = DBSession,
+                cuid = cuid,
+                lat = lat,
+                lng = lng,
+            )
+        success = True
+    except:
+        error_text[''] = "Required Fields: cuid, language_code, lat, lng"
 
-#@view_config(route_name='get_posts.json')
-#def get_posts(request):
-#
-#    """
-#    Return all of the posts on the server
-#    """
-#
-#    result = {'success': False}
-#
-#    try:
-#    #if True:
-#
-#        reported = False
-#        try:
-#            reported = bool(request.GET['reported'])
-#        except:
-#            pass
-#
-#        user_id = None
-#        try:
-#            client_id = request.GET['client_id']
-#            user, created = Users.get_from_client_id(
-#                session = DBSession,
-#                client_id = client_id,
-#                create_if_not_exist = False
-#            )
-#            user_id = user.user_id
-#        except:
-#            result['error_text'] = "Missing or invalidfield"
-#            raise Exception('missing/invalid field')
-#
-#        if user_id != None:
-#            posts = Posts.get_all_from_user_id(DBSession, user_id, reported)
-#        else:
-#            posts = Posts.get_posts(DBSession, reported)
-#
-#        ret_posts = []
-#        for post_id,title,post_datetime,reported,lat,lng,assignment_id, \
-#                verified,user_client_id,first_name,last_name,organization, \
-#                language_code,language_name in posts:
-#            media_objects = MediaObjects.get_from_post_id(DBSession, post_id)
-#            ret_media_objects = []
-#            for file_name,caption,media_text,name,description in media_objects:
-#                ret_media_objects.append({
-#                    'file_name': file_name,
-#                    'caption': caption,
-#                    'media_text': media_text,
-#                    'name': name,
-#                    'description': description,
-#                })
-#            ret_posts.append({
-#                'post_id': post_id,
-#                'title': title,
-#                'post_datetime': str(post_datetime),
-#                'reported': reported,
-#                'lat': lat,
-#                'lng': lng,
-#                'verified': verified,
-#                'user_id': user_client_id,
-#                'first_name': first_name,
-#                'last_name': last_name,
-#                'organization': organization,
-#                'language_code': language_code,
-#                'language_name': language_name,
-#                'media_objects': ret_media_objects,
-#            })
-#
-#        result['posts'] = ret_posts
-#        result['success'] = True
-#
-#    except:
-#        pass
-#
-#    event_type = 'http_request'
-#    event_details = {
-#        'client_id': client_id,
-#        'method': 'get_posts.json',
-#        'post_count': len(ret_posts),
-#        'result': result,
-#    }
-#    client_log = EventLogs.log(DBSession,client_id,event_type, \
-#        json.dumps(event_details))
-#
-#    resp = json.dumps(result)
-#    return Response(resp, content_type='application/json')
+    return success, error_text, language_code, lat, lng, client
 
 @view_config(route_name='get_assignments.json')
 def get_assignments(request):
 
     result = {'success': False}
 
-    # defaults for client logs
-    client_id = None
-    ret_assignments = []
+    try:
+   
+        success, error_text, language_code, lat, lng, client = \
+            register_client(request)
+        if success == False:
+            raise Exception(error_text)
 
-    #try:
-    if True:
-
-        #language_code = 'en'
-        #if True:
-        try:
-            client_id = request.GET['client_id']
-            language_code = request.GET['language_code']
-            lat = float(request.GET['lat'])
-            lng = float(request.GET['lng'])
-        except:
-            result['error_text'] = "Missing or invalid field"
-            raise Exception('missing/invalid field')
-
-        assignments = Assignments.get_all_open_with_questions(DBSession, \
-            language_code, lat, lng)
-
-        #counts = Assignments.get_all_open_response_count(
-        #    session = DBSession,
-        #    lat = lat,
-        #    lng = lng,
-        #)
-
-        print "\n\n"
-        print assignments
-        print "\n\n"
+        assignments = Assignments.get_all_open_with_questions(
+            session = DBSession,
+            language_code = language_code,
+            lat = lat,
+            lng = lng
+        )
 
         ret_assignments = []
         for assignment_id, publish_datetime, expire_datetime, name, \
@@ -268,10 +164,6 @@ def get_assignments(request):
                 question_text, question_type_id, description, answer0, \
                 answer1, answer2, answer3, answer4, answer5, answer6, \
                 answer7, answer8, answer9, post_count in assignments:
-            #post_count = 0
-            #for _assignment_id, _post_count in counts:
-            #    if _assignment_id == assignment_id:
-            #        post_count = _post_count
             ret_assignments.append({
                 'assignment_id': assignment_id,
                 'organization': organization,
@@ -298,21 +190,28 @@ def get_assignments(request):
                 'post_count': post_count,
             })
                     
-
         result['assignments'] = ret_assignments
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
-    event_type = 'http_request'
-    event_details = {
-        'client_id': client_id,
-        'method': 'get_assignments.json',
-        'message_count': len(ret_assignments),
-        'result': result,
-    }
-    client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'get_assignments.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
 
     return make_response(result)
 
@@ -323,42 +222,47 @@ def get_notifications(request):
 
     try:
 
-        client_id = None
-        try:
-            client_id = request.GET['client_id']
-        except:
-            result['error_text'] = 'Missing or invalid field'
-            raise Exception("missing/invalid field")
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
 
-        if client_id != None:
-            notifications,created = Notifications.get_notifications_from_client_id(
-                DBSession,
-                client_id
-            )
-            ret_notifications = []
-            for notification_id, notification_datetime, \
-                    notification_type, payload in notifications:
-                ret_notifications.append({
-                    'notification_id': notification_id,
-                    'notification_datetime': str(notification_datetime),
-                    'notification_type': notification_type,
-                    'payload': json.loads(payload),
-                })
+        notifications,created = Notifications.get_notifications_from_client_id(
+            session = DBSession,
+            client_id = client.client_id,
+        )
+        ret_notifications = []
+        for notification_id, notification_datetime, \
+                notification_type, payload in notifications:
+            ret_notifications.append({
+                'notification_id': notification_id,
+                'notification_datetime': str(notification_datetime),
+                'notification_type': notification_type,
+                'payload': json.loads(payload),
+            })
 
-            result['notifications'] = ret_notifications
-            result['success'] = True
+        result['notifications'] = ret_notifications
+        result['success'] = True
 
     except Exception, e:
         pass
 
-    event_type = 'http_request'
-    event_details = {
-        'client_id': client_id,
-        'method': 'get_notifications.json',
-        'message_count': len(ret_notifications),
-        'result': result,
-    }
-    client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'get_notifications.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
 
     return make_response(result)
 
@@ -368,17 +272,11 @@ def create_response_message(request):
     result = {'success': False}
 
     try:
-    #if True:
 
-        try:
-        #if True:
-            client_id = request.POST['client_id']
-            parent_message_id = request.POST['parent_message_id']
-            subject = request.POST['subject']
-            text = request.POST['text']
-        except:
-            result['error_text'] = 'Missing or invalid field'
-            raise Exception("missing/invalid field")
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
 
         message = Messages.create_response_message_from_http(
             session = DBSession,
@@ -397,6 +295,23 @@ def create_response_message(request):
     except:
         pass
 
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'create_response_message.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
+
     return make_response(result)
 
 @view_config(route_name='get_messages.json')
@@ -404,18 +319,17 @@ def get_messages(request):
 
     result = {'success': False}
 
-#    try:
+    try:
 
-    if True:
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
 
-        client_id = None
-        try:
-            client_id = request.GET['client_id']
-        except:
-            result['error_text'] = "Missing or invalid field."
-            raise Exception("missing/invalid field")
-
-        messages = Messages.get_messages_from_client_id(DBSession, client_id)
+        messages = Messages.get_messages_from_client_id(
+            session = DBSession,
+            client_id = client.client_id
+        )
         ret_messages = []
         for message_id, from_user_id,to_user_id,message_datetime, \
                 parent_message_id,subject,text, was_read,from_organization, \
@@ -437,18 +351,26 @@ def get_messages(request):
         result['messages'] = ret_messages
         result['success'] = True
 
-#    except:
-#        pass
+    except:
+        pass
 
-    event_type = 'http_request'
-    event_details = {
-        'client_id': client_id,
-        'method': 'get_messages.json',
-        'message_count': len(ret_messages),
-        'result': result,
-    }
-    client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
-
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'get_messages.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
+ 
     return make_response(result)
 
 @view_config(route_name='get_stories.json')
@@ -456,29 +378,20 @@ def get_stories(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
 
-        client_id = None
-        if True:
-        #try:
-            client_id = request.GET['client_id']
-            lat = float(request.GET['lat'])
-            lng = float(request.GET['lng'])
-            language_code = request.GET['language_code']
-        #except:
-        #    result['error_text'] = "Missing or invalid field."
-        #    raise Exception("missing/invalid field")
-
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
+ 
         start = 0
+        count = 25
         try:
-            start = request.GET['start']
-        except:
-            pass
-
-        count = 0
-        try:
-            count = request.GET['start']
+            if 'start' in reqeusts.GET:
+                start = int(float(request.GET['start']))
+            if 'count' in request.GET:
+                count = int(float(request.GET['start']))
         except:
             pass
 
@@ -521,17 +434,25 @@ def get_stories(request):
         result['stories'] = ret_stories
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
-    event_type = 'http_request'
-    event_details = {
-        'client_id': client_id,
-        'method': 'get_stories.json',
-        'message_count': len(ret_stories),
-        'result': result,
-    }
-    client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'get_stories.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
 
     return make_response(result)
 
@@ -553,28 +474,31 @@ def publish_post(request):
 
     result = {'success': False}
 
-    #if True:
     try:
 
-        #if True:
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
+
+        assignment_id = 0
         try:
-            client_id = request.POST['client_id']
-            assignment_id = request.POST['assignment_id']
-            #title = request.POST['title']
-            language_code = request.POST['language_code']
-            lat = request.POST['lat']
-            lng = request.POST['lng']
-            media_objects = json.loads(urllib.unquote(
+            if 'assignment_id' in request.POST:
+                assignment_id = int(float(str(request.POST['assignment_id'])))
+        except:
+            pass
+
+        media_obects = []
+        try:
+             media_objects = json.loads(urllib.unquote(
                 request.POST['media_objects']).decode('utf8')
             )
-
         except:
-            result['error_text'] = 'Missing or invalid field'
-            raise Exception('missing/invalid field')
+            raise Exception("Missing or invalid MediaObjects JSON list")
 
-        post,created = Posts.create_from_http(
+        post = Posts.create_from_http(
             session = DBSession,
-            client_id = client_id,
+            client_id = client.client_id,
             assignment_id = assignment_id,
             title = '', #title,
             language_code = language_code,
@@ -585,40 +509,27 @@ def publish_post(request):
 
         result['success'] = True
         result['post_id'] = post.post_id
-        result['new_user'] = created
-
-        # Debug/Logging
-        event_type = 'http_request'
-        event_details = {
-            'url':'publish_post.json',
-            'event_datetime': str(datetime.datetime.now()),
-            'client_id': client_id,
-            'assignment_id': assignment_id,
-            'language_code': language_code,
-            'lat': lat,
-            'lng': lng,
-            'media_objects': media_objects,
-            'success': result['success'],
-            'post_id': result['post_id'],
-            'new_user': result['new_user'],
-        }
-        client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
-
-        if created:
-            #datetime = str(strftime("%Y-%m-%d %H:%M:%S"))
-            event_type = 'new_user_created'
-            event_details = {
-                'client_id': client_id,
-                'method': 'publish_post.json',
-            }
-            client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
+        #result['new_user'] = created
 
     except Exception, e:
-       result['server_exception'] = str(e)
        pass
 
-    #resp = json.dumps(result)
-    #return Response(resp,content_type='application/json')
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'publish_post.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
 
     return make_response(result)
 
@@ -642,21 +553,18 @@ def upload_media(request):
 
     result = {'success': False}
 
-    #error_text = ''
     try:
-    #if True:
 
-        print "\n\nPOST\n\n"
-        print request.POST
-        print "\n\n"
-
-        #if True:
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
+ 
         try:
-            client_id = request.POST['client_id']
             media_type = request.POST['media_type']
         except:
-            result['error_text'] = 'Missing or invalid field'
-            raise Exception('missing fields')
+            error_text = "Missing media type field"
+            raise Exception(error_text)
 
         file_name = ''
         preview_file_name = ''
@@ -664,13 +572,8 @@ def upload_media(request):
         if media_type == 'image' or media_type == 'video' \
                 or media_type == 'audio':
 
-
             #if True:
             try:
-                #print "FILE TYPE: {0}".format(type(request.POST['media_file']))
-                #print "FILE CONTENTS: {0}".format(request.POST['media_file'])
-                #print "LIST OF FORM OBJECTS:"
-                #print request.POST
                 media_file_name = request.POST['media_file'].filename
                 input_file = request.POST['media_file'].file
             except:
@@ -823,10 +726,10 @@ def upload_media(request):
             #result['error_text'] = 'Missing or invalid media_file contents.'
             #raise Exception('missing/invalid media_file contents')
 
-        media_caption = ''
+        caption = ''
         #if True:
         try:
-            media_caption = request.POST['media_caption']
+            caption = request.POST['caption']
         except:
             pass
 
@@ -840,55 +743,39 @@ def upload_media(request):
 
         # register file with database, and get file id back
         media_object, created = MediaObjects.create_new_media_object(
-            DBSession,
-            client_id,
-            media_type,
-            os.path.basename(file_path),
-            media_caption,
-            media_text,
+            session = DBSession,
+            client_id = client.client_id,
+            media_type_text = media_type,
+            file_name = os.path.basename(file_path),
+            caption = caption,
+            media_text = media_text,
         )
 
         result['media_id'] = media_object.media_id
         result['success'] = True
-        result['new_user'] = created
+        #result['new_user'] = created
         #result['media_text'] = media_text
         result['error_text'] = ''
-
-        # Debug/Logging
-        #datetime = str(strftime("%Y-%m-%d %H:%M:%S"))
-        event_type = 'http_request'
-        event_details = {
-            'url':'upload_media.json',
-            'event_datetime': str(datetime.datetime.now()),
-            'client_id': client_id,
-            'media_type': media_type,
-            'file_name': os.path.basename(file_path),
-            'media_caption': media_caption,
-            'media_text': media_text,
-            'success': result['success'],
-            'media_id': result['media_id'],
-            'new_user': result['new_user'],
-            'error_text': result['error_text'],
-        }
-        client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
-
-        if created:
-            #datetime = str(strftime("%Y-%m-%d %H:%M:%S"))
-            event_type = 'new_user_created'
-            event_details = {
-                'client_id': client_id,
-                'method': 'upload_media.json',
-            }
-            client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
-
-        print "upload_media.json successful.\n\n"
 
     except:
         pass
 
-
-    #resp = json.dumps(result)
-    #return Response(resp,content_type='application/json')
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'upload_media.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
 
     return make_response(result)
 
@@ -896,78 +783,23 @@ def upload_media(request):
 def get_profile(request):
 
     result = {'success': False}
+    
+    try:
 
-#    try:
-
-    if True:
-
-        client_id = None
-        try:
-            client_id = request.GET['client_id']
-        except:
-            result['error_text'] = "Missing or invalid field."
-            raise Exception("missing/invalid field")
-
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
+ 
         user,created = Users.get_from_client_id(
             session = DBSession,
-            client_id = client_id,
+            client_id = client.client_id,
         )
 
-        post_count = Posts.get_count_from_user_id(
+        post_count = Posts.get_count_from_client_id(
             session = DBSession,
-            user_id = user.user_id,
+            client_id = client.client_id,
         )
-
-        """
-
-        posts,post_count = Posts.get_all_from_client_id(
-            session = DBSession,
-            client_id = client_id,
-            start = 0,
-            count = 5, # only return the last 5 posts
-        )
-
-        ret_posts = {}
-        for post_id, assignment_id, user_id, title, post_datetime, reported, \
-                lat, lng, media_object_id, media_id, file_name, caption, \
-                media_text, media_type_name, media_type_description, \
-                verified, client_id, language_code, language_name in posts:
-            if post_id in ret_posts:
-                ret_posts[post_id]['media_objects'].append({
-                    'media_id': media_id,
-                    'file_name': file_name,
-                    'caption': caption,
-                    'media_text': media_text,
-                    'media_type_name': media_type_name,
-                    'media_type_description': media_type_description,
-                })
-            else:
-                ret_posts[post_id] = {
-                    'post_id': post_id,
-                    'assignment_id': assignment_id,
-                    'user_id': user_id,
-                    'title': title,
-                    'post_datetime': str(post_datetime),
-                    'reported': reported,
-                    'lat': lat,
-                    'lng': lng,
-                    'verified_user': bool(verified),
-                    'client_id': client_id,
-                    'language_code': language_code,
-                    'language_name': language_name,
-                    'media_objects': [{
-                        'media_id': media_id,
-                        'file_name': file_name,
-                        'caption': caption,
-                        'media_text': media_text,
-                        'media_type_name': media_type_name,
-                        'media_type_description': media_type_description,
-                    }],
-                }
-
-        result['posts'] = ret_posts
-
-        """
 
         result['first_name'] = user.first_name
         result['last_name'] = user.last_name
@@ -975,76 +807,92 @@ def get_profile(request):
         result['email'] = user.email
         result['verified']  = user.verified
 
+
         result['post_count'] = post_count
         result['post_view_count'] = user.post_view_count
         result['post_used_count'] = user.post_used_count
 
         result['success'] = True
 
-#    except:
-#        pass
+    except:
+        pass
 
-    event_type = 'http_request'
-    event_details = {
-        'client_id': client_id,
-        'method': 'get_profile.json',
-        #'post_count': len(ret_messages),
-        'result': result,
-    }
-    client_log = EventLogs.log(DBSession,client_id,event_type,json.dumps(event_details))
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'get_profile.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
 
     return make_response(result)
 
-@view_config(route_name='verify_user.json')
+@view_config(route_name='verify_client.json')
 def verify_user(request):
 
     result = {'success': False}
 
     try:
-    #if True:
 
-        try:
-        #if True:
-            client_id = request.POST['client_id']
-            user_name = request.POST['username']
-            password = request.POST['password']
-            first_name = request.POST['first_name']
-            last_name = request.POST['last_name']
-            email = ""
-            try:
-                email = request.POST['email']
-            except:
-                pass
-        except:
-            result['error_text'] = 'Missing or invalid field'
-            raise Exception("missing/invalid field")
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
 
-        exists = Users.check_exists(
-            session = DBSession,
-            user_name = user_name,
-            email = email,
-            client_id = client_id,
-        )
         
-        if exists == True:
-            result['error_text'] = "Username, email, and/or client ID already registered"
-            raise Exception("username, email, and/or client ID already registered")
-        else:
-            verified_new_user = Users.verify_user(
-                session = DBSession,
-                client_id = client_id,
-                user_name = user_name,
-                password = password,
-                first_name = first_name,
-                last_name = last_name,
-                email = email,
-            )
-            result['verfied_user_id'] = verified_new_user.user_id
-            
-            result['success'] = True
+
+        #exists = Users.check_exists(
+        #    session = DBSession,
+        #    user_name = user_name,
+        #    email = email,
+        #    client_id = client_id,
+        #)
+        
+        #if exists == True:
+        #    result['error_text'] = "Username, email, and/or client ID already registered"
+        #    raise Exception("username, email, and/or client ID already registered")
+        #else:
+        #    verified_new_user = Users.verify_user(
+        #        session = DBSession,
+        #        client_id = client_id,
+        #        user_name = user_name,
+        #        password = password,
+        #        first_name = first_name,
+        #        last_name = last_name,
+        #        email = email,
+        #    )
+        #    result['verfied_user_id'] = verified_new_user.user_id
+        #    
+        #    result['success'] = True
 
     except:
         pass
+
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'verify_user.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
 
     return make_response(result)
 

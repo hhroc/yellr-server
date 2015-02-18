@@ -30,7 +30,7 @@ from .models import (
     MediaObjects,
     PostMediaObjects,
     Stories,
-    EventLogs,
+    ClientLogs,
     Collections,
     CollectionPosts,
     Messages,
@@ -69,15 +69,16 @@ def admin_get_access_token(request):
 
         user, token = Users.authenticate(DBSession, user_name, password)
 
-        fence = UserGeoFences.get_fence_from_user_id(
-            session = DBSession,
-            user_id = user.user_id,
-        )
-
         if token == None:
             result['error_text'] = 'Invalid credentials'
             raise Exception('invalid credentials')
         else:
+
+            fence = UserGeoFences.get_fence_from_user_id(
+                session = DBSession,
+                user_id = user.user_id,
+            )
+
             result['token'] = token
             result['username'] = user.user_name
             result['first_name'] = user.first_name
@@ -97,18 +98,8 @@ def admin_get_access_token(request):
         result['error'] = str(e)
         pass
 
-    admin_log("HTTP: admin/get_access_token.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_access_token.json => {0}".format(json.dumps(result)))
 
-#    event_type = 'http_request'
-#    event_details = {
-#        'user_name': user_name,
-#        'password': password,
-#        'method': 'admin/get_access_token.json',
-#        'result': result,
-#    }
-#    client_log = EventLogs.log(DBSession,client_id,event_type, \
-#        json.dumps(event_details))
-#
     return make_response(result)
 
 @view_config(route_name='admin/get_client_logs.json')
@@ -136,13 +127,15 @@ def admin_get_client_logs(request):
         except:
             pass
 
-        logs = EventLogs.get_all(DBSession)
+        logs = ClientLogs.get_all(
+            session = DBSession
+        )
 
         ret_logs = []
         for log in logs:
             ret_logs.append({
                 'event_log_id': log.event_log_id,
-                'user_id': log.user_id,
+                'client_id': log.client_id,
                 'event_type': log.event_type,
                 'event_datetime': str(log.event_datetime),
                 'details': json.loads(log.details),
@@ -154,24 +147,7 @@ def admin_get_client_logs(request):
     except:
         pass
 
-    admin_log("HTTP: admin/get_client_logs.json => {0}".format(json.dumps(result)))
-
-#    user_name = 'invalid'
-#    client_id = None
-#    if user != None:
-#        user_name = user.user_name
-#        client_id = user.client_id
-#
-#    event_type = 'http_request'
-#    event_details = {
-#        'user_name': user_name,
-#        #'GET': request.GET,
-#        #'POST': request.POST,
-#        'method': 'admin/get_client_logs.json',
-#        'result': result,
-#    }
-#    client_log = EventLogs.log(DBSession,client_id,event_type, \
-#        json.dumps(event_details))
+    #admin_log("HTTP: admin/get_client_logs.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -320,12 +296,8 @@ def admin_create_question(request):
             result['question_type'] = question_type
 
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: language_code, \
-question_text, description, question_type. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('missing field')
-
 
         # answers is a json array of strings
         answers = []
@@ -357,7 +329,7 @@ question_text, description, question_type. \
     except:
         pass
 
-    admin_log("HTTP: admin/create_question.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/create_question.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -383,10 +355,7 @@ def admin_update_question(request):
             description = request.POST['description']
             question_type = request.POST['question_type']
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: language_code, \
-question_text, description, question_type. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('missing field')
 
         # answers is a json array of strings
@@ -416,7 +385,7 @@ question_text, description, question_type. \
     except:
         pass
 
-    admin_log("HTTP: admin/updatequestion.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/updatequestion.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -453,7 +422,7 @@ def admin_publish_assignment(request):
                 top_left_lat = 43.4
                 top_left_lng = -77.9
                 bottom_right_lat = 43.0
-                bottom_right_lng = 43.0
+                bottom_right_lng = -77.1
             else:
                 top_left_lat = float(request.POST['top_left_lat'])
                 top_left_lng = float(request.POST['top_left_lng'])
@@ -469,11 +438,7 @@ def admin_publish_assignment(request):
             result['bottom_right_lng'] = bottom_right_lng
 
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: life_time,\
-questions (JSON list of question id's), top_left_lat, top_left_lng, \
-bottom_right_lat, bottom_right_lng.
-"""
+            result['error_text'] = "Missing field"
             raise Exception('invalid/missing field')
 
         #geo_fence = {
@@ -519,15 +484,14 @@ bottom_right_lat, bottom_right_lng.
             )
 
         result['assignment_id'] = assignment.assignment_id
-
+        result['question_ids'] = questions
         result['collection_id'] = collection.collection_id
-
         result['success'] = True
 
     except:
         pass
 
-    admin_log("HTTP: admin/publish_assignment.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/publish_assignment.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -563,10 +527,7 @@ def admin_update_assignment(request):
             bottom_right_lng = float(request.POST['bottom_right_lng'])
             #use_fence = boolean(request.POST['use_fence'])
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: life_time, \
-top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('invalid/missing field')
 
         # create assignment
@@ -588,7 +549,7 @@ top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng. \
     except:
         pass
 
-    admin_log("HTTP: admin/update_assignment.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/update_assignment.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -724,10 +685,7 @@ def admin_create_message(request):
             subject = request.POST['subject']
             text = request.POST['text']
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: to_client_id, \
-subject, text.
-"""
+            result['error_text'] = "Missing field"
             raise Exception('invalid/missing field')
 
         parent_message_id = None
@@ -752,7 +710,7 @@ subject, text.
     except:
         pass
 
-    admin_log("HTTP: admin/create_message.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/create_message.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -800,7 +758,7 @@ def admin_get_my_messages(request):
     except:
         pass
 
-    admin_log("HTTP: admin/get_my_messages.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_my_messages.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -835,7 +793,7 @@ def admin_get_languages(request):
     except:
         pass
 
-    admin_log("HTTP: admin/get_languages.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_languages.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -871,7 +829,7 @@ def admin_get_question_types(request):
     except:
         pass
 
-    admin_log("HTTP: admin/get_question_types.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_question_types.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -881,7 +839,6 @@ def admin_get_assignment_responses(request):
     result = {'success': False}
 
     try:
-    #if True:
 
         token = None
         valid_token = False
@@ -893,9 +850,7 @@ def admin_get_assignment_responses(request):
         try:
             assignment_id = int(request.GET['assignment_id'])
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: assignment_id. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('invalid/missing field')
 
         start=0
@@ -933,7 +888,7 @@ One or more of the following fields is missing or invalid: assignment_id. \
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, assignment_id, user_id, title, post_datetime, \
+            for post_id, assignment_id, client_id, title, post_datetime, \
                     deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
@@ -948,7 +903,7 @@ One or more of the following fields is missing or invalid: assignment_id. \
                     post = {
                         'post_id': post_id,
                         'assignment_id': assignment_id,
-                        'user_id': user_id,
+                        'client_id': client_id,
                         'title': title,
                         'post_datetime': str(post_datetime),
                         'deleted': deleted,
@@ -992,7 +947,7 @@ One or more of the following fields is missing or invalid: assignment_id. \
     except:
         pass
 
-    admin_log("HTTP: admin/get_assignment_responses.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_assignment_responses.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1014,9 +969,7 @@ def admin_register_post_view(request):
         try:
             post_id = request.POST['post_id']
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: post_id. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('invalid/missing field')
 
         post = Posts.get_from_post_id(
@@ -1040,7 +993,7 @@ One or more of the following fields is missing or invalid: post_id. \
     except:
         pass
 
-    admin_log("HTTP: admin/register_post_view.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/register_post_view.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1073,11 +1026,7 @@ def admin_publish_story(request):
             language_code = request.POST['language_code']
             #use_fense = request.POST['use_fense']
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: title, tags, \
-top_text, banner_media_id, contents, top_left_lat, top_left_lng, \
-bottom_right_lat, bottom_right_lng, language_code. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('invalid/missing field')
 
         story = Stories.create_from_http(
@@ -1102,7 +1051,7 @@ bottom_right_lat, bottom_right_lng, language_code. \
     except:
         pass
 
-    admin_log("HTTP: admin/publish_story.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/publish_story.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1148,7 +1097,7 @@ def admin_get_my_collection(request):
     except:
         pass
 
-    admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1173,10 +1122,7 @@ def admin_create_collection(request):
             description = request.POST['description']
             tags = request.POST['tags']
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: name, \
-description, tags. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('Missing or invalid field.')
 
         collection = Collections.create_new_collection_from_http(
@@ -1193,7 +1139,7 @@ description, tags. \
     except:
         pass
 
-    admin_log("HTTP: admin/create_collection.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/create_collection.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1217,10 +1163,7 @@ def admin_add_post_to_collection(request):
             collection_id = int(request.POST['collection_id'])
             post_id = int(request.POST['post_id'])
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: collection_id, \
-post_id. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('Missing or invalid field.')
 
         _collection = Collections.get_from_collection_id(
@@ -1250,7 +1193,7 @@ post_id. \
     except:
         pass
 
-    admin_log("HTTP: admin/add_post_to_collection.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/add_post_to_collection.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1274,10 +1217,7 @@ def admin_remove_post_from_collection(request):
             collection_id = int(request.POST['collection_id'])
             post_id = int(request.POST['post_id'])
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: collection_id, \
-post_id. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('Missing or invalid field.')
 
         successfully_removed = Collections.remove_post_from_collection(
@@ -1295,7 +1235,7 @@ post_id. \
     except:
         pass
 
-    admin_log("HTTP: admin/remove_post_from_collection.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/remove_post_from_collection.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1318,9 +1258,7 @@ def admin_disable_collection(request):
         #if True:
             collection_id = int(request.POST['collection_id'])
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: collection_id. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('Missing or invalid field.')
 
         collection = Collections.disable_collection(
@@ -1335,7 +1273,7 @@ One or more of the following fields is missing or invalid: collection_id. \
     except:
         pass
 
-    admin_log("HTTP: admin/disable_collection.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/disable_collection.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1357,9 +1295,7 @@ def admin_get_collection_posts(request):
         try:
             collection_id = int(request.GET['collection_id'])
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: collection_id. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('invalid/missing field')
 
         start=0
@@ -1455,7 +1391,7 @@ One or more of the following fields is missing or invalid: collection_id. \
     except:
         pass
 
-    admin_log("HTTP: admin/get_collection_posts.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_collection_posts.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1478,9 +1414,7 @@ def admin_get_user_posts(request):
         #if True:
             client_id = request.GET['client_id']
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: client_id. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('Missing or invalid field.')
 
         start=0
@@ -1571,7 +1505,7 @@ One or more of the following fields is missing or invalid: client_id. \
     except:
         pass
 
-    admin_log("HTTP: admin/get_user_posts.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/get_user_posts.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 
@@ -1648,9 +1582,7 @@ def admin_create_user(request):
             fence_bottom_right_lat = float(request.POST['fence_bottom_right_lat'])
             fence_bottom_right_lng = float(request.POST['fence_bottom_right_lng'])
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: user_type_id, client_id, user_name, password, first_name, last_name, email, organization, fence_top_left_lat, fence_top_left_lng, fence_bottom_right_lat, fence_bottom_right_lng. \
-"""
+            result['error_text'] = "Missing field"
             raise Exception('Missing or invalid field.')
 
         # we need to make sure that the user trying to create the
@@ -1717,6 +1649,7 @@ One or more of the following fields is missing or invalid: user_type_id, client_
 def admin_get_post(request):
 
     result = {'success': False}
+
     try:
     #if True:
         token = None
@@ -1730,7 +1663,7 @@ def admin_get_post(request):
         #if True:
             post_id = request.GET['post_id']
         except:
-            result['error_text'] = "Missing post_id"
+            result['error_text'] = "Missing fields"
             raise Exception('missing post_id') 
 
         posts, post_count = Posts.get_with_media_objects_from_post_id(
@@ -1825,9 +1758,7 @@ def admin_delete_post(request):
         try:
             post_id = request.POST['post_id']
         except:
-            result['error_text'] = """\
-One or more of the following fields is missing or invalid: post_id. \
-"""
+            result['error_text'] = "Missing fields"
             raise Exception('invalid/missing field')
 
         post = Posts.delete_post(
@@ -1835,23 +1766,23 @@ One or more of the following fields is missing or invalid: post_id. \
             post_id = post_id,
         )
 
-        notification = Notifications.create_notification(
-            session = DBSession,
-            user_id = post.user_id,
-            notification_type = 'post_deleted',
-            payload = json.dumps({
-                'organization': user.organization,
-            })
-        )
+        #notification = Notifications.create_notification(
+        #    session = DBSession,
+        #    client_id = post.client_id,
+        #    notification_type = 'post_deleted',
+        #    payload = json.dumps({
+        #        'organization': user.organization,
+        #    })
+        #)
 
         result['post_id'] = post.post_id
-        result['notification_id'] = notification.notification_id
+        #result['notification_id'] = notification.notification_id
         result['success'] = True
 
     except:
         pass
 
-    admin_log("HTTP: admin/delete_post.json => {0}".format(json.dumps(result)))
+    #admin_log("HTTP: admin/delete_post.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
 

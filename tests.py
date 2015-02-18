@@ -52,7 +52,7 @@ def url_action(url_payload, data, method, files=None):
 
     return json_response
 
-def _execute_test(url, token, data, method, files=None):
+def _execute_test(url, token, language_code, lat, lng, data, method, files=None):
 
     log("----")
     log("TEST: {0}".format(url))
@@ -72,7 +72,15 @@ def _execute_test(url, token, data, method, files=None):
 
                 # this is a client url, and needs a client)id
                 # rather than a token
-                url_payload = "{0}{1}?client_id={2}&".format(ROOT_DOMAIN,url,token)
+                url_payload = \
+                    "{0}{1}?cuid={2}&language_code={3}&lat={4}&lng={5}&".format(
+                        ROOT_DOMAIN,
+                        url,
+                        token,
+                        language_code,
+                        lat,
+                        lng,
+                )
             else:
 
                 log('Calling Admin URL')
@@ -117,9 +125,16 @@ def run_tests():
 
     log("Testing Assignments ...")
 
+    _language_code = 'en'
+    _lat = 43.2
+    _lng = -77.5
+
     success, payload = _execute_test(
         'admin/get_access_token.json',
         None,
+        _language_code,
+        _lat,
+        _lng,
         {
             'username': 'system',
             'password': hashlib.sha256('password').hexdigest(),
@@ -157,6 +172,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_languages.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             # no fields required
         },
@@ -185,6 +203,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_question_types.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             # no fields required
         },
@@ -213,6 +234,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/create_question.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'language_code': 'en',
             'question_text': 'How will you be spending New Years Eve?',
@@ -261,6 +285,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/publish_assignment.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'name': 'New Years',
             'life_time': 24*7, # 1 week
@@ -304,6 +331,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/create_question.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'language_code': 'en',
             'question_text': 'What are you doing this weekend?',
@@ -352,6 +382,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/publish_assignment.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'name': "Weekend plans?",
             'life_time': 24*7, # 1 week
@@ -394,10 +427,13 @@ def run_tests():
     success, payload = _execute_test(
         'get_assignments.json',
         random_client_id,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'language_code': 'en',
-            'lat': 43.2,
-            'lng': -77.5,
+            #'language_code': 'en',
+            #'lat': 43.2,
+            #'lng': -77.5,
         },
         'GET',
     )
@@ -410,6 +446,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_my_collections.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             # does not take any input fields
         },
@@ -426,6 +465,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/create_collection.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'name': 'Random Things',
             'description': 'My collection of randomness',
@@ -442,6 +484,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_my_collections.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             # does not take any input fields
         },
@@ -458,6 +503,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_assignments.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             # does not take any input fields
         },
@@ -485,9 +533,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
+            #'client_id': client_id_a,
             'media_type': 'text',
             'media_text': 'Hopefully staying awake long enough to see the ball drop ... :/',
         },
@@ -501,14 +552,17 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
+            #'client_id': client_id_a,
             'assignment_id': assignment_id,
-            'title': '',
-            'language_code': 'en',
-            'lat': 43.1,
-            'lng': -77.5,
+            #'title': '',
+            #'language_code': 'en',
+            #'lat': 43.1,
+            #'lng': -77.5,
             'media_objects': json.dumps([media_id_a]),
         },
         'POST',
@@ -522,6 +576,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_user_posts.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'client_id': client_id_a,
         },
@@ -538,6 +595,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_post.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'post_id': client_a_posts[0]['post_id'],
         },
@@ -557,9 +617,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        None,
+        client_id_b,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_b,
+            #'client_id': client_id_b,
             'media_type': 'text',
             'media_text': 'Going out to Da CLUB!!!',
         },
@@ -573,14 +636,17 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        None,
+        client_id_b,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_b,
+            #'client_id': client_id_b,
             'assignment_id': assignment_id,
-            'title': '',
-            'language_code': 'en',
-            'lat': 43.1,
-            'lng': -77.5,
+            #'title': '',
+            #'language_code': 'en',
+            #'lat': 43.1,
+            #'lng': -77.5,
             'media_objects': json.dumps([media_id_b]),
         },
         'POST',
@@ -598,9 +664,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        None,
+        client_id_c,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_c,
+            #'client_id': client_id_c,
             'media_type': 'text',
             'media_text': 'I like turtles.',
         },
@@ -614,14 +683,17 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        None,
+        client_id_c,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_c,
+            #'client_id': client_id_c,
             'assignment_id': assignment_id,
-            'title': '',
-            'language_code': 'en',
-            'lat': 43.1,
-            'lng': -77.5,
+            #'title': '',
+            #'language_code': 'en',
+            #'lat': 43.1,
+            #'lng': -77.5,
             'media_objects': json.dumps([media_id_c]),
         },
         'POST',
@@ -635,6 +707,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_assignment_responses.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'assignment_id': assignment_id,
         },
@@ -670,6 +745,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/delete_post.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'post_id': post_id_c,
         },
@@ -689,6 +767,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_assignment_responses.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'assignment_id': assignment_id,
         },
@@ -710,6 +791,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/add_post_to_collection.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'collection_id': collection_id,
             'post_id': post_id_a,
@@ -734,6 +818,9 @@ def run_tests():
         success, payload = _execute_test(
             'admin/add_post_to_collection.json',
             token,
+            _language_code,
+            _lat,
+            _lng,
             {
                 'collection_id': 99,
                 'post_id': 100,
@@ -753,6 +840,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_collection_posts.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'collection_id': collection_id,
         },
@@ -773,9 +863,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
+            #'client_id': client_id_a,
             'media_type': 'text',
             'media_text': 'I saw a policeman help walk an old lady accross the street today.',
         },
@@ -789,14 +882,17 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
-            'assignment_id': '',
-            'title': '',
-            'language_code': 'en',
-            'lat': 43.1,
-            'lng': -77.5,
+            #'client_id': client_id_a,
+            'assignment_id': '0',
+            #'title': '',
+            #'language_code': 'en',
+            #'lat': 43.1,
+            #'lng': -77.5,
             'media_objects': json.dumps([text_media_id]),
         },
         'POST',
@@ -813,9 +909,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
+            #'client_id': client_id_a,
             'media_type': 'image',
         },
         'POST',
@@ -829,14 +928,17 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
-            'assignment_id': '',
-            'title': '',
-            'language_code': 'en',
-            'lat': 43.1,
-            'lng': -77.5,
+            #'client_id': client_id_a,
+            'assignment_id': '0',
+            #'title': '',
+            #'language_code': 'en',
+            #'lat': 43.1,
+            #'lng': -77.5,
             'media_objects': json.dumps([image_media_id]),
         },
         'POST',
@@ -850,6 +952,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/add_post_to_collection.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'collection_id': collection_id,
             'post_id': image_1_post_id,
@@ -863,9 +968,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
+            #'client_id': client_id_a,
             'media_type': 'image',
         },
         'POST',
@@ -879,14 +987,17 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        None,
+        client_id_a,
+        _language_code,
+        _lat,
+        _lng,
         {
-            'client_id': client_id_a,
+            #'client_id': client_id_a,
             'assignment_id': '',
-            'title': '',
-            'language_code': 'en',
-            'lat': 43.1,
-            'lng': -77.5,
+            #'title': '',
+            #'language_code': 'en',
+            #'lat': 43.1,
+            #'lng': -77.5,
             'media_objects': json.dumps([image_media_id]),
         },
         'POST',
@@ -900,6 +1011,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/add_post_to_collection.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'collection_id': collection_id,
             'post_id': image_2_post_id,
@@ -910,6 +1024,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_collection_posts.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'collection_id': collection_id,
         },
@@ -926,6 +1043,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_my_collections.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             # does not take any input fields
         },
@@ -947,6 +1067,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_posts.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             # no fields required
         },
@@ -972,6 +1095,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/publish_story.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'title': "Bringing in 2015",
             'tags': 'new years, 2015',
@@ -996,6 +1122,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/publish_story.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'title': "Reflections of the yellr dev team",
             'tags': 'yellr, dev, reflections',
@@ -1025,6 +1154,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/create_user.json',
         token,
+        _language_code,
+        _lat,
+        _lng,
         {
             'user_type_id': 2,
             'client_id': new_user_client_id,
@@ -1050,6 +1182,9 @@ def run_tests():
     success, payload = _execute_test(
         'admin/get_access_token.json',
         None,
+        _language_code,
+        _lat,
+        _lng,
         {
             'username': new_username,
             'password': new_password
