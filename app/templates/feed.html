@@ -7,13 +7,9 @@
         <select ng-options="option.type as option.name for option in responseTypes" ng-model="selectedType"></select>
     </div>
 </div>
-<div ng-if="!posts.length">
-    <h4>No posts yet.</h4>
-</div>
 
-<div ng-if="posts.length">
-    <div ng-include src="'assets/templates/posts.html'"></div>
-</div>
+<div ng-include src="'assets/templates/posts.html'"></div>
+
 <div class="tools-column">
     <div class="row">
         <div class="total">
