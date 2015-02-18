@@ -2,9 +2,10 @@ import os
 import json
 import uuid
 import datetime
-from time import strftime
+from time import strftime, sleep
 from random import randint
 import hashlib
+from random import randint
 
 import transaction
 
@@ -21,7 +22,7 @@ from sqlalchemy import (
 
 from sqlalchemy import ForeignKey
 
-from sqlalchemy import update, desc, func
+from sqlalchemy import update, desc, func, text
 
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -351,7 +352,7 @@ class UserGeoFences(Base):
             ).first()
         return fence
 
-'''
+
 class Clients(Base):
 
     """
@@ -360,7 +361,7 @@ class Clients(Base):
 
     __tablename__ = 'clients'
     client_id = Column(Integer, primary_key=True)
-    unique_id = Column(Text)
+    cuid = Column(Text)
     
     first_name = Column(Text, nullable=True)
     last_name = Column(Text, nullable=True)
@@ -368,21 +369,177 @@ class Clients(Base):
     passhash = Column(Text, nullable=True)
     passsalt = Column(Text, nullable=True)
     verified = Column(Boolean)
+    verified_datetime = Column(DateTime, nullable=True)
 
     creation_datetime = Column(DateTime)
-    last_checkin_datetime = Column(DateTime)
+    last_check_in_datetime = Column(DateTime)
 
-    last_checkin_lat = Column(Float)
-    last_checkin_lng = Column(Float)
+    last_lat = Column(Float)
+    last_lng = Column(Float)
+
+    post_view_count = Column(Integer)
+    post_used_count = Column(Integer)
 
     @classmethod
-    def create_new_client(cls, session, unique_id, lat, lng):
+    def create_new_client(cls, session, cuid, lat, lng):
         with transaction.manager:
             client = Clients(
-            
-)
+                cuid = cuid,
+                first_name = None,
+                last_name = None,
+                email = None,
+                passhash = None,
+                passsalt = None,
+                verified = False,
+                verified_datetime = None,
+                creation_datetime = datetime.datetime.now(),
+                last_check_in_datetime = datetime.datetime.now(),
+                last_lat = lat,
+                last_lng = lng,
+                post_view_count = 0,
+                post_used_count = 0,
+            )
+            session.add(client)
+            transaction.commit()
         return client
-'''
+
+    @classmethod
+    def check_in(cls, session, cuid, lat, lng):
+        with transaction.manager:
+            client = session.query(
+                Clients,
+            ).filter(
+                cuid == cuid,
+            ).first()
+            client.last_lat = lat
+            client.last_lng = lng
+            session.add(client)
+            transaction.commit()
+        return client
+
+    @classmethod
+    def get_client_by_cuid(cls, session, cuid, lat, lng):
+        client = None
+        with transaction.manager:
+            #result = session.execute(text(
+            #    'INSERT INTO clients(cuid) '
+            #    'SELECT * FROM ( SELECT ":cuid" ) AS temp_table '
+            #    'WHERE NOT EXISTS ( '
+            #    '    SELECT cuid FROM clients WHERE cuid = ":cuid" '
+            #    ') LIMIT 1;'),
+            #   {"cuid":cuid}
+            #)
+            #print "\n\nRESULT ID:\n{0}\n\n".format(result.inserted_primary_key)
+            #transaction.commit()
+        #print "\n\nRESULT ID:\n{0}\n\n".format(result.lastrowid)
+        #for row in result:
+        #    print "\nRow: {0}".format(row)
+
+        #with transaction.manager:
+
+            #print "\n\nRESULT\n\n"
+            #print result
+            #print "\n\n"
+
+            client = session.query(
+                Clients,
+            ).filter(
+                Clients.cuid == cuid,
+            ).first()
+            
+        if not client:
+            
+            #
+            # This is max gross, and is terrible.  Was done because when a
+            # client first comes on line, the android app hammers the server 
+            # with lots of requests all in a row.  SQLAlchemy serves these up
+            # in some kind of queue, which causes SELECT INSERT SELECT INSERT 
+            # rather than SELECT INSERT SELECT <none>
+            #
+            sleep_time = randint(500,1000)/1000
+            sleep(sleep_time)
+
+            client = session.query(
+                Clients,
+            ).filter(
+                Clients.cuid == cuid,
+            ).first()
+            if not client:
+                client = Clients.create_new_client(
+                    session = DBSession,
+                    cuid = cuid,
+                    lat = lat,
+                    lng = lng,
+                )
+                #client = Clients(
+                #    cuid = cuid,
+                #    first_name = None,
+                #    last_name = None,
+                #    email = None,
+                #    passhash = None,
+                #    passsalt = None,
+                #    verified = False,
+                #    verified_datetime = None,
+                #    creation_datetime = datetime.datetime.now(),
+                #    last_check_in_datetime = datetime.datetime.now(),
+                #    last_lat = lat,
+                #    last_lng = lng,
+                #    post_view_count = 0,
+                #    post_used_count = 0,
+                #)
+                #session.add(client)
+            transaction.commit()
+        return client
+
+    @classmethod
+    def verify_user(cls, session, cuid, first_name, last_name, email, \
+            password):
+        with transaction.manager:
+            client = session(
+                Clients,
+            ).filter(
+                Clients.cuid,
+            ).first()
+            client.first_name = first_name
+            client.last_name = last_name
+            client.email = email
+            passsalt =hashlib.sha256('{0}'.format(str(uuid.uuid4())))
+            client.passhash = hashlib.sha256('{0}{1}'.format(
+                password,
+                passsalt
+            )).hexdigest()
+            client.passsalt = passsalt
+            client.verified = True
+            client.verified_datetime = datetime.datetime.now()
+            session.add(client)
+            transaction.commit()
+        return client
+
+    @classmethod
+    def increment_view_count(cls, session, cuid):
+        with transaction.manager:
+            client = session.query(
+                Clients,
+            ).filter(
+                Clients.cuid == cuid,
+            ).first()
+            client.post_view_count += 1
+            session.add(client)
+            transaction.commit()
+        return client
+
+    @classmethod
+    def increment_used_count(cls, session, cuid):
+        with transaction.manager:
+            client = session.query(
+                Clients,
+            ).filter(
+                Clients.cuid == cuid,
+            ).first()
+            client.post_used_count += 1
+            session.add(client)
+            transaction.commit()
+        return client
 
 class Assignments(Base):
 
@@ -807,7 +964,8 @@ class Posts(Base):
 
     __tablename__ = 'posts'
     post_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
+    #user_id = Column(Integer, ForeignKey('users.user_id'))
+    client_id = Column(Integer, ForeignKey('clients.client_id'))
     assignment_id = Column(Integer, ForeignKey('assignments.assignment_id'))
     title = Column(Text)
     post_datetime = Column(DateTime)
@@ -821,14 +979,17 @@ class Posts(Base):
             language_code, lat, lng, media_objects=[]):
         # create post
         with transaction.manager:
-            language = Languages.get_from_code(session,language_code)
+            language = Languages.get_from_code(
+                session = session,
+                language_code = language_code
+            )
             if assignment_id == None \
                    or assignment_id == '' \
                    or assignment_id == 0:
                 assignment_id = None
-            user,created = Users.get_from_client_id(session,client_id)
+            #user,created = Users.get_from_client_id(session,client_id)
             post = cls(
-                user_id = user.user_id,
+                client_id = client_id,
                 assignment_id = assignment_id,
                 title = title,
                 post_datetime = datetime.datetime.now(),
@@ -843,8 +1004,8 @@ class Posts(Base):
         with transaction.manager:
             for media_id in media_objects:
                 media_object = MediaObjects.get_from_media_id(
-                    session,
-                    media_id,
+                    session = session,
+                    media_id = media_id,
                 )
                 if media_object == None:
                     raise Exception("Invalid media_object_id within media_objects array")
@@ -854,16 +1015,16 @@ class Posts(Base):
                 )
                 session.add(post_media_object)
             transaction.commit()
-        Notifications.create_notification(
-            session,
-            user.user_id,
-            'post_successful',
-            json.dumps({'post_id': post.post_id, 'post_text': ''}),
-        )
-        return (post, created)
+        #Notifications.create_notification(
+        #    session,
+        #    user.user_id,
+        #    'post_successful',
+        #    json.dumps({'post_id': post.post_id, 'post_text': ''}),
+        #)
+        return post #, created)
 
     @classmethod
-    def get_all_from_user_id(cls, session, user_id, deleted=False):
+    def get_all_from_user_id(cls, session, client_id, deleted=False):
         with transaction.manager:
             posts = session.query(
                 Posts.post_id,
@@ -873,21 +1034,21 @@ class Posts(Base):
                 Posts.lat,
                 Posts.lng,
                 Posts.assignment_id,
-                Users.verified,
-                Users.client_id,
-                Users.first_name,
-                Users.last_name,
-                Users.organization,
+                Clients.verified,
+                Clients.client_id,
+                Clients.first_name,
+                Clients.last_name,
+                Clients.organization,
                 Languages.language_code,
                 Languages.name,
             ).join(
                 Users,
                 Languages,
             ).filter(
-                Posts.user_id == Users.user_id,
+                Posts.client_id == Clients.client_id,
                 Posts.language_id == Languages.language_id,
                 Posts.deleted == deleted,
-                Posts.user_id == user_id,
+                Posts.client_id == client_id,
             ).all()
         return posts
 
@@ -902,12 +1063,12 @@ class Posts(Base):
         return post
 
     @classmethod
-    def get_count_from_user_id(cls, session, user_id):
+    def get_count_from_client_id(cls, session, client_id):
         with transaction.manager:
             post_count = session.query(
-                Posts.user_id,
+                Posts.client_id,
             ).filter(
-                Posts.user_id == user_id,
+                Posts.client_id == client_id,
             ).count()
         return post_count 
 
@@ -917,7 +1078,7 @@ class Posts(Base):
             posts_query = session.query(
                 Posts.post_id,
                 Posts.assignment_id,
-                Posts.user_id,
+                Posts.client_id,
                 Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
@@ -941,7 +1102,7 @@ class Posts(Base):
             ).join(
                 MediaTypes,
             ).join(
-                Users, Users.user_id == Posts.user_id,
+                Clients, Clients.client_id == Clients.client_id,
             ).join(
                 Languages,
             ).filter(
@@ -964,7 +1125,7 @@ class Posts(Base):
             posts_query = session.query(
                 Posts.post_id,
                 #Posts.assignment_id,
-                Posts.user_id,
+                Posts.client_id,
                 Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
@@ -990,7 +1151,7 @@ class Posts(Base):
             ).join(
                 MediaTypes,
             ).join(
-                Users, Users.user_id == Posts.user_id,
+                Clients, Clients.client_id == Posts.client_id, 
             ).join(
                 Languages,
             ).outerjoin(
@@ -1020,7 +1181,7 @@ class Posts(Base):
             posts_query = session.query(
                 Posts.post_id,
                 Posts.assignment_id,
-                Posts.user_id,
+                Posts.client_id,
                 Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
@@ -1033,8 +1194,8 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                Users.verified,
-                Users.client_id,
+                Clients.verified,
+                Clients.client_id,
                 Languages.language_code,
                 Languages.name,
             ).join(
@@ -1050,9 +1211,9 @@ class Posts(Base):
                 #MediaTypes.media_type_id == \
                 #    MediaObjects.media_type_id,
             ).join(
-                Users,
-                Users.user_id == \
-                    Posts.user_id,
+                Clients,
+                Clients.client_id == \
+                    Posts.client_id,
             ).join(
                 Languages,
                 #Languages.language_id ==
@@ -1079,7 +1240,7 @@ class Posts(Base):
             posts_query = session.query(
                 Posts.post_id,
                 Posts.assignment_id,
-                Posts.user_id,
+                Posts.client_id,
                 Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
@@ -1107,7 +1268,7 @@ class Posts(Base):
                 MediaTypes, MediaTypes.media_type_id == \
                     MediaObjects.media_type_id,
             ).join(
-                Users,Users.user_id == Posts.user_id,
+                Clients, Clients.client_id == Posts.client_id, 
             ).join(
                 Languages, Languages.language_id == \
                     Posts.language_id,
@@ -1137,7 +1298,7 @@ class Posts(Base):
             posts_query = session.query(
                 Posts.post_id,
                 Posts.assignment_id,
-                Posts.user_id,
+                Posts.client_id,
                 Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
@@ -1161,11 +1322,11 @@ class Posts(Base):
             ).join(
                 MediaTypes,
             ).join(
-                Users,Users.user_id == Posts.post_id,
+                Clients,Clients.client_id == Posts.client_id,
             ).join(
                 Languages,
             ).filter(
-                Posts.user_id == user.user_id,
+                Posts.client_id == Clients.client_id,
             ).order_by(
                 desc(Posts.post_datetime),
             ).group_by(
@@ -1257,18 +1418,18 @@ class MediaObjects(Base):
         return media_objects
 
     @classmethod
-    def create_new_media_object(cls, session, client_id, media_type_value,
-            file_name, caption, text):
+    def create_new_media_object(cls, session, client_id, media_type_text,
+            file_name, caption, media_text):
         with transaction.manager:
             user,created = Users.get_from_client_id(session,client_id)
-            mediatype = MediaTypes.from_value(session,media_type_value)
+            mediatype = MediaTypes.from_value(session,media_type_text)
             mediaobject = cls(
                 user_id = user.user_id,
                 media_type_id = mediatype.media_type_id,
                 media_id = str(uuid.uuid4()),
                 file_name = file_name,
                 caption = caption,
-                media_text = text,
+                media_text = media_text,
             )
             session.add(mediaobject)
             transaction.commit()
@@ -1400,14 +1561,14 @@ class Stories(Base):
                  desc(Stories.publish_datetime),
             )
             total_story_count = stories_filter_query.count()
-            if start == 0 and count == 0:
-                stories = stories_filter_query.all()
-            else:
-                stories = posts_query.slice(start, start+count)
+            #if start == 0 and count == 0:
+            #    stories = stories_filter_query.all()
+            #else:
+            stories = stories_filter_query.slice(start, start+count)
         return stories, total_story_count
 
 
-class EventLogs(Base):
+class ClientLogs(Base):
 
     """
     This is used as a debugging tool to keep track of how the application is
@@ -1415,37 +1576,57 @@ class EventLogs(Base):
     """
 
     __tablename__ = 'clientlogs'
-    event_log_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
-    event_type = Column(Text)
-    event_datetime = Column(DateTime)
-    details = Column(Text)
+    client_log_id = Column(Integer, primary_key=True)
+    client_id = Column(Integer, ForeignKey('clients.client_id'), \
+        nullable=True)
+    url = Column(Text)
+    lat = Column(Float)
+    lng = Column(Float)
+    request = Column(Text)
+    result = Column(Text)
+    success = Column(Boolean) 
+    log_datetime = Column(DateTime)
 
     @classmethod
-    def log(cls, session, client_id, event_type, details):
+    def log(cls, session, client_id, url, lat, lng, request, result,
+            success):
+        print "URL: %s" % url
         with transaction.manager:
-            user,created = Users.get_from_client_id(session,client_id)
-            user_id = 0
-            if user != None:
-                user_id = user.user_id
-            eventlog = EventLogs(
-                user_id = user_id,
-                event_type = event_type,
-                event_datetime = datetime.datetime.now(),
-                details = details,
+            client_log = ClientLogs(
+                client_id = client_id,
+                url = url,
+                lat = lat,
+                lng = lng,
+                request = request,
+                result = result,
+                success = success,
+                log_datetime = datetime.datetime.now(),
             )
-            session.add(eventlog)
-        return eventlog
+            session.add(client_log)
+            transaction.commit()
+        return client_log
 
     @classmethod
     def get_all(cls, session):
         with transaction.manager:
-            eventlogs = session.query(
-                EventLogs,
+            client_logs = session.query(
+                ClientLogs,
             ).order_by(
-                EventLogs.event_datetime,
+                ClientLogs.log_datetime,
             ).all()
-        return eventlogs
+        return client_logs
+
+    @classmethod
+    def get_all_by_client_id(cls, session):
+        with transaction.manager:
+             client_logs = session.query(
+                ClientLogs,
+            ).filter(
+                ClientLogs.client_id == client_id,
+            ).order_by(
+                ClientLogs.log_datetime,
+            ).all()
+        return client_logs
 
 class Collections(Base):
 
