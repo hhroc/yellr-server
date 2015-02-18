@@ -3,9 +3,9 @@
 angular
     .module('Yellr')
     .controller('viewCollectionCtrl',
-    ['$scope', '$rootScope', '$location', '$stateParams',
+    ['$scope', '$rootScope', '$location', '$stateParams', '$modal',
         'collectionApiService', 'formatPosts',
-    function ($scope, $rootScope, $location, $stateParams,
+    function ($scope, $rootScope, $location, $stateParams, $modal,
               collectionApiService, formatPosts) {
 
         if ($rootScope.user === undefined) {
@@ -14,6 +14,24 @@ angular
         }
 
         $scope.user = $rootScope.user;
+        $scope.responseTypes = [
+            { name: 'All', type: 'all' },
+            { name: 'Text Post', type: 'text' },
+            { name: 'Image Post', type: 'image' },
+            { name: 'Audio Post', type: 'audio' },
+            { name: 'Video Post', type: 'video' }
+        ];
+
+        $scope.selectedType = 'all';
+
+        $scope.openPost = function (postId) {
+            $scope.postId = postId;
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/templates/viewPost.html',
+                controller: 'viewPostModalCtrl',
+                scope: $scope
+            });
+        };
 
         /**
          * Places collection of url id in scope
@@ -38,12 +56,7 @@ angular
         collectionApiService.getPosts($rootScope.user.token,
                                       $stateParams.collectionId)
         .success(function (data) {
-            console.log(data);
             $scope.posts = formatPosts(data.posts);
         });
 
-        if ($rootScope.user === undefined) {
-            $location.path('/login');
-            return;
-        }
     }]);
