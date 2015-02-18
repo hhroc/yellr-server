@@ -26,11 +26,6 @@ angular
                 templateUrl: 'assets/templates/feed.html',
                 controller: 'rawFeedCtrl'
             })
-            .state('view-post', {
-                url: '/view/:postId',
-                templateUrl: 'assets/templates/viewPost.html',
-                controller: 'viewPostCtrl'
-            })
 
             .state('write-article', {
                 templateUrl: 'assets/templates/writeArticle.html',

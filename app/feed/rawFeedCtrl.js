@@ -5,10 +5,10 @@ var moment = moment || {};
 angular
     .module('Yellr')
     .controller('rawFeedCtrl',
-        ['$scope', '$rootScope', '$location', 'assignmentApiService',
-            'collectionApiService', 'formatPosts',
-         function ($scope, $rootScope, $location, assignmentApiService,
-                   collectionApiService, formatPosts) {
+    ['$scope', '$rootScope', '$location', '$modal', 'assignmentApiService',
+        'collectionApiService', 'formatPosts',
+     function ($scope, $rootScope, $location, $modal, assignmentApiService,
+               collectionApiService, formatPosts) {
 
         if ($rootScope.user === undefined) {
             $location.path('/login');
@@ -30,8 +30,16 @@ angular
             { name: 'Audio Post', type: 'audio' },
             { name: 'Video Post', type: 'video' }
         ];
-
         $scope.selectedType = 'all';
+
+        $scope.openPost = function (postId) {
+            $scope.postId = postId;
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/templates/viewPost.html',
+                controller: 'viewPostModalCtrl',
+                scope: $scope
+            });
+        };
 
         /**
          * Populates feed with first 50 items

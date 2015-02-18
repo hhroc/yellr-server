@@ -1,10 +1,11 @@
 <div class="posts">
+    <div ng-show="posts.length === 0">
+        <h3>No Results</h3>
+    </div>
     <div masonry load-images="false" masonry-options="{isFitWidth: true, gutter: 10, position: 'relative'}">
-        <div ng-show="!posts.length === 0">
-            <h4>No posts yet.</h4>
-        </div>
-        <div ng-show="posts.length" class="post-column masonry-brick"
-            ng-repeat="post in posts | filter:search | postType:selectedType">
+        <div class="post-column masonry-brick"
+            ng-if="posts"
+            ng-repeat="post in filteredPosts = (posts | filter:search | postType:selectedType)">
             <div class="inner-post">
                 <div ng-if="post.imageUrl" ng-style="post.imageUrl" ng-class="post.description ? 'post-image' : 'full-image'"></div>
                 <div ng-if="!post.imageUrl" class="post-image post-image-blank">
@@ -21,10 +22,13 @@
                     <ul id="drop-{{post.post_id}}" class="f-dropdown add-post-dropdown">
                         <li ng-repeat="collection in collections" ng-click="addPostToCollection(post, collection)">{{collection.name}}</li>
                     </ul>
-                    <a class="view-post" href="#/view/{{post.post_id}}">VIEW POST</a>
+                    <button class="view-post" ng-click="openPost(post.post_id)">VIEW POST</button>
                 </div>
             </div>
         </div>
+    </div>
+    <div ng-show="filteredPosts.length === 0">
+        <h3>No Posts Found</h3>
     </div>
 </div>
 
