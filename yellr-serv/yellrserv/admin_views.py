@@ -109,11 +109,11 @@ def admin_get_client_logs(request):
     Returns all of the event logs in the system.  Optionally by client_id.
     """
 
-    result = {'succes' :False}
+    result = {'success' :False}
 
     user = None
-    try:
-
+    #try:
+    if True:
         token = None
         valid_token = False
         valid, user = check_token(request)
@@ -134,18 +134,22 @@ def admin_get_client_logs(request):
         ret_logs = []
         for log in logs:
             ret_logs.append({
-                'event_log_id': log.event_log_id,
+                'client_log_id': log.client_log_id,
                 'client_id': log.client_id,
-                'event_type': log.event_type,
-                'event_datetime': str(log.event_datetime),
-                'details': json.loads(log.details),
+                'url': log.url,
+                'lat': log.lat,
+                'lng': log.lng,
+                'request': log.request,
+                'result': log.result,
+                'success': log.success,
+                'log_datetime': str(log.log_datetime),
             })
 
         result['logs'] = ret_logs
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     #admin_log("HTTP: admin/get_client_logs.json => {0}".format(json.dumps(result)))
 

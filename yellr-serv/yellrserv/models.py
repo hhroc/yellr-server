@@ -2,9 +2,10 @@ import os
 import json
 import uuid
 import datetime
-from time import strftime
+from time import strftime, sleep
 from random import randint
 import hashlib
+from random import randint
 
 import transaction
 
@@ -21,7 +22,7 @@ from sqlalchemy import (
 
 from sqlalchemy import ForeignKey
 
-from sqlalchemy import update, desc, func
+from sqlalchemy import update, desc, func, text
 
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -376,6 +377,9 @@ class Clients(Base):
     last_lat = Column(Float)
     last_lng = Column(Float)
 
+    post_view_count = Column(Integer)
+    post_used_count = Column(Integer)
+
     @classmethod
     def create_new_client(cls, session, cuid, lat, lng):
         with transaction.manager:
@@ -392,6 +396,8 @@ class Clients(Base):
                 last_check_in_datetime = datetime.datetime.now(),
                 last_lat = lat,
                 last_lng = lng,
+                post_view_count = 0,
+                post_used_count = 0,
             )
             session.add(client)
             transaction.commit()
@@ -412,13 +418,77 @@ class Clients(Base):
         return client
 
     @classmethod
-    def get_client_by_cuid(cls, session, cuid):
+    def get_client_by_cuid(cls, session, cuid, lat, lng):
+        client = None
         with transaction.manager:
+            #result = session.execute(text(
+            #    'INSERT INTO clients(cuid) '
+            #    'SELECT * FROM ( SELECT ":cuid" ) AS temp_table '
+            #    'WHERE NOT EXISTS ( '
+            #    '    SELECT cuid FROM clients WHERE cuid = ":cuid" '
+            #    ') LIMIT 1;'),
+            #   {"cuid":cuid}
+            #)
+            #print "\n\nRESULT ID:\n{0}\n\n".format(result.inserted_primary_key)
+            #transaction.commit()
+        #print "\n\nRESULT ID:\n{0}\n\n".format(result.lastrowid)
+        #for row in result:
+        #    print "\nRow: {0}".format(row)
+
+        #with transaction.manager:
+
+            #print "\n\nRESULT\n\n"
+            #print result
+            #print "\n\n"
+
             client = session.query(
                 Clients,
             ).filter(
                 Clients.cuid == cuid,
             ).first()
+            
+        if not client:
+            
+            #
+            # This is max gross, and is terrible.  Was done because when a
+            # client first comes on line, the android app hammers the server 
+            # with lots of requests all in a row.  SQLAlchemy serves these up
+            # in some kind of queue, which causes SELECT INSERT SELECT INSERT 
+            # rather than SELECT INSERT SELECT <none>
+            #
+            sleep_time = randint(500,1000)/1000
+            sleep(sleep_time)
+
+            client = session.query(
+                Clients,
+            ).filter(
+                Clients.cuid == cuid,
+            ).first()
+            if not client:
+                client = Clients.create_new_client(
+                    session = DBSession,
+                    cuid = cuid,
+                    lat = lat,
+                    lng = lng,
+                )
+                #client = Clients(
+                #    cuid = cuid,
+                #    first_name = None,
+                #    last_name = None,
+                #    email = None,
+                #    passhash = None,
+                #    passsalt = None,
+                #    verified = False,
+                #    verified_datetime = None,
+                #    creation_datetime = datetime.datetime.now(),
+                #    last_check_in_datetime = datetime.datetime.now(),
+                #    last_lat = lat,
+                #    last_lng = lng,
+                #    post_view_count = 0,
+                #    post_used_count = 0,
+                #)
+                #session.add(client)
+            transaction.commit()
         return client
 
     @classmethod
@@ -441,6 +511,32 @@ class Clients(Base):
             client.passsalt = passsalt
             client.verified = True
             client.verified_datetime = datetime.datetime.now()
+            session.add(client)
+            transaction.commit()
+        return client
+
+    @classmethod
+    def increment_view_count(cls, session, cuid):
+        with transaction.manager:
+            client = session.query(
+                Clients,
+            ).filter(
+                Clients.cuid == cuid,
+            ).first()
+            client.post_view_count += 1
+            session.add(client)
+            transaction.commit()
+        return client
+
+    @classmethod
+    def increment_used_count(cls, session, cuid):
+        with transaction.manager:
+            client = session.query(
+                Clients,
+            ).filter(
+                Clients.cuid == cuid,
+            ).first()
+            client.post_used_count += 1
             session.add(client)
             transaction.commit()
         return client
@@ -1480,7 +1576,7 @@ class ClientLogs(Base):
     """
 
     __tablename__ = 'clientlogs'
-    event_log_id = Column(Integer, primary_key=True)
+    client_log_id = Column(Integer, primary_key=True)
     client_id = Column(Integer, ForeignKey('clients.client_id'), \
         nullable=True)
     url = Column(Text)
@@ -1494,6 +1590,7 @@ class ClientLogs(Base):
     @classmethod
     def log(cls, session, client_id, url, lat, lng, request, result,
             success):
+        print "URL: %s" % url
         with transaction.manager:
             client_log = ClientLogs(
                 client_id = client_id,

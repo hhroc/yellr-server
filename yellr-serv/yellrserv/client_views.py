@@ -116,25 +116,23 @@ def register_client(request):
     lng = 0
     client = None
     try:
+    #if True:
         cuid = request.GET['cuid']
         language_code = request.GET['language_code']
         lat = float(request.GET['lat'])
         lng = float(request.GET['lng'])
 
+        # creates client if not yet seen
         client = Clients.get_client_by_cuid(
             session = DBSession,
             cuid = cuid,
+            lat = lat,
+            lng = lng,
         )
-        if client == None:
-            client = Clients.create_new_client(
-                session = DBSession,
-                cuid = cuid,
-                lat = lat,
-                lng = lng,
-            )
+
         success = True
     except:
-        error_text[''] = "Required Fields: cuid, language_code, lat, lng"
+        error_text = "Required Fields: cuid, language_code, lat, lng"
 
     return success, error_text, language_code, lat, lng, client
 
@@ -144,7 +142,7 @@ def get_assignments(request):
     result = {'success': False}
 
     try:
-   
+    #if True:
         success, error_text, language_code, lat, lng, client = \
             register_client(request)
         if success == False:
@@ -473,6 +471,7 @@ def publish_post(request):
     """
 
     result = {'success': False}
+    status_code = 200
 
     try:
 
@@ -511,8 +510,8 @@ def publish_post(request):
         result['post_id'] = post.post_id
         #result['new_user'] = created
 
-    except Exception, e:
-       pass
+    except:
+       status_code = 400
 
     client_id = None
     if client != None:
@@ -531,7 +530,7 @@ def publish_post(request):
         success = success,
     )
 
-    return make_response(result)
+    return make_response(result, status_code)
 
 @view_config(route_name='upload_media.json')
 def upload_media(request):
@@ -552,9 +551,10 @@ def upload_media(request):
     """
 
     result = {'success': False}
+    status_code = 200
 
     try:
-
+    #if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -758,6 +758,7 @@ def upload_media(request):
         result['error_text'] = ''
 
     except:
+        status_code = 400
         pass
 
     client_id = None
@@ -777,45 +778,53 @@ def upload_media(request):
         success = success,
     )
 
-    return make_response(result)
+    return make_response(result, status_code)
 
 @view_config(route_name='get_profile.json')
 def get_profile(request):
 
     result = {'success': False}
     
-    try:
+    #try:
+    if True:
 
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
             raise Exception(error_text)
  
-        user,created = Users.get_from_client_id(
-            session = DBSession,
-            client_id = client.client_id,
-        )
+        #user,created = Users.get_from_client_id(
+        #    session = DBSession,
+        #    client_id = client.client_id,
+        #)
+
+        #client = Clients.get_client_by_cuid(
+        #    session = DBSession,
+        #    cuid = cuid,
+        #)
+
+        
 
         post_count = Posts.get_count_from_client_id(
             session = DBSession,
             client_id = client.client_id,
         )
 
-        result['first_name'] = user.first_name
-        result['last_name'] = user.last_name
-        result['organization'] = user.organization
-        result['email'] = user.email
-        result['verified']  = user.verified
-
+        result['client_id'] = client.client_id
+        result['first_name'] = client.first_name
+        result['last_name'] = client.last_name
+        result['organization'] = '' #client.organization
+        result['email'] = client.email
+        result['verified']  = client.verified
 
         result['post_count'] = post_count
-        result['post_view_count'] = user.post_view_count
-        result['post_used_count'] = user.post_used_count
+        result['post_view_count'] = client.post_view_count
+        result['post_used_count'] = client.post_used_count
 
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     client_id = None
     if client != None:
