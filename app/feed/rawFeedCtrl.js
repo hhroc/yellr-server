@@ -5,10 +5,12 @@ var moment = moment || {};
 angular
     .module('Yellr')
     .controller('rawFeedCtrl',
-    ['$scope', '$rootScope', '$location', '$modal', 'assignmentApiService',
-        'collectionApiService', 'formatPosts',
-     function ($scope, $rootScope, $location, $modal, assignmentApiService,
-               collectionApiService, formatPosts) {
+    ['$scope', '$rootScope', '$location', '$modal', 'collectionApiService',
+     'assignmentApiService', 'formatPosts',
+     function ($scope, $rootScope, $location, $modal, collectionApiService,
+               assignmentApiService, formatPosts) {
+        var postIndex = 0,
+            postCount = 50;
 
         if ($rootScope.user === undefined) {
             $location.path('/login');
@@ -16,6 +18,8 @@ angular
         }
 
         $scope.user = $rootScope.user;
+        $scope.feed = true;
+        $scope.posts = [];
 
         $scope.$parent.clear();
         $scope.$parent.feedPage = true;
@@ -41,22 +45,12 @@ angular
             });
         };
 
-        /**
-         * Populates feed with first 50 items
-         *
-         * @return void
-         */
-        $scope.getFeed = function () {
-            assignmentApiService.getFeed($scope.user.token)
+        $scope.loadMore = function () {
+            assignmentApiService.getFeed($scope.user.token, postIndex, postCount)
             .success(function (data) {
-                var postId,
-                    posts = formatPosts(data.posts);
-
-                $scope.posts = posts;
-            })
-            .error(function (data) {
-                console.log('error: ', data);
+                $scope.posts = $scope.posts.concat(formatPosts(data.posts));
             });
+            postIndex += postCount;
         };
 
         /**
@@ -78,12 +72,10 @@ angular
          * @return void
          */
         $scope.addPostToCollection = function (post, collection) {
-            console.log(post.post_id, collection.collection_id);
             collectionApiService.addPost($scope.user.token,
                                          collection.collection_id,
                                          post.post_id)
             .success(function (data) {
-                console.log(data);
                 collection.post_count++;
             });
         };
@@ -97,6 +89,6 @@ angular
 
         };
 
-        $scope.getFeed();
+        $scope.loadMore();
         $scope.getCollections();
     }]);
