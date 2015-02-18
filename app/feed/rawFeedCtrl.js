@@ -18,6 +18,7 @@ angular
         }
 
         $scope.user = $rootScope.user;
+        $scope.feed = true;
         $scope.posts = [];
 
         $scope.$parent.clear();
