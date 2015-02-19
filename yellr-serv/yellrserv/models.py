@@ -413,6 +413,7 @@ class Clients(Base):
             ).first()
             client.last_lat = lat
             client.last_lng = lng
+            client.last_check_in_datetime = datetime.datetime.now()
             session.add(client)
             transaction.commit()
         return client
