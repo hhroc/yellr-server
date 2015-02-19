@@ -79,6 +79,8 @@ def admin_get_access_token(request):
             raise Exception('invalid credentials')
         else:
 
+            request.session['token'] = token
+
             fence = UserGeoFences.get_fence_from_user_id(
                 session = DBSession,
                 user_id = user.user_id,
