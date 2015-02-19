@@ -122,6 +122,9 @@ def register_client(request):
         lat = float(request.GET['lat'])
         lng = float(request.GET['lng'])
 
+        print request.GET
+        print request.POST
+
         # creates client if not yet seen
         client = Clients.get_client_by_cuid(
             session = DBSession,
@@ -480,8 +483,8 @@ def publish_post(request):
     result = {'success': False}
     status_code = 200
 
-    try:
-
+    #try:
+    if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -517,8 +520,8 @@ def publish_post(request):
         result['post_id'] = post.post_id
         #result['new_user'] = created
 
-    except:
-       status_code = 400
+    #except:
+    #   status_code = 400
 
     client_id = None
     if client != None:
@@ -620,8 +623,9 @@ def upload_media(request):
                     'image/tiff',
                 ]
 
-                if not mime_type in allowed_image_types:
-                    raise Exception("Unsupported Image Type")
+                #if not mime_type in allowed_image_types:
+                     
+                #    raise Exception("Unsupported Image Type: %s" % mime_type)
 
                 # convert to jpeg from whatever format it was
                 try:
@@ -738,8 +742,10 @@ def upload_media(request):
         try:
             caption = request.POST['caption']
         except:
-            pass
-
+            try:
+                caption = request.POST['media_caption']
+            except:
+                pass
 
         media_text = ''
         if media_type == 'text':
