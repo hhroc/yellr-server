@@ -2,6 +2,8 @@ from pyramid.config import Configurator
 from pyramid.renderers import JSONP
 from sqlalchemy import engine_from_config
 
+from pyramid.session import SignedCookieSessionFactory
+
 from .models import (
     DBSession,
     Base,
@@ -20,6 +22,9 @@ def main(global_config, **settings):
     Base.metadata.bind = engine
     config = Configurator(settings=settings)
     config.include('pyramid_chameleon')
+
+    my_session_factory = SignedCookieSessionFactory('max_secret_yellr_password')
+    config.set_session_factory(my_session_factory)
 
     #config.add_renderer('jsonp', JSONP(param_name='callback'))
     #config.add_route('json_test', 'json_test')
