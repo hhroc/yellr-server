@@ -406,19 +406,22 @@ class Clients(Base):
     @classmethod
     def check_in(cls, session, cuid, lat, lng):
         with transaction.manager:
+            #print "check_in(): cuid: {0}".format(cuid)
             client = session.query(
                 Clients,
             ).filter(
-                cuid == cuid,
+                Clients.cuid == cuid,
             ).first()
+            #print "check_in(): client.cuid: {0}, client.client_id: {1}".format(client.cuid, client.client_id)
             client.last_lat = lat
             client.last_lng = lng
+            client.last_check_in_datetime = datetime.datetime.now()
             session.add(client)
             transaction.commit()
         return client
 
     @classmethod
-    def get_client_by_cuid(cls, session, cuid, lat, lng):
+    def get_client_by_cuid(cls, session, cuid, lat, lng, create=True):
         client = None
         with transaction.manager:
             #result = session.execute(text(
@@ -446,8 +449,9 @@ class Clients(Base):
             ).filter(
                 Clients.cuid == cuid,
             ).first()
-            
-        if not client:
+            transaction.commit()            
+
+        if not client and create == True:
             
             #
             # This is max gross, and is terrible.  Was done because when a
@@ -456,7 +460,7 @@ class Clients(Base):
             # in some kind of queue, which causes SELECT INSERT SELECT INSERT 
             # rather than SELECT INSERT SELECT <none>
             #
-            sleep_time = randint(500,1000)/1000
+            sleep_time = float(float(randint(500,2000))/float(1000.0))
             sleep(sleep_time)
 
             client = session.query(
@@ -488,7 +492,7 @@ class Clients(Base):
                 #    post_used_count = 0,
                 #)
                 #session.add(client)
-            transaction.commit()
+                #transaction.commit()
         return client
 
     @classmethod
@@ -1091,8 +1095,10 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                Users.verified,
-                Users.client_id,
+                #Users.verified,
+                #Users.client_id,
+                Clients.verified,
+                Clients.cuid,
                 Languages.language_code,
                 Languages.name,
             ).join(
@@ -1138,8 +1144,10 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                Users.verified,
-                Users.client_id,
+                #Users.verified,
+                #Users.client_id,
+                Clients.verified,
+                Clients.cuid,
                 Languages.language_code,
                 Languages.name,
                 Assignments.assignment_id,
@@ -1253,8 +1261,10 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                Users.verified,
-                Users.client_id,
+                #Users.verified,
+                #Users.client_id,
+                Clients.verified,
+                Clients.cuid,
                 Languages.language_code,
                 Languages.name,
                 #CollectionPosts,
@@ -1290,11 +1300,18 @@ class Posts(Base):
         return posts, total_post_count
 
     @classmethod
-    def get_all_from_client_id(cls, session, client_id,
+    def get_all_from_cuid(cls, session, cuid,
             start=0, count=0):
         with transaction.manager:
-            user,created = Users.get_from_client_id(session, client_id,
-                create_if_not_exist=False)
+            #user,created = Users.get_from_client_id(session, client_id,
+            #    create_if_not_exist=False)
+            client = Clients.get_client_by_cuid(
+                session = session,
+                cuid = cuid,
+                lat = 0,
+                lng = 0,
+                create = False,
+            )
             posts_query = session.query(
                 Posts.post_id,
                 Posts.assignment_id,
@@ -1311,8 +1328,10 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                Users.verified,
-                Users.client_id,
+                #Users.verified,
+                #Users.client_id,
+                Clients.verified,
+                Clients.cuid,
                 Languages.language_code,
                 Languages.name,
             ).join(
@@ -1381,7 +1400,8 @@ class MediaObjects(Base):
 
     __tablename__ = 'mediaobjects'
     media_object_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
+    #user_id = Column(Integer, ForeignKey('users.user_id'))
+    client_id = Column(Integer, ForeignKey('clients.client_id'))
     media_type_id = Column(Integer, ForeignKey('mediatypes.media_type_id'))
     media_id = Column(Text)
     file_name = Column(Text)
@@ -1421,10 +1441,9 @@ class MediaObjects(Base):
     def create_new_media_object(cls, session, client_id, media_type_text,
             file_name, caption, media_text):
         with transaction.manager:
-            user,created = Users.get_from_client_id(session,client_id)
             mediatype = MediaTypes.from_value(session,media_type_text)
             mediaobject = cls(
-                user_id = user.user_id,
+                client_id = client_id,
                 media_type_id = mediatype.media_type_id,
                 media_id = str(uuid.uuid4()),
                 file_name = file_name,
@@ -1433,7 +1452,7 @@ class MediaObjects(Base):
             )
             session.add(mediaobject)
             transaction.commit()
-        return mediaobject, created
+        return mediaobject
 
 class PostMediaObjects(Base):
 

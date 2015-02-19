@@ -25,7 +25,7 @@ from sqlalchemy.exc import DBAPIError
 from .models import (
     DBSession,
     UserTypes,
-    Users,
+    #Users,
     Clients,
     Assignments,
     Questions,
@@ -124,6 +124,13 @@ def register_client(request):
 
         # creates client if not yet seen
         client = Clients.get_client_by_cuid(
+            session = DBSession,
+            cuid = cuid,
+            lat = lat,
+            lng = lng,
+        )
+
+        Clients.check_in(
             session = DBSession,
             cuid = cuid,
             lat = lat,
@@ -553,8 +560,8 @@ def upload_media(request):
     result = {'success': False}
     status_code = 200
 
-    try:
-    #if True:
+    #try:
+    if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -742,7 +749,7 @@ def upload_media(request):
                 raise Exception('Invalid/missing field')
 
         # register file with database, and get file id back
-        media_object, created = MediaObjects.create_new_media_object(
+        media_object = MediaObjects.create_new_media_object(
             session = DBSession,
             client_id = client.client_id,
             media_type_text = media_type,
@@ -757,9 +764,9 @@ def upload_media(request):
         #result['media_text'] = media_text
         result['error_text'] = ''
 
-    except:
-        status_code = 400
-        pass
+    #except:
+    #    status_code = 400
+    #    pass
 
     client_id = None
     if client != None:

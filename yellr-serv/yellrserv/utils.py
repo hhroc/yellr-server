@@ -4,9 +4,9 @@ from pyramid.response import Response
 
 def make_response(resp_dict, status_code=200):
 
-    print "\n\n[DEBUG]"
+    print "[DEBUG]"
     print resp_dict
-    print '\n\n'
+    print '\n'
 
     resp = Response(json.dumps(resp_dict), content_type='application/json') #, charset='utf8')
     resp.headerlist.append(('Access-Control-Allow-Origin', '*'))
