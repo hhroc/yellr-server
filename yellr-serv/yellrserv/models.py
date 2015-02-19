@@ -406,11 +406,13 @@ class Clients(Base):
     @classmethod
     def check_in(cls, session, cuid, lat, lng):
         with transaction.manager:
+            #print "check_in(): cuid: {0}".format(cuid)
             client = session.query(
                 Clients,
             ).filter(
-                cuid == cuid,
+                Clients.cuid == cuid,
             ).first()
+            #print "check_in(): client.cuid: {0}, client.client_id: {1}".format(client.cuid, client.client_id)
             client.last_lat = lat
             client.last_lng = lng
             client.last_check_in_datetime = datetime.datetime.now()
@@ -447,7 +449,8 @@ class Clients(Base):
             ).filter(
                 Clients.cuid == cuid,
             ).first()
-            
+            transaction.commit()            
+
         if not client and create == True:
             
             #
@@ -457,7 +460,7 @@ class Clients(Base):
             # in some kind of queue, which causes SELECT INSERT SELECT INSERT 
             # rather than SELECT INSERT SELECT <none>
             #
-            sleep_time = randint(500,1000)/1000
+            sleep_time = float(float(randint(500,2000))/float(1000.0))
             sleep(sleep_time)
 
             client = session.query(
@@ -489,7 +492,7 @@ class Clients(Base):
                 #    post_used_count = 0,
                 #)
                 #session.add(client)
-            transaction.commit()
+                #transaction.commit()
         return client
 
     @classmethod
