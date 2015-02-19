@@ -130,6 +130,13 @@ def register_client(request):
             lng = lng,
         )
 
+        Clients.check_in(
+            session = DBSession,
+            cuid = cuid,
+            lat = lat,
+            lng = lng,
+        )
+
         success = True
     except:
         error_text = "Required Fields: cuid, language_code, lat, lng"
