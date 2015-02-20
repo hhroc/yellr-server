@@ -500,24 +500,24 @@ def run_tests():
     log('')
     log('')
 
-    success, payload = _execute_test(
-        'admin/get_assignments.json',
-        token,
-        _language_code,
-        _lat,
-        _lng,
-        {
-            # does not take any input fields
-        },
-        'POST',
-    )
-    assignments = payload['assignments']
-    log('Assignment Count: {0}'.format(len(assignments)))
-    if len(assignments) == 0:
-        raise Exception("Error: Created assignment was not returned.")
-    log('----')
-    log('')
-    log('')
+    #success, payload = _execute_test(
+    #    'admin/get_assignments.json',
+    #    token,
+    #    _language_code,
+    #    _lat,
+    #    _lng,
+    #    {
+    #        # does not take any input fields
+    #    },
+    #    'POST',
+    #)
+    #assignments = payload['assignments']
+    #log('Assignment Count: {0}'.format(len(assignments)))
+    #if len(assignments) == 0:
+    #    raise Exception("Error: Created assignment was not returned.")
+    #log('----')
+    #log('')
+    #log('')
 
     #
     # Create our Client ID """
@@ -569,6 +569,25 @@ def run_tests():
     )
     post_id_a = payload['post_id']
     log('Post ID: {0}'.format(post_id_a))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/get_assignments.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # does not take any input fields
+        },
+        'POST',
+    )
+    assignments = payload['assignments']
+    log('Assignment Count: {0}'.format(len(assignments)))
+    if len(assignments) == 0:
+        raise Exception("Error: Created assignment was not returned.")
     log('----')
     log('')
     log('')
