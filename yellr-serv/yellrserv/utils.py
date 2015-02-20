@@ -1,5 +1,8 @@
 import json
 import datetime
+
+import markdown
+
 from pyramid.response import Response
 
 from .models import (
@@ -50,6 +53,7 @@ def get_assignments(language_code, lat, lng):
         lat = lat,
         lng = lng
     )
+    
     ret_assignments = []
     for assignment_id, publish_datetime, expire_datetime, name, \
             top_left_lat, top_left_lng, bottom_right_lat, \
@@ -95,7 +99,7 @@ def get_stories(language_code, lat, lng):
         start = 0, #start,
         count = 15, #count,
     )
-    
+
     ret_stories = []
     for story_unique_id, publish_datetime, edited_datetime, title, tags, \
             top_text, contents, top_left_lat, top_left_lng, \
