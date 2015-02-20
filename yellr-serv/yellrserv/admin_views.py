@@ -103,7 +103,6 @@ def admin_get_access_token(request):
 
     except Exception, e:
         result['error'] = str(e)
-        pass
 
     #admin_log("HTTP: admin/get_access_token.json => {0}".format(json.dumps(result)))
 
@@ -119,8 +118,8 @@ def admin_get_client_logs(request):
     result = {'success' :False}
 
     user = None
-    #try:
-    if True:
+    try:
+    #if True:
         token = None
         valid_token = False
         valid, user = check_token(request)
@@ -155,8 +154,8 @@ def admin_get_client_logs(request):
         result['logs'] = ret_logs
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_client_logs.json => {0}".format(json.dumps(result)))
 
@@ -213,7 +212,7 @@ def admin_get_posts(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, user_id, title, post_datetime, deleted, \
+            for post_id, user_id, post_datetime, deleted, \
                     lat, lng, media_object_id, media_id, file_name, \
                     caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
@@ -229,7 +228,7 @@ def admin_get_posts(request):
                     post = {
                         'post_id': post_id,
                         'user_id': user_id,
-                        'title': title,
+                        #'title': title,
                         'post_datetime': str(post_datetime),
                         'deleted': deleted,
                         'lat': lat,
@@ -585,7 +584,7 @@ def admin_get_my_assignments(request):
         except:
             pass
 
-        count=0
+        count=50
         try:
             count = int(request.GET['count'])
         except:
@@ -597,6 +596,10 @@ def admin_get_my_assignments(request):
             start = start,
             count = count,
         )
+
+        #print "\n\nASSIGNMENTS:\n\n"
+        #print assignments
+        #print "\n\n"
 
         ret_assignments = []
         # this is for development.ini ... sqlite was puking on the query
@@ -611,9 +614,10 @@ def admin_get_my_assignments(request):
             for assignment_id, publish_datetime, expire_datetime, name, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
                     bottom_right_lng, use_fence, collection_id, organization, \
-                    question_text, question_type_id, answer0, answer1, answer2, \
-                    answer3, answer4, answer5, answer6, answer7, answer8, \
-                    answer9, post_count in assignments:
+                    question_text, question_type_id, question_description, \
+                    answer0, answer1, answer2, answer3, answer4, answer5, \
+                    answer6, answer7, answer8, answer9, post_count \
+                    in assignments:
 
                 if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
 
@@ -645,6 +649,7 @@ def admin_get_my_assignments(request):
                 question = {
                     'question_text': question_text,
                     'question_type_id': question_type_id,
+                    'description': question_description,
                     'answer0': answer0,
                     'answer1': answer1,
                     'answer2': answer2,
@@ -899,7 +904,7 @@ def admin_get_assignment_responses(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, assignment_id, client_id, title, post_datetime, \
+            for post_id, assignment_id, client_id, post_datetime, \
                     deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
@@ -915,7 +920,7 @@ def admin_get_assignment_responses(request):
                         'post_id': post_id,
                         'assignment_id': assignment_id,
                         'client_id': client_id,
-                        'title': title,
+                        #'title': title,
                         'post_datetime': str(post_datetime),
                         'deleted': deleted,
                         'lat': lat,
@@ -1341,7 +1346,7 @@ def admin_get_collection_posts(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, assignment_id, user_id, title, post_datetime, \
+            for post_id, assignment_id, user_id, post_datetime, \
                     deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
@@ -1357,7 +1362,7 @@ def admin_get_collection_posts(request):
                         'post_id': post_id,
                         'assignment_id': assignment_id,
                         'user_id': user_id,
-                        'title': title,
+                        #'title': title,
                         'post_datetime': str(post_datetime),
                         'deleted': deleted,
                         'lat': lat,
@@ -1411,8 +1416,8 @@ def admin_get_user_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1462,7 +1467,7 @@ def admin_get_user_posts(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, assignment_id, user_id, title, post_datetime, \
+            for post_id, assignment_id, user_id, post_datetime, \
                     deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
@@ -1478,7 +1483,7 @@ def admin_get_user_posts(request):
                         'post_id': post_id,
                         'assignment_id': assignment_id,
                         'user_id': user_id,
-                        'title': title,
+                        #'title': title,
                         'post_datetime': str(post_datetime),
                         'deleted': deleted,
                         'lat': lat,
@@ -1519,8 +1524,8 @@ def admin_get_user_posts(request):
         result['client_id'] = client_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_user_posts.json => {0}".format(json.dumps(result)))
 
@@ -1587,7 +1592,7 @@ def admin_create_user(request):
         try:
         #if True:
             user_type_id = request.POST['user_type_id']
-            client_id = request.POST['client_id']
+            #client_id = request.POST['client_id']
             user_name = request.POST['username']
             password = request.POST['password']
             first_name = request.POST['first_name']
@@ -1635,20 +1640,28 @@ def admin_create_user(request):
                 session = DBSession,
                 user_type_id = user_type_id,
                 user_geo_fence_id = user_geo_fence.user_geo_fence_id,
-                client_id = client_id,
-            )
-
-            verified_new_user = Users.verify_user(
-                session = DBSession,
-                client_id = new_user.client_id,
                 user_name = user_name,
                 password = password,
                 first_name = first_name,
                 last_name = last_name,
                 email = email,
+                organization = organization,
+                #client_id = client_id,
             )
 
-            new_user_id = verified_new_user.user_id
+            new_user_id = new_user.user_id
+
+            #verified_new_user = Users.verify_user(
+            #    session = DBSession,
+            #    client_id = new_user.client_id,
+            #    user_name = user_name,
+            #    password = password,
+            #    first_name = first_name,
+            #    last_name = last_name,
+            #    email = email,
+            #)
+
+            #new_user_id = verified_new_user.user_id
 
 
         result['user_id'] = new_user_id
@@ -1697,7 +1710,7 @@ def admin_get_post(request):
 
             # itterate throught he list, and build our resposne
             index = 0
-            for post_id, assignment_id, user_id, title, post_datetime, \
+            for post_id, assignment_id, user_id, post_datetime, \
                     deleted, lat, lng, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, client_id, \
@@ -1713,7 +1726,7 @@ def admin_get_post(request):
                         'post_id': post_id,
                         'assignment_id': assignment_id,
                         'user_id': user_id,
-                        'title': title,
+                        #'title': title,
                         'post_datetime': str(post_datetime),
                         'deleted': deleted,
                         'lat': lat,

@@ -80,7 +80,7 @@ class Users(Base):
     user_id = Column(Integer, primary_key=True)
     user_type_id = Column(Integer, ForeignKey('usertypes.user_type_id'))
     
-    client_id = Column(Text)
+    #client_id = Column(Text)
 
     user_name = Column(Text)
     first_name = Column(Text)
@@ -89,79 +89,83 @@ class Users(Base):
     email = Column(Text)
     pass_salt = Column(Text)
     pass_hash = Column(Text)
-    verified = Column(Boolean)
+    #verified = Column(Boolean)
     user_geo_fence_id = Column(Integer,
         ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
 
     token = Column(Text, nullable=True)
     token_expire_datetime = Column(DateTime, nullable=True)
 
-    post_view_count = Column(Integer)
-    post_used_count = Column(Integer)
+    #post_view_count = Column(Integer)
+    #post_used_count = Column(Integer)
 
     @classmethod
     def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
-            client_id, user_name = '', verified=False, first_name='', \
-            last_name='', email='', organization='', \
-            pass_salt=str(uuid.uuid4()), pass_hash=''):
+            user_name, password, first_name, last_name, email, organization):
         user = None
         with transaction.manager:
+            pass_salt=str(uuid.uuid4())
+            pass_hash = hashlib.sha256('{0}{1}'.format(
+                password,
+                pass_salt
+            )).hexdigest()
             user = cls(
                 user_type_id = user_type_id,
                 user_geo_fence_id = user_geo_fence_id, 
-                verified = verified,
-                client_id = client_id,
+                #verified = verified,
+                #client_id = client_id,
                 first_name = first_name,
                 last_name = last_name,
                 organization = organization,
                 email = email,
+                user_name = user_name,
                 pass_salt = pass_salt,
                 pass_hash = pass_hash,
                 token = None,
                 token_expire_datetime = None,
-                post_view_count = 0,
-                post_used_count = 0,
+                #post_view_count = 0,
+                #post_used_count = 0,
             )
             session.add(user)
             transaction.commit()
-        system_user = Users.get_from_user_type_name(session,'system')
-        message = Messages.create_message(
-            session = session,
-            from_user_id = system_user.user_id,
-            to_user_id = user.user_id,
-            subject = 'Welcome to Yellr!',
-            text = "Congratulations, you are now using Yellr!  You can start posting content right away!",
-        )
+        #system_user = Users.get_from_user_type_name(session,'system')
+        #message = Messages.create_message(
+        #    session = session,
+        #    from_user_id = system_user.user_id,
+        #    to_user_id = user.user_id,
+        #    subject = 'Welcome to Yellr!',
+        #    text = "Congratulations, you are now using Yellr!  You can start posting content right away!",
+        #)
         return user
 
-    @classmethod
-    def verify_user(cls, session, client_id, user_name, password,
-            first_name = '', last_name = '', email = ''):
-        with transaction.manager:
-            user,created = Users.get_from_client_id(session, client_id)
-            # TODO: may wan tto check to see if we just created the user, because that
-            #       should never happen ...
-            pass_hash = hashlib.sha256('{0}{1}'.format(
-                password,
-                user.pass_salt
-            )).hexdigest()
-            user.user_name = user_name
-            user.pass_hash = pass_hash
-            user.email = email
-            user.verified = True
-            session.add(user)
-            transaction.commit()
-        return user
+    #@classmethod
+    #def verify_user(cls, session, client_id, user_name, password,
+    #        first_name = '', last_name = '', email = ''):
+    #    with transaction.manager:
+    #        user,created = Users.get_from_client_id(session, client_id)
+    #        # TODO: may wan tto check to see if we just created the user, because that
+    #        #       should never happen ...
+    #        pass_hash = hashlib.sha256('{0}{1}'.format(
+    #            password,
+    #            user.pass_salt
+    #        )).hexdigest()
+    #        user.user_name = user_name
+    #        user.pass_hash = pass_hash
+    #        user.email = email
+    #        user.verified = True
+    #        session.add(user)
+    #        transaction.commit()
+    #    return user
 
     @classmethod
-    def check_exists(cls, session, user_name, email, client_id):
+    def check_exists(cls, session, user_name):
         with transaction.manager:
             user = session.query(
                 Users,
             ).filter(
-                Users.user_name == user_name or \
-                    Users.email == email or \
-                    Users.client_id == client_id
+                Users.user_name == user_name, #or \
+                    #Users.email == email or \
+                    #Users.client_id == client_id
             ).first()
             exists = False
             if not user == None:
@@ -192,46 +196,12 @@ class Users(Base):
         return user
 
     @classmethod
-    def get_from_client_id(cls, session, client_id, create_if_not_exist=True):
-        user = None
-        created = False
-        if client_id != None:
-            with transaction.manager:
-                user = session.query(
-                    Users
-                ).filter(
-                    Users.client_id == client_id
-                ).first()
-                created = False
-                if user == None and create_if_not_exist == True:
-                    user_type = UserTypes.get_from_name(session,name='user')
-                    user = cls.create_new_user(session,
-                        user_type_id = user_type.user_type_id,
-                        user_geo_fence_id = None,
-                        client_id = client_id
-                    )
-                    created = True
-        return (user, created)
-
-    @classmethod
     def get_from_user_id(cls, session, user_id):
         with transaction.manager:
             user = session.query(
                 Users,
             ).filter(
                 Users.user_id == user_id,
-            ).first()
-        return user
-
-    @classmethod
-    def get_from_post_id(cls, session, post_id):
-        with transaction.manager:
-            user = session.query(
-               Users,
-            ).join(
-                Users,Posts.user_id,
-            ).filter(
-                Posts.id == post_id,
             ).first()
         return user
 
@@ -281,7 +251,7 @@ class Users(Base):
             user = session.query(
                 Users,
             ).filter(
-                Users.verified == True,
+                #Users.verified == True,
                 Users.user_type_id != user_user_type_id, # or \
                 #    Users.user_type_id == admin_user_type_id or \
                 #    Users.user_type_id == mod_user_type_id or \
@@ -289,9 +259,12 @@ class Users(Base):
                 Users.user_name == str(user_name),
             ).first()
 
+            print "Password: %s" % password 
+
             token = None
             if user != None:
                 pass_hash = hashlib.sha256('{0}{1}'.format(password, user.pass_salt)).hexdigest()
+                print "pass_hash: %s" % pass_hash
                 if ( user.pass_hash == pass_hash ):
                     token = str(uuid.uuid4())
                     user.token = token
@@ -628,6 +601,7 @@ class Assignments(Base):
                 Users.organization,
                 Questions.question_text,
                 Questions.question_type_id,
+                Questions.description,
                 Questions.answer0,
                 Questions.answer1,
                 Questions.answer2,
@@ -655,12 +629,12 @@ class Assignments(Base):
             ).order_by(
                 desc(Assignments.publish_datetime),
             )
-            assignments = assignments_query.all()
+            #assignments = assignments_query.all()
             total_assignment_count = assignments_query.count()
             #if start == 0 and count == 0:
             #    assignments = assignments_query.all()
             #else:
-            #    assignments = assignments_query.slice(start, start+count)
+            assignments = assignments_query.slice(start, start+count).all()
         return assignments, total_assignment_count
 
     @classmethod
@@ -971,7 +945,7 @@ class Posts(Base):
     #user_id = Column(Integer, ForeignKey('users.user_id'))
     client_id = Column(Integer, ForeignKey('clients.client_id'))
     assignment_id = Column(Integer, ForeignKey('assignments.assignment_id'))
-    title = Column(Text)
+    #title = Column(Text)
     post_datetime = Column(DateTime)
     language_id = Column(Integer, ForeignKey('languages.language_id'))
     deleted = Column(Boolean)
@@ -979,7 +953,7 @@ class Posts(Base):
     lng = Column(Float)
 
     @classmethod
-    def create_from_http(cls, session, client_id, assignment_id, title,
+    def create_from_http(cls, session, client_id, assignment_id, #title, 
             language_code, lat, lng, media_objects=[]):
         # create post
         with transaction.manager:
@@ -991,11 +965,10 @@ class Posts(Base):
                    or assignment_id == '' \
                    or assignment_id == 0:
                 assignment_id = None
-            #user,created = Users.get_from_client_id(session,client_id)
             post = cls(
                 client_id = client_id,
                 assignment_id = assignment_id,
-                title = title,
+                #title = title,
                 post_datetime = datetime.datetime.now(),
                 language_id = language.language_id,
                 deleted = False,
@@ -1028,11 +1001,11 @@ class Posts(Base):
         return post #, created)
 
     @classmethod
-    def get_all_from_user_id(cls, session, client_id, deleted=False):
+    def get_all_from_client_id(cls, session, client_id, deleted=False):
         with transaction.manager:
             posts = session.query(
                 Posts.post_id,
-                Posts.title,
+                #Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
                 Posts.lat,
@@ -1046,8 +1019,9 @@ class Posts(Base):
                 Languages.language_code,
                 Languages.name,
             ).join(
-                Users,
-                Languages,
+                Clients, Clients.client_id == Posts.client_id,
+            ).join(
+                Languages, Languages.language_id == Posts.language_id,
             ).filter(
                 Posts.client_id == Clients.client_id,
                 Posts.language_id == Languages.language_id,
@@ -1083,7 +1057,7 @@ class Posts(Base):
                 Posts.post_id,
                 Posts.assignment_id,
                 Posts.client_id,
-                Posts.title,
+                #Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
                 Posts.lat,
@@ -1095,18 +1069,19 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                #Users.verified,
-                #Users.client_id,
                 Clients.verified,
                 Clients.cuid,
                 Languages.language_code,
                 Languages.name,
             ).join(
-                PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
+                PostMediaObjects, PostMediaObjects.media_object_id == \
+                    MediaObjects.media_object_id,
             ).join(
-                MediaObjects, #MediaObjects.media_object_id == PostMediaObjects.media_object_id,
+                MediaObjects, MediaObjects.media_object_id == \
+                    PostMediaObjects.media_object_id,
             ).join(
-                MediaTypes,
+                MediaTypes, MediaTypes.media_type_id == \
+                    MediaObjects.media_type_id,
             ).join(
                 Clients, Clients.client_id == Clients.client_id,
             ).join(
@@ -1132,7 +1107,7 @@ class Posts(Base):
                 Posts.post_id,
                 #Posts.assignment_id,
                 Posts.client_id,
-                Posts.title,
+                #Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
                 Posts.lat,
@@ -1144,8 +1119,6 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                #Users.verified,
-                #Users.client_id,
                 Clients.verified,
                 Clients.cuid,
                 Languages.language_code,
@@ -1190,7 +1163,7 @@ class Posts(Base):
                 Posts.post_id,
                 Posts.assignment_id,
                 Posts.client_id,
-                Posts.title,
+                #Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
                 Posts.lat,
@@ -1249,7 +1222,7 @@ class Posts(Base):
                 Posts.post_id,
                 Posts.assignment_id,
                 Posts.client_id,
-                Posts.title,
+                #Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
                 Posts.lat,
@@ -1261,8 +1234,6 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                #Users.verified,
-                #Users.client_id,
                 Clients.verified,
                 Clients.cuid,
                 Languages.language_code,
@@ -1303,8 +1274,6 @@ class Posts(Base):
     def get_all_from_cuid(cls, session, cuid,
             start=0, count=0):
         with transaction.manager:
-            #user,created = Users.get_from_client_id(session, client_id,
-            #    create_if_not_exist=False)
             client = Clients.get_client_by_cuid(
                 session = session,
                 cuid = cuid,
@@ -1316,7 +1285,7 @@ class Posts(Base):
                 Posts.post_id,
                 Posts.assignment_id,
                 Posts.client_id,
-                Posts.title,
+                #Posts.title,
                 Posts.post_datetime,
                 Posts.deleted,
                 Posts.lat,
@@ -1328,8 +1297,6 @@ class Posts(Base):
                 MediaObjects.media_text,
                 MediaTypes.name,
                 MediaTypes.description,
-                #Users.verified,
-                #Users.client_id,
                 Clients.verified,
                 Clients.cuid,
                 Languages.language_code,
@@ -1813,7 +1780,7 @@ class Notifications(Base):
 
     __tablename__ = 'notifications'
     notification_id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id'))
+    client_id = Column(Integer, ForeignKey('clients.client_id'))
     notification_datetime = Column(DateTime)
     notification_type = Column(Text)
     payload = Column(Text)
@@ -1821,18 +1788,17 @@ class Notifications(Base):
     @classmethod
     def get_notifications_from_client_id(cls, session, client_id):
         with transaction.manager:
-            user,created = Users.get_from_client_id(session, client_id)
             notifications = session.query(
                 Notifications.notification_id,
                 Notifications.notification_datetime,
                 Notifications.notification_type,
                 Notifications.payload,
             ).filter(
-                Notifications.user_id == user.user_id,
+                Notifications.client_id == client_id,
             ).order_by(
                 desc(Notifications.notification_datetime),
-            ).all() #.limit(25)
-        return notifications, created
+            ).limit(25)
+        return notifications #, created
 
     @classmethod
     def create_notification(cls, session, user_id, notification_type, payload):
@@ -1888,79 +1854,82 @@ class Messages(Base):
     @classmethod
     def create_message(cls, session, from_user_id, to_user_id, subject, text,
             parent_message_id=None):
-        with transaction.manager:
-            message = cls(
-                from_user_id = from_user_id,
-                to_user_id = to_user_id,
-                message_datetime = datetime.datetime.now(),
-                parent_message_id = parent_message_id,
-                subject = subject,
-                text = text,
-                was_read = False,
-            )
-            session.add(message)
-            transaction.commit()
-        Notifications.create_notification(
-            session,
-            to_user_id,
-            'new_message',
-            json.dumps({'organization': \
-                Users.get_organization_from_user_id(session, from_user_id)}),
-        )
+        message = None
+        #with transaction.manager:
+        #    message = cls(
+        #        from_user_id = from_user_id,
+        #        to_user_id = to_user_id,
+        #        message_datetime = datetime.datetime.now(),
+        #        parent_message_id = parent_message_id,
+        #        subject = subject,
+        #        text = text,
+        #        was_read = False,
+        #    )
+        #    session.add(message)
+        #    transaction.commit()
+        #Notifications.create_notification(
+        #    session,
+        #    to_user_id,
+        #    'new_message',
+        #    json.dumps({'organization': \
+        #        Users.get_organization_from_user_id(session, from_user_id)}),
+        #)
         return message
 
     @classmethod
     def create_message_from_http(cls, session, from_token, to_client_id, subject,
             text, parent_message_id=None):
-        from_user = Users.get_from_token(session, from_token)
-        to_user,created = Users.get_from_client_id(session, to_client_id)
         message = None
-        if created == False:
-            message = Messages.create_message(
-                session = session,
-                from_user_id = from_user.user_id,
-                to_user_id = to_user.user_id,
-                subject = subject,
-                text = text,
-                parent_message_id = parent_message_id,
-            )
-            session.add(message)
-            transaction.commit()
+        #from_user = Users.get_from_token(session, from_token)
+        #to_user,created = Users.get_from_client_id(session, to_client_id)
+        #message = None
+        #if created == False:
+        #    message = Messages.create_message(
+        #        session = session,
+        #        from_user_id = from_user.user_id,
+        #        to_user_id = to_user.user_id,
+        #        subject = subject,
+        #        text = text,
+        #        parent_message_id = parent_message_id,
+        #    )
+        #    session.add(message)
+        #    transaction.commit()
         return message
 
     @classmethod
     def create_response_message_from_http(cls, session, client_id,
             parent_message_id, subject, text):
-        exists = Messages.check_if_message_has_child(session, parent_message_id)
-        parent_message = Messages.get_from_message_id(
-            session,
-            parent_message_id
-        )
         message = None
-        if parent_message != None and exists == False:
-            from_user, created = Users.get_from_client_id(session, client_id)
-            to_user_id = Messages.get_user_id_from_message_id(
-                session,
-                parent_message_id
-            )
-            with transaction.manager:
-                message = cls(
-                    from_user_id = from_user.user_id,
-                    to_user_id = to_user_id,
-                    message_datetime = datetime.datetime.now(),
-                    parent_message_id = parent_message_id,
-                    subject = subject,
-                    text = text,
-                    was_read = False,
-                )
-                session.add(message)
-                transaction.commit()
-            Notifications.create_notification(
-                session,
-                to_user_id,
-                'new_message',
-                json.dumps({'parent_message_id': parent_message_id}),
-            )
+        #exists = Messages.check_if_message_has_child(session, parent_message_id)
+        #parent_message = Messages.get_from_message_id(
+        #    session,
+        #    parent_message_id
+        #)
+        #message = None
+        #if parent_message != None and exists == False:
+        #    from_user, created = Users.get_from_client_id(session, client_id)
+        #    to_user_id = Messages.get_user_id_from_message_id(
+        #        session,
+        #        parent_message_id
+        #    )
+        #    with transaction.manager:
+        #        message = cls(
+        #            from_user_id = from_user.user_id,
+        #            to_user_id = to_user_id,
+        #            message_datetime = datetime.datetime.now(),
+        #            parent_message_id = parent_message_id,
+        #            subject = subject,
+        #            text = text,
+        #            was_read = False,
+        #        )
+        #        session.add(message)
+        #        transaction.commit()
+        #    Notifications.create_notification(
+        #        session,
+        #        to_user_id,
+        #        'new_message',
+        #        json.dumps({'parent_message_id': parent_message_id}),
+        #    )
         return message
 
     @classmethod
@@ -1978,18 +1947,19 @@ class Messages(Base):
 
     @classmethod
     def mark_as_read(cls, session, client_id, message_id):
-        with transaction.manager:
-            user = Users.get_from_client_id(session, client_id)
-            message = session.query(
-                Messages,
-            ).filter(
-                Messages.message_id == message_id,
-                # only the recipiant can mark as read.
-                Messages.to_user_id == user.user_id,
-            ).first()
-            message.was_read = True
-            session.add(message)
-            transaction.commit()
+        message = None
+        #with transaction.manager:
+        #    user = Users.get_from_client_id(session, client_id)
+        #    message = session.query(
+        #        Messages,
+        #    ).filter(
+        #        Messages.message_id == message_id,
+        #        # only the recipiant can mark as read.
+        #        Messages.to_user_id == user.user_id,
+        #    ).first()
+        #    message.was_read = True
+        #    session.add(message)
+        #    transaction.commit()
         return message
 
     # TODO: make this not have to itterate through all the messages ...
@@ -2013,34 +1983,35 @@ class Messages(Base):
 
     @classmethod
     def get_messages_from_client_id(cls, session, client_id):
-        with transaction.manager:
-            user,created = Users.get_from_client_id(
-                session,
-                client_id,
-                create_if_not_exist=False,
-            )
-            messages = []
-            if user != None:
-                messages = session.query(
-                    Messages.message_id,
-                    Messages.from_user_id,
-                    Messages.to_user_id,
-                    Messages.message_datetime,
-                    Messages.parent_message_id,
-                    Messages.subject,
-                    Messages.text,
-                    Messages.was_read,
-                    Users.organization,
-                    Users.first_name,
-                    Users.last_name,
-                ).join(
-                    Users,Users.user_id == Messages.from_user_id,
-                ).filter(
-                    Messages.to_user_id == user.user_id,
-                    Messages.was_read == False,
-                ).all()
-        for m in messages:
-            Messages.mark_all_as_read(session,m[2])
+        messages = []
+        #with transaction.manager:
+        #    user,created = Users.get_from_client_id(
+        #        session,
+        #        client_id,
+        #        create_if_not_exist=False,
+        #    )
+        #    messages = []
+        #    if user != None:
+        #        messages = session.query(
+        #            Messages.message_id,
+        #            Messages.from_user_id,
+        #            Messages.to_user_id,
+        #            Messages.message_datetime,
+        #            Messages.parent_message_id,
+        #            Messages.subject,
+        #            Messages.text,
+        #            Messages.was_read,
+        #            Users.organization,
+        #            Users.first_name,
+        #            Users.last_name,
+        #        ).join(
+        #            Users,Users.user_id == Messages.from_user_id,
+        #        ).filter(
+        #            Messages.to_user_id == user.user_id,
+        #            Messages.was_read == False,
+        #        ).all()
+        #for m in messages:
+        #    Messages.mark_all_as_read(session,m[2])
         return messages
 
 class DebugSubmissions(Base):
