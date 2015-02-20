@@ -120,68 +120,72 @@ def main(argv=sys.argv):
 
     #with transaction.manager:
 
-    system_user_client_id = str(uuid.uuid4())
-    system_user_type = UserTypes.get_from_name(DBSession,'system')
+    if not Users.check_exists(DBSession, 'system'):
+        #system_user_client_id = str(uuid.uuid4())
+        system_user_type = UserTypes.get_from_name(DBSession,'system')
 
-    # create the systme user
-    system_user_fence = UserGeoFences.create_fence(
-        session = DBSession,
-        top_left_lat = 43.4,
-        top_left_lng = -77.9,
-        bottom_right_lat = 43.0,
-        bottom_right_lng = -77.3,
-    )
+        # create the systme user
+        system_user_fence = UserGeoFences.create_fence(
+            session = DBSession,
+            top_left_lat = 43.4,
+            top_left_lng = -77.9,
+            bottom_right_lat = 43.0,
+            bottom_right_lng = -77.3,
+        )
 
-    system_user = Users.create_new_user(
-        session = DBSession,
-        user_type_id = system_user_type.user_type_id,
-        user_geo_fence_id = system_user_fence.user_geo_fence_id,
-        client_id = system_user_client_id,
-        #verified = True,
-        #user_name = '',
-        first_name = 'SYSTEM',
-        last_name = 'USER',
-        email = '',
-        organization = 'Yellr',
-        #pass_salt = '',
-        #pass_hash = 'hash', # NOTE: will never be the result of a md5 hash
-    )
+        system_user = Users.create_new_user(
+            session = DBSession,
+            user_type_id = system_user_type.user_type_id,
+            user_geo_fence_id = system_user_fence.user_geo_fence_id,
+            #client_id = system_user_client_id,
+            #verified = True,
+            #user_name = '',
+            user_name = 'system',
+            password = hashlib.sha256('password').hexdigest(),
+            first_name = 'SYSTEM',
+            last_name = 'USER',
+            email = '',
+            organization = 'Yellr',
+            #pass_salt = '',
+            #pass_hash = 'hash', # NOTE: will never be the result of a md5 hash
+        )
 
-    # set the system user as verified
-    system_user = Users.verify_user(
-        session = DBSession,
-        client_id = system_user_client_id,
-        user_name = 'system',
-        # we hash the password since we will be getting the password
-	# pre-hashed from the web front-end
-	password = hashlib.sha256('password').hexdigest(),
-        email=''
-    )
+        # set the system user as verified
+        #system_user = Users.verify_user(
+        #    session = DBSession,
+        #    client_id = system_user_client_id,
+        #    user_name = 'system',
+        #    # we hash the password since we will be getting the password
+        #    # pre-hashed from the web front-end
+        #    password = hashlib.sha256('password').hexdigest(),
+        #    email=''
+        #)
 
     with transaction.manager:
         question_type_free_text = QuestionTypes(
             question_type = 'free_text',
-            question_type_description = 'Free form text responce.',
+            question_type_description = 'Free form text response.',
         )
         DBSession.add(question_type_free_text)
 
         question_type_multiple_choice = QuestionTypes(
             question_type = 'multiple_choice',
-            question_type_description = 'Allows for up to ten multiple \
-choice options',
+            question_type_description = \
+                ('Allows for up to ten multiple'
+                 'choice options')
         )
         DBSession.add(question_type_multiple_choice)
 
         transaction.commit()
 
-    subscriber = Subscribers.add_subscriber(
-        session = DBSession,
-        email = 'test_users@mahtests.net',
-        name = 'Frank Testuserian',
-        organization = 'WXXI',
-        profession = 'Elmo Stunt Double',
-        receive_updates = True,
-        receive_version_announcement = False,
-        interested_in_partnering = False,
-        want_to_know_more = True,
-    )
+    #subscriber = Subscribers.add_subscriber(
+    #    session = DBSession,
+    #    email = 'test_users@mahtests.net',
+    #    name = 'Frank Testuserian',
+    #    organization = 'WXXI',
+    #    profession = 'Elmo Stunt Double',
+    #    receive_updates = True,
+    #    receive_version_announcement = False,
+    #    interested_in_partnering = False,
+    #    want_to_know_more = True,
+    #)

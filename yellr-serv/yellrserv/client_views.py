@@ -9,7 +9,8 @@ import mutagen.mp3
 import mutagen.oggvorbis
 import mutagen.mp4
 
-from utils import make_response
+#from utils import utils.make_response
+import utils
 
 import urllib
 
@@ -56,8 +57,8 @@ system_status = {
 @view_config(route_name='index', renderer='templates/index.mak')
 def index(request):
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         latest_stories,dummy = Stories.get_stories(
             session = DBSession,
@@ -95,8 +96,8 @@ def index(request):
                 'preview_text': preview_text,
             })
 
-    #except:
-    #    pass
+    except:
+        pass
 
     # print ret_stories
     return {'title': 'Yellr - Frontpage', 'data_page': 'index','stories': True, 'latest_stories': ret_latest_stories}
@@ -145,6 +146,51 @@ def register_client(request):
         error_text = "Required Fields: cuid, language_code, lat, lng"
 
     return success, error_text, language_code, lat, lng, client
+
+@view_config(route_name="get_data.json")
+def get_data(request):
+
+    result = {'success': False}
+    try:
+    #if True:
+        success, error_text, language_code, lat, lng, client = \
+            register_client(request)
+        if success == False:
+            raise Exception(error_text)
+
+        assignments = utils.get_assignments(language_code, lat, lng)
+        stories = utils.get_stories(language_code, lat, lng)
+        notifications = utils.get_notifications(client.client_id, language_code, lat, lng)
+        messages = utils.get_messages(client.client_id, language_code, lat, lng)
+
+        result['assignments'] = assignments
+        result['stories'] = stories
+        result['notifications'] = [] #notifications
+        result['messages'] = [] #messages
+
+        result['success'] = True
+
+    except:
+        pass
+
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'get_data.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
+
+    return utils.make_response(result)
 
 @view_config(route_name='get_assignments.json')
 def get_assignments(request):
@@ -221,7 +267,7 @@ def get_assignments(request):
         success = success,
     )
 
-    return make_response(result)
+    return utils.make_response(result)
 
 @view_config(route_name='get_notifications.json')
 def get_notifications(request):
@@ -229,13 +275,13 @@ def get_notifications(request):
     result = {'success': False}
 
     try:
-
+    #if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
             raise Exception(error_text)
 
-        notifications,created = Notifications.get_notifications_from_client_id(
+        notifications = Notifications.get_notifications_from_client_id(
             session = DBSession,
             client_id = client.client_id,
         )
@@ -272,7 +318,7 @@ def get_notifications(request):
         success = success,
     )
 
-    return make_response(result)
+    return utils.make_response(result)
 
 @view_config(route_name='create_response_message.json')
 def create_response_message(request):
@@ -320,7 +366,7 @@ def create_response_message(request):
         success = success,
     )
 
-    return make_response(result)
+    return utils.make_response(result)
 
 @view_config(route_name='get_messages.json')
 def get_messages(request):
@@ -379,7 +425,7 @@ def get_messages(request):
         success = success,
     )
  
-    return make_response(result)
+    return utils.make_response(result)
 
 @view_config(route_name='get_stories.json')
 def get_stories(request):
@@ -462,7 +508,7 @@ def get_stories(request):
         success = success,
     )
 
-    return make_response(result)
+    return utils.make_response(result)
 
 
 @view_config(route_name='publish_post.json')
@@ -483,8 +529,8 @@ def publish_post(request):
     result = {'success': False}
     status_code = 200
 
-    #try:
-    if True:
+    try:
+    #if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -509,7 +555,7 @@ def publish_post(request):
             session = DBSession,
             client_id = client.client_id,
             assignment_id = assignment_id,
-            title = '', #title,
+            #title = '', #title,
             language_code = language_code,
             lat = lat,
             lng = lng,
@@ -520,8 +566,8 @@ def publish_post(request):
         result['post_id'] = post.post_id
         #result['new_user'] = created
 
-    #except:
-    #   status_code = 400
+    except:
+       status_code = 400
 
     client_id = None
     if client != None:
@@ -540,7 +586,7 @@ def publish_post(request):
         success = success,
     )
 
-    return make_response(result, status_code)
+    return utils.make_response(result, status_code)
 
 @view_config(route_name='upload_media.json')
 def upload_media(request):
@@ -563,8 +609,8 @@ def upload_media(request):
     result = {'success': False}
     status_code = 200
 
-    #try:
-    if True:
+    try:
+    #if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -770,9 +816,9 @@ def upload_media(request):
         #result['media_text'] = media_text
         result['error_text'] = ''
 
-    #except:
-    #    status_code = 400
-    #    pass
+    except:
+        status_code = 400
+        pass
 
     client_id = None
     if client != None:
@@ -791,15 +837,15 @@ def upload_media(request):
         success = success,
     )
 
-    return make_response(result, status_code)
+    return utils.make_response(result, status_code)
 
 @view_config(route_name='get_profile.json')
 def get_profile(request):
 
     result = {'success': False}
     
-    #try:
-    if True:
+    try:
+    #if True:
 
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
@@ -836,8 +882,8 @@ def get_profile(request):
 
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     client_id = None
     if client != None:
@@ -856,7 +902,7 @@ def get_profile(request):
         success = success,
     )
 
-    return make_response(result)
+    return utils.make_response(result)
 
 @view_config(route_name='verify_client.json')
 def verify_user(request):
@@ -916,5 +962,6 @@ def verify_user(request):
         success = success,
     )
 
-    return make_response(result)
+    return utils.make_response(result)
+
 

@@ -79,6 +79,9 @@ def main(global_config, **settings):
 
     # client views
     #config.add_route('server_info.json','server_info.json')
+
+    config.add_route('get_data.json', 'get_data.json')
+
     config.add_route('create_response_message.json', \
         'create_response_message.json')
     config.add_route('get_assignments.json','get_assignments.json')
