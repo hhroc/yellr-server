@@ -59,8 +59,8 @@ def admin_get_access_token(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         user_name = ''
         password = ''
@@ -101,9 +101,8 @@ def admin_get_access_token(request):
 
             result['success'] = True
 
-    #except Exception, e:
-    #    result['error'] = str(e)
-    #    pass
+    except Exception, e:
+        result['error'] = str(e)
 
     #admin_log("HTTP: admin/get_access_token.json => {0}".format(json.dumps(result)))
 
@@ -119,8 +118,8 @@ def admin_get_client_logs(request):
     result = {'success' :False}
 
     user = None
-    #try:
-    if True:
+    try:
+    #if True:
         token = None
         valid_token = False
         valid, user = check_token(request)
@@ -155,8 +154,8 @@ def admin_get_client_logs(request):
         result['logs'] = ret_logs
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_client_logs.json => {0}".format(json.dumps(result)))
 
@@ -405,8 +404,8 @@ def admin_publish_assignment(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -499,8 +498,8 @@ def admin_publish_assignment(request):
         result['collection_id'] = collection.collection_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/publish_assignment.json => {0}".format(json.dumps(result)))
 
@@ -569,8 +568,8 @@ def admin_get_my_assignments(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -675,8 +674,8 @@ def admin_get_my_assignments(request):
         result['assignments'] = ret_assignments
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     admin_log("HTTP: admin/get_my_assignments.json => {0}".format(json.dumps(result)))
 
@@ -1417,8 +1416,8 @@ def admin_get_user_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1525,8 +1524,8 @@ def admin_get_user_posts(request):
         result['client_id'] = client_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_user_posts.json => {0}".format(json.dumps(result)))
 
@@ -1580,8 +1579,8 @@ def admin_create_user(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1669,8 +1668,8 @@ def admin_create_user(request):
         #result['disabled'] = True
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_subscriber_list.json => {0}".format(json.dumps(result)))
 
@@ -1681,8 +1680,8 @@ def admin_get_post(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
         token = None
         valid_token = False
         valid, user = check_token(request)
@@ -1766,8 +1765,8 @@ def admin_get_post(request):
         result['post'] = ret_posts[0]
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     return make_response(result)
 

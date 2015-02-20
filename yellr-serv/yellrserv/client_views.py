@@ -57,8 +57,8 @@ system_status = {
 @view_config(route_name='index', renderer='templates/index.mak')
 def index(request):
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         latest_stories,dummy = Stories.get_stories(
             session = DBSession,
@@ -96,8 +96,8 @@ def index(request):
                 'preview_text': preview_text,
             })
 
-    #except:
-    #    pass
+    except:
+        pass
 
     # print ret_stories
     return {'title': 'Yellr - Frontpage', 'data_page': 'index','stories': True, 'latest_stories': ret_latest_stories}
@@ -151,8 +151,8 @@ def register_client(request):
 def get_data(request):
 
     result = {'success': False}
-    #try:
-    if True:
+    try:
+    #if True:
         success, error_text, language_code, lat, lng, client = \
             register_client(request)
         if success == False:
@@ -170,8 +170,8 @@ def get_data(request):
 
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     client_id = None
     if client != None:
@@ -275,13 +275,13 @@ def get_notifications(request):
     result = {'success': False}
 
     try:
-
+    #if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
             raise Exception(error_text)
 
-        notifications,created = Notifications.get_notifications_from_client_id(
+        notifications = Notifications.get_notifications_from_client_id(
             session = DBSession,
             client_id = client.client_id,
         )
@@ -529,8 +529,8 @@ def publish_post(request):
     result = {'success': False}
     status_code = 200
 
-    #try:
-    if True:
+    try:
+    #if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -566,8 +566,8 @@ def publish_post(request):
         result['post_id'] = post.post_id
         #result['new_user'] = created
 
-    #except:
-    #   status_code = 400
+    except:
+       status_code = 400
 
     client_id = None
     if client != None:
@@ -609,8 +609,8 @@ def upload_media(request):
     result = {'success': False}
     status_code = 200
 
-    #try:
-    if True:
+    try:
+    #if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -816,9 +816,9 @@ def upload_media(request):
         #result['media_text'] = media_text
         result['error_text'] = ''
 
-    #except:
-    #    status_code = 400
-    #    pass
+    except:
+        status_code = 400
+        pass
 
     client_id = None
     if client != None:
@@ -844,8 +844,8 @@ def get_profile(request):
 
     result = {'success': False}
     
-    #try:
-    if True:
+    try:
+    #if True:
 
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
@@ -882,8 +882,8 @@ def get_profile(request):
 
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     client_id = None
     if client != None:

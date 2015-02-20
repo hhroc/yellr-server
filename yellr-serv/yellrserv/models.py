@@ -1797,7 +1797,7 @@ class Notifications(Base):
                 Notifications.client_id == client_id,
             ).order_by(
                 desc(Notifications.notification_datetime),
-            ).all() #.limit(25)
+            ).limit(25)
         return notifications #, created
 
     @classmethod
