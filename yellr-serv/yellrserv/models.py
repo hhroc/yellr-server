@@ -1074,14 +1074,14 @@ class Posts(Base):
                 Languages.language_code,
                 Languages.name,
             ).join(
-                PostMediaObjects, PostMediaObjects.media_object_id == \
-                    MediaObjects.media_object_id,
+                PostMediaObjects, #PostMediaObjects.media_object_id == \
+                    #MediaObjects.media_object_id,
             ).join(
-                MediaObjects, MediaObjects.media_object_id == \
-                    PostMediaObjects.media_object_id,
+                MediaObjects, #MediaObjects.media_object_id == \
+                    #PostMediaObjects.media_object_id,
             ).join(
-                MediaTypes, MediaTypes.media_type_id == \
-                    MediaObjects.media_type_id,
+                MediaTypes, #MediaTypes.media_type_id == \
+                    #MediaObjects.media_type_id,
             ).join(
                 Clients, Clients.client_id == Clients.client_id,
             ).join(
