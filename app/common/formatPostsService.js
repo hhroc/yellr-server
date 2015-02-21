@@ -14,7 +14,7 @@ angular
                     post.contentTypes.push('text');
                     return mediaObject.media_text;
                 } else if (mediaObject.media_type_name == 'image') {
-                    if ( mediaObject.caption !== '' ) {
+                    if (mediaObject.caption !== '') {
                         return mediaObject.caption;
                     }
                 }
@@ -57,4 +57,3 @@ angular
 
         return formatPosts;
     });
-
