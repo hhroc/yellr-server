@@ -240,26 +240,27 @@ class Users(Base):
     @classmethod
     def authenticate(cls, session, user_name, password):
         with transaction.manager:
-            user_user_type_id = \
-                UserTypes.get_from_name(session, 'user').user_type_id
-            #admin_user_type_id = \
-            #    UserTypes.get_from_name(session, 'admin').user_type_id
-            #mod_user_type_id = \
-            #    UserTypes.get_from_name(session, 'moderator').user_type_id
-            #sub_user_type_id = \
-            #    UserTypes.get_from_name(session, 'subscriber').user_type_id
+            #user_user_type_id = \
+            #    UserTypes.get_from_name(session, 'user').user_type_id
+            admin_user_type_id = \
+                UserTypes.get_from_name(session, 'admin').user_type_id
+            mod_user_type_id = \
+                UserTypes.get_from_name(session, 'moderator').user_type_id
+            sub_user_type_id = \
+                UserTypes.get_from_name(session, 'subscriber').user_type_id
             user = session.query(
                 Users,
             ).filter(
                 #Users.verified == True,
-                Users.user_type_id != user_user_type_id, # or \
-                #    Users.user_type_id == admin_user_type_id or \
+                #Users.user_type_id != user_user_type_id, # or \
+                
+                #Users.user_type_id == admin_user_type_id or \
                 #    Users.user_type_id == mod_user_type_id or \
                 #    Users.user_type_id == sub_user_type_id,
                 Users.user_name == str(user_name),
             ).first()
 
-            print "Password: %s" % password 
+            #print "Password: %s" % password 
 
             token = None
             if user != None:

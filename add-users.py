@@ -27,7 +27,7 @@ def create_user(username, password, first_name, \
         None,
         None,
         {
-            'user_type_id': 1,
+            'user_type': 'moderator',
             'client_id': str(uuid.uuid4()),
             'username': username,
             'password': password,
