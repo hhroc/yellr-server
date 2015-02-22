@@ -137,7 +137,7 @@ def main(argv=sys.argv):
             )
             DBSession.add(language_english)
 
-        language_spanish = Languages.get_from_code(DBSession, 'sp')
+        language_spanish = Languages.get_from_code(DBSession, 'es')
         if language_spanish == None:
             language_spanish = Languages(
                 language_code = 'es',
