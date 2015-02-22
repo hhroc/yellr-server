@@ -2,9 +2,13 @@
 @import 'tools';
 
 .filter-controls {
-
     .filter-control {
         @extend .small-4;
         @extend .columns;
     }
+}
+
+.reveal-modal {
+    max-height: 80% !important;
+    overflow: auto !important;
 }

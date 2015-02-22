@@ -1177,7 +1177,7 @@ def run_tests():
         _lat,
         _lng,
         {
-            'user_type_id': 2,
+            'user_type': 'admin',
             'client_id': new_user_client_id,
             'username': new_username,
             'password': new_password,

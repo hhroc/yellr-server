@@ -1591,7 +1591,7 @@ def admin_create_user(request):
 
         try:
         #if True:
-            user_type_id = request.POST['user_type_id']
+            user_type_name = request.POST['user_type']
             #client_id = request.POST['client_id']
             user_name = request.POST['username']
             password = request.POST['password']
@@ -1622,6 +1622,15 @@ def admin_create_user(request):
             name = 'moderator',
         )
 
+        user_type = UserTypes.get_from_name(
+            session = DBSession,
+            name = user_type_name,
+        )
+
+        if user_type == None:
+            result['error_text'] = "Invalid user_type"
+            raise Exception("Invalid user_type")
+
         new_user_id = None
 
         if user.user_type_id == system_user_type.user_type_id or \
@@ -1638,7 +1647,7 @@ def admin_create_user(request):
 
             new_user = Users.create_new_user(
                 session = DBSession,
-                user_type_id = user_type_id,
+                user_type_id = user_type.user_type_id,
                 user_geo_fence_id = user_geo_fence.user_geo_fence_id,
                 user_name = user_name,
                 password = password,
