@@ -152,8 +152,8 @@ def register_client(request):
 def zipcode_loopup(request):
     
     result = {'success': False }
-    if True:
-    #try:
+    #if True:
+    try:
 
         success, error_text, language_code, lat, lng, client = \
             register_client(request)
@@ -179,10 +179,11 @@ def zipcode_loopup(request):
             result['lng'] = zipcode.lng  
             result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        status_code = 400
+        pass
 
-    return utils.make_response(result)
+    return utils.make_response(result, status_code)
 
 @view_config(route_name="get_data.json")
 def get_data(request):
