@@ -152,6 +152,7 @@ def register_client(request):
 def zipcode_loopup(request):
     
     result = {'success': False }
+    status_code = 200
     #if True:
     try:
 
