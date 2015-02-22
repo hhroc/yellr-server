@@ -80,6 +80,8 @@ def main(global_config, **settings):
     # client views
     #config.add_route('server_info.json','server_info.json')
 
+    config.add_route('zipcode_lookup.json','zipcode_lookup.json')
+
     config.add_route('get_data.json', 'get_data.json')
 
     config.add_route('create_response_message.json', \

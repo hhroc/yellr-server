@@ -2092,4 +2092,47 @@ class Subscribers(Base):
             ).all()
         return subscribers
 
+class Zipcodes(Base):
+
+    __tablename__ = 'zipcodes'
+    zipcode_id = Column(Integer, primary_key=True)
+    zipcode = Column(Text)
+    city = Column(Text)
+    state_code = Column(Text)
+    lat = Column(Float)
+    lng = Column(Float)
+    timezone = Column(Integer)
+
+    @classmethod
+    def add_zipcode(cls, session, _zipcode, city, state_code, lat, lng, 
+            timezone):
+        with transaction.manager:
+            zipcode = Zipcodes(
+                zipcode = _zipcode,
+                city = city,
+                state_code = state_code,
+                lat = lat,
+                lng = lng,
+            )
+            session.add(zipcode)
+            transaction.commit()
+        return zipcode
+
+    @classmethod
+    def get_from_zipcode(cls, session, _zipcode):
+        with transaction.manager:
+            zipcode = session.query(
+                Zipcodes,
+            ).filter(
+                Zipcodes.zipcode == _zipcode,
+            ).first()
+        return zipcode
+
+    @classmethod
+    def get_count(cls, session):
+        with transaction.manager:
+            zipcodes_count = session.query(
+                Zipcodes,
+            ).count()
+        return zipcodes_count
 
