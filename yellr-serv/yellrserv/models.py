@@ -1338,6 +1338,12 @@ class Posts(Base):
             transaction.commit()
         return post
 
+# Posts indexes ... these will be important to implement soon
+
+#Index('index_posts_post_id', Posts.post_id, unique=True)
+#Index('index_posts_post_datetime', Posts.creation_datetime)
+#Index('index_posts_client_id', Posts.client_id)
+
 class MediaTypes(Base):
 
     """
