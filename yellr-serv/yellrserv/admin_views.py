@@ -59,8 +59,8 @@ def admin_get_access_token(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         user_name = ''
         password = ''
@@ -101,8 +101,8 @@ def admin_get_access_token(request):
 
             result['success'] = True
 
-    #except Exception, e:
-    #    result['error'] = str(e)
+    except Exception, e:
+        result['error'] = str(e)
 
     #admin_log("HTTP: admin/get_access_token.json => {0}".format(json.dumps(result)))
 
@@ -1579,8 +1579,8 @@ def admin_create_user(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -1677,8 +1677,8 @@ def admin_create_user(request):
         #result['disabled'] = True
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_subscriber_list.json => {0}".format(json.dumps(result)))
 

@@ -51,41 +51,48 @@ def main(argv=sys.argv):
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
-    with transaction.manager:
+    #with transaction.manager:
+    if True:
         #
         # User Types
         #
         usertype_system = UserTypes.get_from_name(DBSession, 'system')
+        #print "usertype_system: {0}".format(usertype_system)
         if usertype_system == None:
-            usertype_system = UserTypes(
+            usertype_system = UserTypes.add_user_type(
+                session = DBSession,
                 description = 'The system user.',
                 name = 'system',
             )
-            DBSession.add(usertype_system)
-        
+            #DBSession.add(usertype_system)
+            #print "System user added."        
+
         usertype_admin = UserTypes.get_from_name(DBSession, 'admin')
         if usertype_admin == None:
-            usertype_admin = UserTypes(
+            usertype_admin = UserTypes.add_user_type(
+                session = DBSession,
                 description = 'A system administrator.  This user type has the highest level of permissions.',
                 name = 'admin',
             )
-            DBSession.add(usertype_admin)
+            #DBSession.add(usertype_admin)
 
         usertype_mod = UserTypes.get_from_name(DBSession, 'moderator')
         if usertype_mod == None:
-            usertype_mod = UserTypes(
+            usertype_mod = UserTypes.add_user_type(
+                session = DBSession,
                 description = 'A system moderator.  This user type moderators content produced by users.',
                 name = 'moderator',
             )
-            DBSession.add(usertype_mod)
+            #DBSession.add(usertype_mod)
 
         usertype_sub = UserTypes.get_from_name(DBSession, 'subscriber')
         if usertype_sub == None:
-            usertype_sub = UserTypes(
+            usertype_sub = UserTypes.add_user_type(
+                session = DBSession,
                 description = 'A system subscriber.  This user type uses content produced by moderators and users.',
                 name = 'subscriber',
             )
-            DBSession.add(usertype_sub)
+            #DBSession.add(usertype_sub)
         
         #usertype_user = UserTypes(
         #    description = 'A basic user.  Accesses the system via mobile app or webpage.',
@@ -98,52 +105,52 @@ def main(argv=sys.argv):
         #
         mediatype_image = MediaTypes.from_value(DBSession, 'image')
         if mediatype_image == None:
-            mediatype_image = MediaTypes(
+            mediatype_image = MediaTypes.add_media_type(
+                session = DBSession,
                 description = 'An Image.',
                 name = 'image',
             )
-            DBSession.add(mediatype_image)
 
         mediatype_audio = MediaTypes.from_value(DBSession, 'audio')
         if mediatype_audio == None:
-            mediatype_audio = MediaTypes(
+            mediatype_audio = MediaTypes.add_media_type(
+                session = DBSession,
                 description = 'An Audio Clip.',
                 name = 'audio',
             )
-            DBSession.add(mediatype_audio)
 
         mediatype_video = MediaTypes.from_value(DBSession, 'video')
         if mediatype_video == None:
-            mediatype_video = MediaTypes(
+            mediatype_video = MediaTypes.add_media_type(
+                session = DBSession,
                 description = 'A Video.',
                 name = 'video',
             )
-            DBSession.add(mediatype_video)
 
         mediatype_text = MediaTypes.from_value(DBSession, 'text')
         if mediatype_text == None:
-            mediatype_text = MediaTypes(
+            mediatype_text = MediaTypes.add_media_type(
+                session = DBSession,
                 description = 'Text.',
                 name = 'text',
             )
-            DBSession.add(mediatype_text)
 
         # Languages
         language_english = Languages.get_from_code(DBSession, 'en')
         if language_english == None:
-            language_english = Languages(
+            language_english = Languages.add_language(
+                session = DBSession,
                 language_code = 'en',
                 name = 'English',
             )
-            DBSession.add(language_english)
 
         language_spanish = Languages.get_from_code(DBSession, 'es')
         if language_spanish == None:
-            language_spanish = Languages(
+            language_spanish = Languages.add_language(
+                session = DBSession,
                 language_code = 'es',
                 name = 'Spanish',
             )
-            DBSession.add(language_spanish)
 
         transaction.commit()
 
@@ -191,26 +198,28 @@ def main(argv=sys.argv):
         #    email=''
         #)
 
-    with transaction.manager:
+    #with transaction.manager:
+    if True:
+        
         question_type_free_text = QuestionTypes.get_from_type(DBSession, 'free_text')
         if question_type_free_text == None:
-            question_type_free_text = QuestionTypes(
+            question_type_free_text = QuestionTypes.add_question_type(
+                session = DBSession,
                 question_type = 'free_text',
                 question_type_description = 'Free form text response.',
             )
-            DBSession.add(question_type_free_text)
 
         question_type_multiple_choice = QuestionTypes.get_from_type(DBSession, 'multiple_choice')
         if question_type_multiple_choice == None:
-            question_type_multiple_choice = QuestionTypes(
+            question_type_multiple_choice = QuestionTypes.add_question_type(
+                session = DBSession,
                 question_type = 'multiple_choice',
                 question_type_description = \
                     ('Allows for up to ten multiple'
                      'choice options')
             )
-            DBSession.add(question_type_multiple_choice)
 
-        transaction.commit()
+        #transaction.commit()
 
     if Zipcodes.get_count(DBSession) == 0:
 

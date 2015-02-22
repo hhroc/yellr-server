@@ -67,6 +67,17 @@ class UserTypes(Base):
             ).first()
         return user_type
 
+    @classmethod
+    def add_user_type(cls, session, name, description):
+        with transaction.manager:
+            user_type = UserTypes(
+                name = name,
+                description = description,
+            )
+            session.add(user_type)
+            transaction.commit()
+        return user_type
+
 class Users(Base):
 
     """
@@ -789,6 +800,17 @@ class QuestionTypes(Base):
             ).all()
         return question_types
 
+    @classmethod
+    def add_question_type(cls, session, question_type, question_type_description):
+        with transaction.manager:
+            question_type = QuestionTypes(
+                question_type = question_type,
+                question_type_description = question_type_description,
+            )
+            session.add(question_type)
+            transaction.commit()
+        return question_type
+
 class Questions(Base):
 
     """
@@ -931,6 +953,17 @@ class Languages(Base):
                 Languages.name,
             ).all()
         return languages
+
+    @classmethod
+    def add_language(cls, session, language_code, name):
+        with transaction.manager:
+            language = Languages(
+                language_code = language_code,
+                name = name,
+            )
+            session.add(language)
+            transaction.commit()
+        return language
 
 class Posts(Base):
 
@@ -1364,6 +1397,17 @@ class MediaTypes(Base):
             ).filter(
                 MediaTypes.name == name,
             ).first()
+        return media_type
+
+    @classmethod
+    def add_media_type(cls, session, name, description):
+        with transaction.manager:
+            media_type = MediaTypes(
+                name = name,
+                description = description,
+            )
+            session.add(media_type)
+            transaction.commit()
         return media_type
 
 class MediaObjects(Base):
