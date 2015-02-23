@@ -42,6 +42,7 @@ from .models import (
     CollectionPosts,
     Messages,
     Notifications,
+    Zipcodes,
     )
 
 from config import system_config
@@ -146,6 +147,44 @@ def register_client(request):
         error_text = "Required Fields: cuid, language_code, lat, lng"
 
     return success, error_text, language_code, lat, lng, client
+
+@view_config(route_name="zipcode_lookup.json")
+def zipcode_loopup(request):
+    
+    result = {'success': False }
+    status_code = 200
+    #if True:
+    try:
+
+        success, error_text, language_code, lat, lng, client = \
+            register_client(request)
+        if success == False:
+            raise Exception(error_text)
+
+        try:
+            _zipcode = request.GET['zipcode']
+        except:
+            result['error_text'] = "Missing Field: zipcode"
+            raise Exception('Missing Field: zipcode')
+
+        zipcode = Zipcodes.get_from_zipcode(
+            session = DBSession,
+            _zipcode = _zipcode,
+        )
+
+        if zipcode != None:
+            result['zipcode'] = zipcode.zipcode
+            result['city'] = zipcode.city
+	    result['state_code'] = zipcode.state_code
+            result['lat'] = zipcode.lat
+            result['lng'] = zipcode.lng  
+            result['success'] = True
+
+    except:
+        status_code = 400
+        pass
+
+    return utils.make_response(result, status_code)
 
 @view_config(route_name="get_data.json")
 def get_data(request):

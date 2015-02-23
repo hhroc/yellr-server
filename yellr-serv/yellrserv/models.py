@@ -67,6 +67,17 @@ class UserTypes(Base):
             ).first()
         return user_type
 
+    @classmethod
+    def add_user_type(cls, session, name, description):
+        with transaction.manager:
+            user_type = UserTypes(
+                name = name,
+                description = description,
+            )
+            session.add(user_type)
+            transaction.commit()
+        return user_type
+
 class Users(Base):
 
     """
@@ -240,26 +251,27 @@ class Users(Base):
     @classmethod
     def authenticate(cls, session, user_name, password):
         with transaction.manager:
-            user_user_type_id = \
-                UserTypes.get_from_name(session, 'user').user_type_id
-            #admin_user_type_id = \
-            #    UserTypes.get_from_name(session, 'admin').user_type_id
-            #mod_user_type_id = \
-            #    UserTypes.get_from_name(session, 'moderator').user_type_id
-            #sub_user_type_id = \
-            #    UserTypes.get_from_name(session, 'subscriber').user_type_id
+            #user_user_type_id = \
+            #    UserTypes.get_from_name(session, 'user').user_type_id
+            admin_user_type_id = \
+                UserTypes.get_from_name(session, 'admin').user_type_id
+            mod_user_type_id = \
+                UserTypes.get_from_name(session, 'moderator').user_type_id
+            sub_user_type_id = \
+                UserTypes.get_from_name(session, 'subscriber').user_type_id
             user = session.query(
                 Users,
             ).filter(
                 #Users.verified == True,
-                Users.user_type_id != user_user_type_id, # or \
-                #    Users.user_type_id == admin_user_type_id or \
+                #Users.user_type_id != user_user_type_id, # or \
+                
+                #Users.user_type_id == admin_user_type_id or \
                 #    Users.user_type_id == mod_user_type_id or \
                 #    Users.user_type_id == sub_user_type_id,
                 Users.user_name == str(user_name),
             ).first()
 
-            print "Password: %s" % password 
+            #print "Password: %s" % password 
 
             token = None
             if user != None:
@@ -788,6 +800,17 @@ class QuestionTypes(Base):
             ).all()
         return question_types
 
+    @classmethod
+    def add_question_type(cls, session, question_type, question_type_description):
+        with transaction.manager:
+            question_type = QuestionTypes(
+                question_type = question_type,
+                question_type_description = question_type_description,
+            )
+            session.add(question_type)
+            transaction.commit()
+        return question_type
+
 class Questions(Base):
 
     """
@@ -930,6 +953,17 @@ class Languages(Base):
                 Languages.name,
             ).all()
         return languages
+
+    @classmethod
+    def add_language(cls, session, language_code, name):
+        with transaction.manager:
+            language = Languages(
+                language_code = language_code,
+                name = name,
+            )
+            session.add(language)
+            transaction.commit()
+        return language
 
 class Posts(Base):
 
@@ -1338,6 +1372,12 @@ class Posts(Base):
             transaction.commit()
         return post
 
+# Posts indexes ... these will be important to implement soon
+
+#Index('index_posts_post_id', Posts.post_id, unique=True)
+#Index('index_posts_post_datetime', Posts.creation_datetime)
+#Index('index_posts_client_id', Posts.client_id)
+
 class MediaTypes(Base):
 
     """
@@ -1357,6 +1397,17 @@ class MediaTypes(Base):
             ).filter(
                 MediaTypes.name == name,
             ).first()
+        return media_type
+
+    @classmethod
+    def add_media_type(cls, session, name, description):
+        with transaction.manager:
+            media_type = MediaTypes(
+                name = name,
+                description = description,
+            )
+            session.add(media_type)
+            transaction.commit()
         return media_type
 
 class MediaObjects(Base):
@@ -2092,4 +2143,47 @@ class Subscribers(Base):
             ).all()
         return subscribers
 
+class Zipcodes(Base):
+
+    __tablename__ = 'zipcodes'
+    zipcode_id = Column(Integer, primary_key=True)
+    zipcode = Column(Text)
+    city = Column(Text)
+    state_code = Column(Text)
+    lat = Column(Float)
+    lng = Column(Float)
+    timezone = Column(Integer)
+
+    @classmethod
+    def add_zipcode(cls, session, _zipcode, city, state_code, lat, lng, 
+            timezone):
+        with transaction.manager:
+            zipcode = Zipcodes(
+                zipcode = _zipcode,
+                city = city,
+                state_code = state_code,
+                lat = lat,
+                lng = lng,
+            )
+            session.add(zipcode)
+            transaction.commit()
+        return zipcode
+
+    @classmethod
+    def get_from_zipcode(cls, session, _zipcode):
+        with transaction.manager:
+            zipcode = session.query(
+                Zipcodes,
+            ).filter(
+                Zipcodes.zipcode == _zipcode,
+            ).first()
+        return zipcode
+
+    @classmethod
+    def get_count(cls, session):
+        with transaction.manager:
+            zipcodes_count = session.query(
+                Zipcodes,
+            ).count()
+        return zipcodes_count
 
