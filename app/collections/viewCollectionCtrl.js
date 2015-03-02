@@ -23,6 +23,7 @@ angular
         ];
 
         $scope.selectedType = 'all';
+        $scope.collectionPage = true;
 
         $scope.openPost = function (postId) {
             $scope.postId = postId;
