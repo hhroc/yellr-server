@@ -47,6 +47,9 @@ environment and then run these commands.
     cd yellr-serv/
     $VENV/bin/python setup.py develop
     $VENV/bin/initialize_yellr-serv_db development.ini
+    sqlite3 yellr-serv.sqlite < ./zipcodes/insert_zips_sqlite.sql
+    
+Note: there is a seperate zipcode sql file for production (postgresql server) called insert_zips.sql.
     
 You will also need to install the ImageMagick tools.
 
