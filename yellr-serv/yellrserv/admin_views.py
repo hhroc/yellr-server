@@ -51,8 +51,8 @@ def admin_get_client_logs(request):
     result = {'success' :False}
 
     user = None
-    #try:
-    if True:
+    try:
+    #if True:
         token = None
         valid_token = False
         valid, user = admin_utils.check_token(request)
@@ -87,8 +87,8 @@ def admin_get_client_logs(request):
         result['logs'] = ret_logs
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_client_logs.json => {0}".format(json.dumps(result)))
 
@@ -99,8 +99,8 @@ def admin_create_question(request):
 
     result = {'success': False}
 
-    if True:
-    #try:
+    #if True:
+    try:
 
         token = None
         valid_token = False
@@ -152,8 +152,8 @@ def admin_create_question(request):
         result['question_id'] = question.question_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/create_question.json => {0}".format(json.dumps(result)))
 
@@ -164,8 +164,8 @@ def admin_update_question(request):
 
     result = {'success': False}
 
-    if True:
-    #try:
+    #if True:
+    try:
 
         token = None
         valid_token = False
@@ -208,8 +208,8 @@ def admin_update_question(request):
         result['question_id'] = question.question_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/updatequestion.json => {0}".format(json.dumps(result)))
 
@@ -220,8 +220,8 @@ def admin_publish_assignment(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -314,8 +314,8 @@ def admin_publish_assignment(request):
         result['collection_id'] = collection.collection_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/publish_assignment.json => {0}".format(json.dumps(result)))
 
@@ -326,8 +326,8 @@ def admin_update_assignment(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -372,8 +372,8 @@ def admin_update_assignment(request):
         result['assignment_id'] = assignment.assignment_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/update_assignment.json => {0}".format(json.dumps(result)))
 
@@ -384,8 +384,8 @@ def admin_create_message(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -421,8 +421,8 @@ def admin_create_message(request):
             result['message_id'] = message.message_id
             result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/create_message.json => {0}".format(json.dumps(result)))
 
@@ -433,8 +433,8 @@ def admin_register_post_view(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -467,8 +467,8 @@ def admin_register_post_view(request):
         result['notification_id'] = notification.notification_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/register_post_view.json => {0}".format(json.dumps(result)))
 
@@ -480,8 +480,8 @@ def admin_publish_story(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -525,8 +525,8 @@ def admin_publish_story(request):
         result['story_unique_id'] = story.story_unique_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/publish_story.json => {0}".format(json.dumps(result)))
 
@@ -537,8 +537,8 @@ def admin_create_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -567,8 +567,8 @@ def admin_create_collection(request):
         result['collection_id'] = collection.collection_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/create_collection.json => {0}".format(json.dumps(result)))
 
@@ -579,8 +579,8 @@ def admin_add_post_to_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -621,8 +621,8 @@ def admin_add_post_to_collection(request):
         result['collection_id'] = collection_post.collection_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/add_post_to_collection.json => {0}".format(json.dumps(result)))
 
@@ -633,8 +633,8 @@ def admin_remove_post_from_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -663,8 +663,8 @@ def admin_remove_post_from_collection(request):
         else:
             result['error_text'] = 'Post does not exist within collection.'
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/remove_post_from_collection.json => {0}".format(json.dumps(result)))
 
@@ -675,8 +675,8 @@ def admin_disable_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -701,8 +701,8 @@ def admin_disable_collection(request):
         result['disabled'] = True
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/disable_collection.json => {0}".format(json.dumps(result)))
 
@@ -713,8 +713,8 @@ def admin_get_subscriber_list(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -746,8 +746,8 @@ def admin_get_subscriber_list(request):
         result['subscribers'] = ret_subscribers
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     return make_response(result)
 
@@ -756,8 +756,8 @@ def admin_create_user(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -854,8 +854,8 @@ def admin_create_user(request):
         #result['disabled'] = True
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_subscriber_list.json => {0}".format(json.dumps(result)))
 
@@ -866,8 +866,8 @@ def admin_delete_post(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -900,8 +900,8 @@ def admin_delete_post(request):
         #result['notification_id'] = notification.notification_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/delete_post.json => {0}".format(json.dumps(result)))
 

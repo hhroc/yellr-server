@@ -10,8 +10,8 @@ def admin_get_access_token(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         user_name = ''
         password = ''
@@ -42,8 +42,8 @@ def admin_get_access_token(request):
 
         result['success'] = True
 
-    #except Exception, e:
-    #    result['error'] = str(e)
+    except Exception, e:
+        result['error'] = str(e)
 
     #admin_log("HTTP: admin/get_access_token.json => {0}".format(json.dumps(result)))
 
@@ -54,8 +54,8 @@ def admin_get_languages(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -69,8 +69,8 @@ def admin_get_languages(request):
         result['languages'] = ret_languages
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_languages.json => {0}".format(json.dumps(result)))
 
@@ -81,8 +81,8 @@ def admin_get_question_types(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -96,8 +96,8 @@ def admin_get_question_types(request):
         result['question_types'] = ret_question_types
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_question_types.json => {0}".format(json.dumps(result)))
 
@@ -110,8 +110,8 @@ def admin_get_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -145,8 +145,8 @@ def admin_get_posts(request):
 
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_posts.json => {0}".format(json.dumps(result)))
 
@@ -157,8 +157,8 @@ def admin_get_my_assignments(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -185,8 +185,8 @@ def admin_get_my_assignments(request):
         result['assignments'] = ret_assignments
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_my_assignments.json => {0}".format(json.dumps(result)))
 
@@ -197,8 +197,8 @@ def admin_get_assignment_responses(request):
 
     result = {'success': False}
 
-    if True:
-    #try:
+    #if True:
+    try:
 
         token = None
         valid_token = False
@@ -237,8 +237,8 @@ def admin_get_assignment_responses(request):
         result['posts'] = ret_posts
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_assignment_responses.json => {0}".format(json.dumps(result)))
 
@@ -249,8 +249,8 @@ def admin_get_my_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -264,8 +264,8 @@ def admin_get_my_collection(request):
         result['collections'] = ret_collections
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_my_collections.json => {0}".format(json.dumps(result)))
 
@@ -276,8 +276,8 @@ def admin_get_collection_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -312,8 +312,8 @@ def admin_get_collection_posts(request):
         result['posts'] = ret_posts
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_collection_posts.json => {0}".format(json.dumps(result)))
 
@@ -324,8 +324,8 @@ def admin_get_user_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -360,8 +360,8 @@ def admin_get_user_posts(request):
         #result['client_id'] = client_id
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/get_user_posts.json => {0}".format(json.dumps(result)))
 
@@ -372,8 +372,8 @@ def admin_get_post(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
         token = None
         valid_token = False
         valid, user = admin_utils.check_token(request)
@@ -393,8 +393,8 @@ def admin_get_post(request):
         result['post'] = ret_posts[0]
         result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     return utils.make_response(result)
 
