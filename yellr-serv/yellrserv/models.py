@@ -9,7 +9,7 @@ from random import randint
 
 import transaction
 
-#from geoalchemy import *
+#from geoalchemy2 import *
 
 from sqlalchemy import (
     Column,
@@ -1829,7 +1829,7 @@ class Zipcodes(Base):
     lng = Column(Float)
     timezone = Column(Integer)
     #geom = Column(Geometry('POLYGON'), nullable=False)
-    geom = Column(BLOB)
+    #geom = Column(Geometry('POLYGON'), nullable=False)
 
     @classmethod
     def add_zipcode(cls, session, _zipcode, city, state_code, lat, lng, 
