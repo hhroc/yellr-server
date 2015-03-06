@@ -236,8 +236,8 @@ def get_assignments(request):
 
     result = {'success': False}
 
-    try:
-    #if True:
+    #try:
+    if True:
         success, error_text, language_code, lat, lng, client = \
             register_client(request)
         if success == False:
@@ -256,7 +256,8 @@ def get_assignments(request):
                 bottom_right_lng, use_fence, collection_id, organization,\
                 question_text, question_type_id, description, answer0, \
                 answer1, answer2, answer3, answer4, answer5, answer6, \
-                answer7, answer8, answer9, post_count in assignments:
+                answer7, answer8, answer9, language_id, language_code, \
+                post_count in assignments:
             ret_assignments.append({
                 'assignment_id': assignment_id,
                 'organization': organization,
@@ -281,13 +282,14 @@ def get_assignments(request):
                 'answer8': answer8,
                 'answer9': answer9,
                 'post_count': post_count,
+                'language_code': language_code,
             })
                     
         result['assignments'] = ret_assignments
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     client_id = None
     if client != None:

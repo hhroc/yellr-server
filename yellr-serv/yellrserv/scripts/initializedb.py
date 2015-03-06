@@ -220,7 +220,7 @@ def main(argv=sys.argv):
             )
 
         #transaction.commit()
-
+    '''
     if Zipcodes.get_count(DBSession) == 0:
 
         with open("zipcodes/zipcode.csv", "r") as f:
@@ -242,6 +242,7 @@ def main(argv=sys.argv):
                     timezone = values[5],
                 )
             index += 1
+    '''
 
     #subscriber = Subscribers.add_subscriber(
     #    session = DBSession,
