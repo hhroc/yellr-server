@@ -1,0 +1,61 @@
+<h1>Settings</h1>
+
+<div class="row">
+    <h3>Create New Account</h3>
+    <form>
+        <div class="large-12 columns">
+            <label>Email
+                <input type="email" placeholder="username" ng-model="account.email" required>
+            </label>
+        </div>
+        <div class="large-12 columns">
+            <label>Username
+                <input type="text" placeholder="username" ng-model="account.username" required>
+            </label>
+        </div>
+        <div class="large-6 columns">
+            <label>First Name
+                <input type="text" placeholder="first name" ng-model="account.first" required>
+            </label>
+        </div>
+        <div class="large-6 columns">
+            <label>Last Name
+                <input type="text" placeholder="last name" ng-model="account.last" required>
+            </label>
+        </div>
+        <div class="large-12k columns">
+            <label>Password
+                <input type="password" placeholder="password" ng-model="account.password" required>
+            </label>
+        </div>
+        <div class="large-12 columns">
+            <label>Confirm Password
+                <input type="password" placeholder="confirm password" ng-model="account.passwordConfirm" required>
+            </label>
+        </div>
+        <input type="submit" value="Create Account" ng-submit="newAccount(account)"/>
+    </form>
+</div>
+
+<div class="row">
+    <h3>Change Password</h3>
+    <form>
+        <div class="large-12 columns">
+            <label>Old Password
+                <input type="password" placeholder="old password" ng-model="password.old" required>
+            </label>
+        </div>
+        <div class="large-12 columns">
+            <label>New Password
+                <input type="password" placeholder="new password" ng-model="password.new" required>
+            </label>
+        </div>
+        <div class="large-12 columns">
+            <label>Confirm Password
+                <input type="password" placeholder="confirm password" ng-model="password.confirm" required>
+            </label>
+        </div>
+        <input type="submit" value="Create Account" ng-submit="newPassword(password)"/>
+    </form>
+
+</div>

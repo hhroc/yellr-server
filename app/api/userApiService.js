@@ -45,10 +45,10 @@ angular
          * @param email : email of user
          * @param organization : organization user belongs to
          */
-        userApi.createUser = function (accessToken, userType, userName,
+        userApi.createUser = function (userType, userName,
                                       password, firstName, lastName, email,
                                       organization) {
-            var url = '/admin/create_user.json?token=' + accessToken,
+            var url = '/admin/create_user.json',
                 params = {
                     user_type: userType,
                     user_name: userName,
