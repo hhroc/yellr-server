@@ -38,6 +38,7 @@ from .models import (
     Messages,
     Notifications,
     Subscribers,
+    Organizations,
     )
 
 
@@ -908,4 +909,67 @@ def admin_delete_post(request):
     #admin_log("HTTP: admin/delete_post.json => {0}".format(json.dumps(result)))
 
     return make_response(result)
+
+@view_config(route_name='admin/add_organization.json')
+def admin_create_collection(request):
+
+    result = {'success': False}
+
+    #try:
+    if True:
+
+        token = None
+        valid_token = False
+        valid, user = admin_utils.check_token(request)
+        if valid == False:
+            result['error_text'] = "Missing or invalid 'token' field in request."
+            raise Exception('invalid/missing token')
+
+        try:
+        #if True:
+            name = request.POST['name']
+            description = request.POST['description']
+            contact_name = request.POST['contact_name']
+            contact_email = request.POST['contact_email']
+        except:
+            result['error_text'] = "Missing field"
+            raise Exception('Missing or invalid field.')
+
+        # we need to make sure that the user trying to create the
+        # new user has the right access level
+        system_user_type = UserTypes.get_from_name(
+            session = DBSession,
+            name = 'system',
+        )
+        admin_user_type = UserTypes.get_from_name(
+            session = DBSession,
+            name = 'admin',
+        )
+        moderator_user_type = UserTypes.get_from_name(
+            session = DBSession,
+            name = 'moderator',
+        )
+
+        if user.user_type_id == system_user_type.user_type_id or \
+                user.user_type_id == admin_user_type.user_type_id or \
+                user.user_type_id == moderator_user_type.user_type_id:
+
+            organization = Organizations.add_organization( #_from_http(
+                session = DBSession,
+                name = name,
+                description = description,
+                contact_name = contact_name,
+                contact_email = contact_email,
+            )
+
+            result['organization_id'] = organization.organization_id
+            result['success'] = True
+
+    #except:
+    #    pass
+
+    #admin_log("HTTP: admin/create_collection.json => {0}".format(json.dumps(result)))
+
+    return make_response(result)
+
 

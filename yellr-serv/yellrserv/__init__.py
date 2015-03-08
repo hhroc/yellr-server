@@ -77,7 +77,7 @@ def main(global_config, **settings):
     config.add_route('admin/get_post.json', 'admin/get_post.json')
     config.add_route('admin/delete_post.json', 'admin/delete_post.json')
     config.add_route('admin/get_organizations.json', 'admin/get_organizations.json')
-
+    config.add_route('admin/add_organization.json', 'admin/add_organization.json')
 
     # client views
     #config.add_route('server_info.json','server_info.json')
