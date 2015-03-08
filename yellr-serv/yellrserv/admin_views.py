@@ -915,8 +915,8 @@ def admin_create_collection(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         token = None
         valid_token = False
@@ -965,10 +965,74 @@ def admin_create_collection(request):
             result['organization_id'] = organization.organization_id
             result['success'] = True
 
-    #except:
-    #    pass
+    except:
+        pass
 
     #admin_log("HTTP: admin/create_collection.json => {0}".format(json.dumps(result)))
+
+    return make_response(result)
+
+@view_config(route_name='admin/check_logged_in.json')
+def admin_check_loged_in(request):
+
+    result = {'success': False}
+
+    try:
+    #if True:
+
+        token = None
+        valid_token = False
+        valid, user = admin_utils.check_token(request)
+
+        result['logged_in'] = False
+        if valid == True:
+            result['logged_in'] = True   
+ 
+        result['success'] = True
+
+    except:
+        pass
+
+    return make_response(result)
+
+@view_config(route_name='admin/logout.json')
+def admin_logout(request):
+
+    result = {'success': False}
+
+    try:
+    #if True:
+
+        #token = None
+        #valid_token = False
+        #valid, user = admin_utils.check_token(request)
+
+        #result['logged_in'] = False
+        #if valid == True:
+        #    result['logged_in'] = True
+
+        token = None
+        try:
+            token = request.GET['token']
+        except:
+            try:
+                token = request.session['token']
+            except:
+                pass
+            pass
+
+        if token != None:
+            Users.invalidate_token(
+                session = DBSession,
+                token = token,
+            )
+
+            request.session['token'] = ""
+
+        result['success'] = True
+
+    except:
+        pass
 
     return make_response(result)
 

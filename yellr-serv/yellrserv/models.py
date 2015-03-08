@@ -261,6 +261,16 @@ class Users(Base):
                 valid = True
         return valid, user
 
+    @classmethod
+    def invalidate_token(cls, session, token):
+        with transaction.manager:
+            user = Users.get_from_token(session, token)
+            if user != None:
+                user.token = ""
+                session.add(user)
+                transaction.commit()
+        return user
+
 class UserGeoFences(Base):
 
     """
