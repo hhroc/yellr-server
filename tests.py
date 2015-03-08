@@ -141,6 +141,7 @@ def run_tests():
         },
         'POST',
     )
+    """
     valid = _validate(
         {
             "organization": {
@@ -167,6 +168,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/get_access_token.json did not validate")
+    """
     token = payload['token']
 
     success, payload = _execute_test(
@@ -180,6 +182,7 @@ def run_tests():
         },
         'GET',
     )
+    """
     valid = _validate(
         {
             "languages": {
@@ -198,8 +201,9 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/get_languages.json did not validate")
+    """
     languages = payload['languages']
-
+    
     success, payload = _execute_test(
         'admin/get_question_types.json',
         token,
@@ -1166,6 +1170,21 @@ def run_tests():
     log('')
     log('')
 
+    success, payload = _execute_test(
+        'admin/get_organizations.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # no fields required
+        },
+        'GET',
+    )
+    if success == False:
+        raise Exception("Could not get organization list.")
+    organizations = payload['organizations']
+    
 
     new_user_cuid = str(uuid.uuid4())
     new_username = 'temp_user'
@@ -1185,7 +1204,8 @@ def run_tests():
             'first_name': 'Temp',
             'last_name': 'User',
             'email': 'temp@user.com',
-            'organization': 'The Temp Group',
+            #'organization': 'The Temp Group',
+            'organization_id': organizations[0]['id'],
             'fence_top_left_lat': 43.4,
             'fence_top_left_lng': -77.9,
             'fence_bottom_right_lat': 43.0,

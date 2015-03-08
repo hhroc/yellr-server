@@ -253,14 +253,17 @@ def get_assignments(request):
         ret_assignments = []
         for assignment_id, publish_datetime, expire_datetime, name, \
                 top_left_lat, top_left_lng, bottom_right_lat, \
-                bottom_right_lng, use_fence, collection_id, organization,\
-                question_text, question_type_id, description, answer0, \
+                bottom_right_lng, use_fence, collection_id, org_id, \
+                org_name, org_description, question_text, \
+                question_type_id, description, answer0, \
                 answer1, answer2, answer3, answer4, answer5, answer6, \
                 answer7, answer8, answer9, language_id, language_code, \
                 post_count in assignments:
             ret_assignments.append({
                 'assignment_id': assignment_id,
-                'organization': organization,
+                #'organization_id': org_id,
+                'organization': org_name,
+                'organization_descriotion': org_description,
                 'publish_datetime': str(publish_datetime),
                 'expire_datetime': str(expire_datetime),
                 'name': name,

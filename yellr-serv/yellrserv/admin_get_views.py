@@ -23,7 +23,7 @@ def admin_get_access_token(request):
             result['error_text'] = "Missing 'username' or 'password' within request"
             raise Exception('missing credentials')
 
-        user, token, fence = admin_utils.authenticate(username, password)
+        user, org, token, fence = admin_utils.authenticate(username, password)
         if user == None or token == None or fence == None:
             raise Exception('Invalid credentials')
 
@@ -31,7 +31,8 @@ def admin_get_access_token(request):
         result['username'] = user.user_name
         result['first_name'] = user.first_name
         result['last_name'] = user.last_name
-        result['organization'] = user.organization
+        result['organization_id'] = org.organization_id
+        result['organization'] = org.name
 
         result['fence'] = {
             'top_left_lat': fence.top_left_lat,
@@ -398,5 +399,27 @@ def admin_get_post(request):
 
     return utils.make_response(result)
 
+@view_config(route_name='admin/get_organizations.json')
+def admin_get_organizations(request):
 
+    result = {'success': False}
+
+    #try:
+    if True:
+        token = None
+        valid_token = False
+        valid, user = admin_utils.check_token(request)
+        if valid == False:
+            result['error_text'] = "Missing or invalid 'token' field in request."
+            raise Exception('invalid/missing token')
+
+        ret_organizations = admin_utils.get_organizations()
+
+        result['organizations'] = ret_organizations
+        result['success'] = True
+
+    #except:
+    #    pass
+
+    return utils.make_response(result)
 

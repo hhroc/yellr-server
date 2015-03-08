@@ -105,7 +105,8 @@ class Users(Base):
     user_name = Column(Text)
     first_name = Column(Text)
     last_name = Column(Text)
-    organization = Column(Text)
+    #organization = Column(Text)
+    organization_id = Column(Integer, ForeignKey('organizations.organization_id'))
     email = Column(Text)
     pass_salt = Column(Text)
     pass_hash = Column(Text)
@@ -116,7 +117,7 @@ class Users(Base):
 
     @classmethod
     def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
-            user_name, password, first_name, last_name, email, organization):
+            user_name, password, first_name, last_name, email, organization_id):
         user = None
         with transaction.manager:
             pass_salt=str(uuid.uuid4())
@@ -129,7 +130,8 @@ class Users(Base):
                 user_geo_fence_id = user_geo_fence_id, 
                 first_name = first_name,
                 last_name = last_name,
-                organization = organization,
+                #organization = organization,
+                organization_id = organization_id,
                 email = email,
                 user_name = user_name,
                 pass_salt = pass_salt,
@@ -247,7 +249,8 @@ class Users(Base):
                         datetime.timedelta(hours=24)
                     session.add(user)
                     transaction.commit()
-        return user, token
+                    org = Organizations.get_from_id(session, user.organization_id)
+        return user, org, token
 
     @classmethod
     def validate_token(cls, session, token):
@@ -544,7 +547,9 @@ class Assignments(Base):
                 Assignments.bottom_right_lng,
                 Assignments.use_fence,
                 Assignments.collection_id,
-                Users.organization,
+                Users.organization_id,
+                Organizations.name,
+                Organizations.description,
                 Questions.question_text,
                 Questions.question_type_id,
                 Questions.description,
@@ -560,9 +565,12 @@ class Assignments(Base):
                 Questions.answer9,
                 Languages.language_id,
                 Languages.language_code,
-                func.count(Posts.post_id),
+                func.count(distinct(Posts.post_id)),
             ).join(
                 Users, Users.user_id == Assignments.user_id,
+            ).join(
+                Organizations, Users.organization_id == \
+                    Organizations.organization_id,
             ).join(
                 QuestionAssignments,
                 QuestionAssignments.assignment_id == \
@@ -1817,6 +1825,54 @@ class Subscribers(Base):
             ).filter(
             ).all()
         return subscribers
+
+class Organizations(Base):
+
+    __tablename__ = 'organizations'
+    organization_id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    description = Column(Text, nullable=True)
+    contact_name = Column(Text, nullable=True)
+    contact_email = Column(Text, nullable=True)
+    creation_datetime = Column(DateTime)
+
+    @classmethod
+    def add_organization(cls, session, name, description, contact_name,\
+             contact_email):
+        with transaction.manager:
+            organization = Organizations(
+                name = name,
+                description = description,
+                contact_name = contact_name,
+                contact_email = contact_email,
+                creation_datetime = datetime.datetime.now(),
+            )
+            session.add(organization)
+            transaction.commit()
+        return organization
+
+    @classmethod
+    def get_from_id(cls, session, organization_id):
+        with transaction.manager:
+            organization = session.query(
+                Organizations,
+            ).filter(
+                Organizations.organization_id == organization_id,
+            ).first()
+        return organization
+
+    @classmethod
+    def get_all(cls, session):
+        with transaction.manager:
+            organizations = session.query(
+                Organizations.organization_id,
+                Organizations.name,
+                Organizations.description,
+                Organizations.contact_name,
+                Organizations.contact_email,
+                Organizations.creation_datetime,
+            ).all()
+        return organizations
 
 class Zipcodes(Base):
 

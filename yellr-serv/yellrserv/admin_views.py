@@ -775,7 +775,8 @@ def admin_create_user(request):
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
             email = request.POST['email']
-            organization = request.POST['organization']
+            #organization = request.POST['organization']
+            organization_id = request.POST['organization_id']
             fence_top_left_lat = float(request.POST['fence_top_left_lat'])
             fence_top_left_lng = float(request.POST['fence_top_left_lng'])
             fence_bottom_right_lat = float(request.POST['fence_bottom_right_lat'])
@@ -831,7 +832,8 @@ def admin_create_user(request):
                 first_name = first_name,
                 last_name = last_name,
                 email = email,
-                organization = organization,
+                #organization = organization,
+                organization_id = organization_id,
                 #client_id = client_id,
             )
 

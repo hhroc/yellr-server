@@ -29,6 +29,7 @@ from .models import (
     Messages,
     Notifications,
     UserGeoFences,
+    Organizations,
     )
 
 def check_token(request):
@@ -61,7 +62,7 @@ def authenticate(username, password):
         token = None
         fence = None
 
-        user, token = Users.authenticate(DBSession, username, password)
+        user, org, token = Users.authenticate(DBSession, username, password)
 
         if token == None:
             result['error_text'] = 'Invalid credentials'
@@ -73,7 +74,7 @@ def authenticate(username, password):
                 user_id = user.user_id,
             )
 
-    return user, token, fence
+    return user, org, token, fence
 
 def get_languages():
 
@@ -357,3 +358,31 @@ def _decode_collections(collections):
             })
 
     return ret_collections
+
+def get_organizations():
+
+    organizations = Organizations.get_all(
+        session = DBSession,
+    )
+
+    return _decode_organizations(organizations)
+
+def _decode_organizations(organizations):
+
+    if True:
+
+        ret_organizations = []
+
+        for org_id, name, desc, contact_name, contact_email, created \
+                in organizations:
+
+            ret_organizations.append({
+                'id': org_id,
+                'name': name,
+                'description': desc,
+                'contact_name': contact_name,
+                'contact_email': contact_email,
+                'created': str(created),
+            })
+
+    return ret_organizations

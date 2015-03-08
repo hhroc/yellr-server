@@ -60,8 +60,9 @@ def _decode_assignments(assignments):
             index = 0
             for assignment_id, publish_datetime, expire_datetime, name, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
-                    bottom_right_lng, use_fence, collection_id, organization, \
-                    question_text, question_type_id, question_description, \
+                    bottom_right_lng, use_fence, collection_id, org_id, \
+                    org_name, org_description, question_text, \
+                    question_type_id, question_description, \
                     answer0, answer1, answer2, answer3, answer4, answer5, \
                     answer6, answer7, answer8, answer9, language_id, \
                     language_code, post_count in assignments:
@@ -84,7 +85,9 @@ def _decode_assignments(assignments):
                         'bottom_right_lat': bottom_right_lat,
                         'bottom_right_lng': bottom_right_lng,
                         #'use_fence': use_fence,
-                        'organization': organization,
+                        'organization_id': org_id,
+                        'organization': org_name,
+                        'organization_description': org_description,
                         'questions': [],
                         'post_count': post_count,
                         'language_code': language_code,
