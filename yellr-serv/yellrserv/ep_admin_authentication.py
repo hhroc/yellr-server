@@ -66,7 +66,7 @@ def admin_check_loged_in(request):
     except Exception, e:
         result['error_text'] = str(e)
 
-    return urils.make_response(result)
+    return utils.make_response(result)
 
 
 @view_config(route_name='admin/logout.json')

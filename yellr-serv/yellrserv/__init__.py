@@ -80,6 +80,7 @@ def main(global_config, **settings):
     config.add_route('admin/add_organization.json', 'admin/add_organization.json')
     config.add_route('admin/check_logged_in.json', 'admin/check_logged_in.json')
     config.add_route('admin/logout.json', 'admin/logout.json')
+    config.add_route('admin/change_password.json', 'admin/change_password.json')
 
     # client views
     #config.add_route('server_info.json','server_info.json')

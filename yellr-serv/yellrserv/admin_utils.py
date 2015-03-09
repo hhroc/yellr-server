@@ -134,6 +134,16 @@ def create_user(user_type_id, user_type_name, user_name, password, first_name,\
 
     return new_user
 
+def change_password(username, password):
+
+    user = Users.change_password(
+        session = DBSession,
+        username = username,
+        password = password,
+    )
+
+    return user
+
 def get_languages():
 
     languages = Languages.get_all(

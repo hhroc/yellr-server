@@ -271,6 +271,25 @@ class Users(Base):
                 transaction.commit()
         return user
 
+    @classmethod
+    def change_password(cls, session, username, password):
+        with transaction.manager:
+            user = session.query(
+                Users,
+            ).filter(
+                Users.user_name == username,
+            ).first()
+            pass_salt=str(uuid.uuid4())
+            pass_hash = hashlib.sha256('{0}{1}'.format(
+                password,
+                pass_salt
+            )).hexdigest()
+            user.pass_salt = pass_salt
+            user.pass_hash = pass_hash
+            session.add(user)
+            transaction.commit()
+        return user
+
 class UserGeoFences(Base):
 
     """

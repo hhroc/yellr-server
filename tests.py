@@ -1257,6 +1257,58 @@ def run_tests():
     log('')
     log('')
 
+    new_password_2 = hashlib.sha256('password123').hexdigest()
+
+    success, payload = _execute_test(
+        'admin/change_password.json',
+        new_user_token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'username': new_username,
+            'password': new_password_2,
+        },
+        'POST',
+    )
+    #new_user_token_2 = payload['token']
+    #log('Got New User Token: {0}'.format(new_user_token))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/get_access_token.json',
+        None,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'username': new_username,
+            'password': new_password_2
+        },
+        'POST',
+    )
+    new_user_token_2 = payload['token']
+    log('Got New User Token: {0}'.format(new_user_token))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/check_logged_in.json',
+        new_user_token_2,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # does not take any params
+        },
+        'GET',
+    )
+    log('----')
+    log('')
+    log('')
 
     log("Done with Tests")
     log("")
