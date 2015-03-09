@@ -1,5 +1,6 @@
 import json
 import datetime
+import os
 
 import markdown
 
@@ -40,138 +41,229 @@ def make_response(resp_dict, status_code=200):
 
     return resp
 
-def admin_log(log_text):
+#def admin_log(log_text):
+#
+#    with open('log.txt', 'a') as f:
+#        f.write('[{0}] {1}\n'.format(str(datetime.datetime.now()),log_text))
 
-    with open('log.txt', 'a') as f:
-        f.write('[{0}] {1}\n'.format(str(datetime.datetime.now()),log_text))
+def _decode_languages(languages):
 
-def get_assignments(language_code, lat, lng):
+    if True:
 
-    assignments = Assignments.get_all_open_with_questions(
-        session = DBSession,
-        language_code = language_code,
-        lat = lat,
-        lng = lng
-    )
+        ret_languages = []
+        
+        for language_code, name in languages:
+            ret_languages.append({
+                'name': name,
+                'code': language_code,
+            })
+
+    return ret_languages
+
+
+def _decode_question_types(question_types):
+
+    if True:
+
+        ret_question_types = []
     
-    ret_assignments = []
-    for assignment_id, publish_datetime, expire_datetime, name, \
-            top_left_lat, top_left_lng, bottom_right_lat, \
-            bottom_right_lng, use_fence, collection_id, organization,\
-            question_text, question_type_id, description, answer0, \
-            answer1, answer2, answer3, answer4, answer5, answer6, \
-            answer7, answer8, answer9, post_count in assignments:
-        ret_assignments.append({
-            'assignment_id': assignment_id,
-            'organization': organization,
-            'publish_datetime': str(publish_datetime),
-            'expire_datetime': str(expire_datetime),
-            'name': name,
-            'top_left_lat': top_left_lat,
-            'top_left_lng': top_left_lng,
-            'bottom_right_lat': bottom_right_lat,
-            'bottom_right_lng': bottom_right_lng,
-            'question_text': question_text,
-            'question_type_id': question_type_id,
-            'description': description,
-            'answer0': answer0,
-            'answer1': answer1,
-            'answer2': answer2,
-            'answer3': answer3,
-            'answer4': answer4,
-            'answer5': answer5,
-            'answer6': answer6,
-            'answer7': answer7,
-            'answer8': answer8,
-            'answer9': answer9,
-            'post_count': post_count,
-        })
+        for question_type_id, question_type_text, question_type_description \
+                in question_types:
+            ret_question_types.append({
+                'question_type_id': question_type_id,
+                'question_type_text': question_type_text,
+                'question_type_description': question_type_description,
+            })
+
+    return ret_question_types
+
+def _decode_assignments(assignments):
+
+    if True:
+
+        ret_assignments = []
+
+        if len(assignments) > 0 and assignments[0][0] != None:
+
+            seen_assignment_ids = []
+            assignment = {}
+
+            # itterate throught he list, and build our resposne
+            index = 0
+            for assignment_id, publish_datetime, expire_datetime, name, \
+                    top_left_lat, top_left_lng, bottom_right_lat, \
+                    bottom_right_lng, use_fence, collection_id, org_id, \
+                    org_name, org_description, question_text, \
+                    question_type_id, question_description, \
+                    answer0, answer1, answer2, answer3, answer4, answer5, \
+                    answer6, answer7, answer8, answer9, language_id, \
+                    language_code, post_count in assignments:
+
+                if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
+
+                    # add our existing assignment to the list of assignments
+                    # to return
+                    if assignment:
+                        ret_assignments.append(assignment)
+
+                    # build our assignment with no question(s)
+                    assignment = {
+                        'assignment_id': assignment_id,
+                        'publish_datetime': str(publish_datetime),
+                        'expire_datetime': str(expire_datetime),
+                        'name': name,
+                        'top_left_lat': top_left_lat,
+                        'top_left_lng': top_left_lng,
+                        'bottom_right_lat': bottom_right_lat,
+                        'bottom_right_lng': bottom_right_lng,
+                        #'use_fence': use_fence,
+                        'organization_id': org_id,
+                        'organization': org_name,
+                        'organization_description': org_description,
+                        'questions': [],
+                        'post_count': post_count,
+                        'language_code': language_code,
+                    }
+
+                    # record that we have seen the assignment_id
+                    seen_assignment_ids.append(assignment_id)
+
+                # build our question
+                question = {
+                    'question_text': question_text,
+                    'question_type_id': question_type_id,
+                    'description': question_description,
+                    'answer0': answer0,
+                    'answer1': answer1,
+                    'answer2': answer2,
+                    'answer3': answer3,
+                    'answer4': answer4,
+                    'answer5': answer5,
+                    'answer6': answer6,
+                    'answer7': answer7,
+                    'answer8': answer8,
+                    'answer9': answer9,
+                }
+
+                # add the question to the current assignment
+                assignment['questions'].append(question)
+
+                if index == len(assignments)-1:
+                    ret_assignments.append(assignment)
+
+                index += 1
 
     return ret_assignments
 
-def get_stories(language_code, lat, lng):
+def _decode_posts(posts):
 
-    stories, total_story_count = Stories.get_stories(
-        session = DBSession,
-        lat = lat,
-        lng = lng,
-        language_code = language_code,
-        start = 0, #start,
-        count = 15, #count,
-    )
+    if True:
 
-    ret_stories = []
-    for story_unique_id, publish_datetime, edited_datetime, title, tags, \
-            top_text, contents, top_left_lat, top_left_lng, \
-            bottom_right_lat, bottom_right_lng, first_name, last_name, \
-            organization, email, media_file_name, media_id in stories:
-        ret_stories.append({
-            'story_unique_id': story_unique_id,
-            'publish_datetime': str(publish_datetime),
-            'edited_datetime': str(edited_datetime),
-            'title': title,
-            'tags': tags,
-            'top_text': top_text,
-            #'contents': contents,
-            'contents_rendered': markdown.markdown(contents),
-            'top_left_lat': top_left_lat,
-            'top_left_lng': top_left_lng,
-            'bottom_right_lat': bottom_right_lat,
-            'bottom_right_lng': bottom_right_lng,
-            'author_first_name': first_name,
-            'author_last_name': last_name,
-            'author_organization': organization,
-            'author_email': email,
-            'banner_media_file_name': media_file_name,
-            'banner_media_id': media_id,
-        })
+        ret_posts = []
 
-    return ret_stories
+        if len(posts) > 0 and posts[0][0] != None:
 
-def get_notifications(client_id, language_code, lat, lng):
+            seen_post_ids = []
+            post = {}
 
-    notifications = Notifications.get_notifications_from_client_id(
-        session = DBSession,
-        client_id = client_id, #client.client_id,
-    )
+            # itterate throught the list, and build our resposne
+            index = 0
+            for post_id, client_id, post_datetime, deleted, \
+                    lat, lng, media_object_id, media_id, file_name, \
+                    caption, media_text, media_type_name, \
+                    media_type_description, verified, cuid, \
+                    language_code, language_name, assignment_id, \
+                    assignment_name in posts:
 
-    ret_notifications = []
-    for notification_id, notification_datetime, \
-            notification_type, payload in notifications:
-        ret_notifications.append({
-            'notification_id': notification_id,
-            'notification_datetime': str(notification_datetime),
-            'notification_type': notification_type,
-            'payload': json.loads(payload),
-        })
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
 
-    return ret_notifications
+                    if post:
 
-def get_messages(client_id, language_code, lat, lng):
+                        ret_posts.append(post)
 
-    messages = Messages.get_messages_from_client_id(
-        session = DBSession,
-        client_id = client_id, #client.client_id
-    )
-    
-    ret_messages = []
-    for message_id, from_user_id,to_user_id,message_datetime, \
-            parent_message_id,subject,text, was_read,from_organization, \
-            from_first_name,from_last_name in messages:
-        ret_messages.append({
-            'message_id': message_id,
-            'from_user_id': from_user_id,
-            'to_user_id': to_user_id,
-            'from_organization': from_organization,
-            'from_first_name': from_first_name,
-            'from_last_name': from_last_name,
-            'message_datetime': str(message_datetime),
-            'parent_message_id': parent_message_id,
-            'subject': subject,
-            'text': text,
-            'was_read': was_read,
-        })
+                    post = {
+                        'post_id': post_id,
+                        'client_id': client_id,
+                        #'title': title,
+                        'post_datetime': str(post_datetime),
+                        'deleted': deleted,
+                        'lat': lat,
+                        'lng': lng,
+                        'verified_user': bool(verified),
+                        'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        'assignment_id': assignment_id,
+                        'assignment_name': assignment_name,
+                        'media_objects': []
+                    }
 
-    return ret_messages
+                    seen_post_ids.append(post_id)
 
-    
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
+                media_object = {
+                    'media_id': media_id,
+                    'file_name': file_name,
+                    'preview_file_name': preview_file_name,
+                    'caption': caption,
+                    'media_text': media_text,
+                    'media_type_name': media_type_name,
+                    'media_type_description': media_type_description,
+                }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
+
+    return ret_posts
+
+def _decode_collections(collections):
+
+    if True:
+
+        ret_collections = []
+
+        for collection_id, user_id, collection_datetime, name, description, \
+                tags, enabled, assignment_id, assignment_name, post_count \
+                in collections:
+            ret_collections.append({
+                'collection_id': collection_id,
+                'collection_datetime': str(collection_datetime),
+                'name': name,
+                'decription': description,
+                'tags': tags,
+                'enabled': enabled,
+                'assignment_id': assignment_id,
+                'assignment_name': assignment_name,
+                'post_count': post_count,
+            })
+
+    return ret_collections
+
+def _decode_organizations(organizations):
+
+    if True:
+
+        ret_organizations = []
+
+        for org_id, name, desc, contact_name, contact_email, created \
+                in organizations:
+
+            ret_organizations.append({
+                'id': org_id,
+                'name': name,
+                'description': desc,
+                'contact_name': contact_name,
+                'contact_email': contact_email,
+                'created': str(created),
+            })
+
+    return ret_organizations
+

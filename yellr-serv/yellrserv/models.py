@@ -9,6 +9,8 @@ from random import randint
 
 import transaction
 
+#from geoalchemy2 import *
+
 from sqlalchemy import (
     Column,
     Index,
@@ -18,18 +20,25 @@ from sqlalchemy import (
     Boolean,
     Float,
     CHAR,
+    BLOB,
     )
 
 from sqlalchemy import ForeignKey
 
-from sqlalchemy import update, desc, func, text
+from sqlalchemy import (
+    update,
+    desc,
+    func,
+    text,
+    distinct,
+)
 
 from sqlalchemy.ext.declarative import declarative_base
 
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
-    )
+)
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
@@ -96,23 +105,19 @@ class Users(Base):
     user_name = Column(Text)
     first_name = Column(Text)
     last_name = Column(Text)
-    organization = Column(Text)
+    #organization = Column(Text)
+    organization_id = Column(Integer, ForeignKey('organizations.organization_id'))
     email = Column(Text)
     pass_salt = Column(Text)
     pass_hash = Column(Text)
-    #verified = Column(Boolean)
     user_geo_fence_id = Column(Integer,
         ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
-
     token = Column(Text, nullable=True)
     token_expire_datetime = Column(DateTime, nullable=True)
 
-    #post_view_count = Column(Integer)
-    #post_used_count = Column(Integer)
-
     @classmethod
     def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
-            user_name, password, first_name, last_name, email, organization):
+            user_name, password, first_name, last_name, email, organization_id):
         user = None
         with transaction.manager:
             pass_salt=str(uuid.uuid4())
@@ -123,50 +128,20 @@ class Users(Base):
             user = cls(
                 user_type_id = user_type_id,
                 user_geo_fence_id = user_geo_fence_id, 
-                #verified = verified,
-                #client_id = client_id,
                 first_name = first_name,
                 last_name = last_name,
-                organization = organization,
+                #organization = organization,
+                organization_id = organization_id,
                 email = email,
                 user_name = user_name,
                 pass_salt = pass_salt,
                 pass_hash = pass_hash,
                 token = None,
                 token_expire_datetime = None,
-                #post_view_count = 0,
-                #post_used_count = 0,
             )
             session.add(user)
             transaction.commit()
-        #system_user = Users.get_from_user_type_name(session,'system')
-        #message = Messages.create_message(
-        #    session = session,
-        #    from_user_id = system_user.user_id,
-        #    to_user_id = user.user_id,
-        #    subject = 'Welcome to Yellr!',
-        #    text = "Congratulations, you are now using Yellr!  You can start posting content right away!",
-        #)
         return user
-
-    #@classmethod
-    #def verify_user(cls, session, client_id, user_name, password,
-    #        first_name = '', last_name = '', email = ''):
-    #    with transaction.manager:
-    #        user,created = Users.get_from_client_id(session, client_id)
-    #        # TODO: may wan tto check to see if we just created the user, because that
-    #        #       should never happen ...
-    #        pass_hash = hashlib.sha256('{0}{1}'.format(
-    #            password,
-    #            user.pass_salt
-    #        )).hexdigest()
-    #        user.user_name = user_name
-    #        user.pass_hash = pass_hash
-    #        user.email = email
-    #        user.verified = True
-    #        session.add(user)
-    #        transaction.commit()
-    #    return user
 
     @classmethod
     def check_exists(cls, session, user_name):
@@ -174,9 +149,7 @@ class Users(Base):
             user = session.query(
                 Users,
             ).filter(
-                Users.user_name == user_name, #or \
-                    #Users.email == email or \
-                    #Users.client_id == client_id
+                Users.user_name == user_name,
             ).first()
             exists = False
             if not user == None:
@@ -262,16 +235,8 @@ class Users(Base):
             user = session.query(
                 Users,
             ).filter(
-                #Users.verified == True,
-                #Users.user_type_id != user_user_type_id, # or \
-                
-                #Users.user_type_id == admin_user_type_id or \
-                #    Users.user_type_id == mod_user_type_id or \
-                #    Users.user_type_id == sub_user_type_id,
                 Users.user_name == str(user_name),
             ).first()
-
-            #print "Password: %s" % password 
 
             token = None
             if user != None:
@@ -284,7 +249,8 @@ class Users(Base):
                         datetime.timedelta(hours=24)
                     session.add(user)
                     transaction.commit()
-        return user, token
+                    org = Organizations.get_from_id(session, user.organization_id)
+        return user, org, token
 
     @classmethod
     def validate_token(cls, session, token):
@@ -295,16 +261,25 @@ class Users(Base):
                 valid = True
         return valid, user
 
+    @classmethod
+    def invalidate_token(cls, session, token):
+        with transaction.manager:
+            user = Users.get_from_token(session, token)
+            if user != None:
+                user.token = ""
+                session.add(user)
+                transaction.commit()
+        return user
+
 class UserGeoFences(Base):
 
     """
-    Ssy Admins, Moderators, and Subscribers all have default geo fences that they 
+    Admins, Moderators, and Subscribers all have default geo fences that they 
     are set to.  That is, that they can not post of view outside of this fence.
     """
 
     __tablename__ = 'user_geo_fences'
     user_geo_fence_id = Column(Integer, primary_key=True)
-    #user_id = Column(Integer, ForeignKey('users.user_id'))
     top_left_lat = Column(Float)
     top_left_lng = Column(Float)
     bottom_right_lat = Column(Float)
@@ -359,6 +334,8 @@ class Clients(Base):
     creation_datetime = Column(DateTime)
     last_check_in_datetime = Column(DateTime)
 
+    home_zipcode_id = Column(Integer, ForeignKey('zipcodes.zipcode_id'))
+
     last_lat = Column(Float)
     last_lng = Column(Float)
 
@@ -409,26 +386,6 @@ class Clients(Base):
     def get_client_by_cuid(cls, session, cuid, lat, lng, create=True):
         client = None
         with transaction.manager:
-            #result = session.execute(text(
-            #    'INSERT INTO clients(cuid) '
-            #    'SELECT * FROM ( SELECT ":cuid" ) AS temp_table '
-            #    'WHERE NOT EXISTS ( '
-            #    '    SELECT cuid FROM clients WHERE cuid = ":cuid" '
-            #    ') LIMIT 1;'),
-            #   {"cuid":cuid}
-            #)
-            #print "\n\nRESULT ID:\n{0}\n\n".format(result.inserted_primary_key)
-            #transaction.commit()
-        #print "\n\nRESULT ID:\n{0}\n\n".format(result.lastrowid)
-        #for row in result:
-        #    print "\nRow: {0}".format(row)
-
-        #with transaction.manager:
-
-            #print "\n\nRESULT\n\n"
-            #print result
-            #print "\n\n"
-
             client = session.query(
                 Clients,
             ).filter(
@@ -460,24 +417,6 @@ class Clients(Base):
                     lat = lat,
                     lng = lng,
                 )
-                #client = Clients(
-                #    cuid = cuid,
-                #    first_name = None,
-                #    last_name = None,
-                #    email = None,
-                #    passhash = None,
-                #    passsalt = None,
-                #    verified = False,
-                #    verified_datetime = None,
-                #    creation_datetime = datetime.datetime.now(),
-                #    last_check_in_datetime = datetime.datetime.now(),
-                #    last_lat = lat,
-                #    last_lng = lng,
-                #    post_view_count = 0,
-                #    post_used_count = 0,
-                #)
-                #session.add(client)
-                #transaction.commit()
         return client
 
     @classmethod
@@ -594,23 +533,33 @@ class Assignments(Base):
         return counts
 
     @classmethod
-    def get_all_with_questions_from_token(cls, session, token, \
-            start=0, count=0):
-        with transaction.manager:
-            #user = Users.get_from_token(session, token)
+    def _build_assignments_query(cls, session):
+        if True:
+
+            #dialect = query.session.bind.dialect
+            #q =  session.query(
+            #    func.count(Posts),
+            #).filter(
+            #    Posts.assignment_id == Assignments.assignment_id,
+            #)
+            #count_sql = "(%s) as count_1" % str(q.statement.compile(dialect=q.session.bind.dialect))
+
+            #count_sql = "(SELECT Count(*) FROM posts WHERE posts.assignment_id = assignments.assignment_id) AS count_1"
+
             assignments_query = session.query(
                 Assignments.assignment_id,
                 Assignments.publish_datetime,
                 Assignments.expire_datetime,
                 Assignments.name,
-                #Assignments.assignment_unique_id,
                 Assignments.top_left_lat,
                 Assignments.top_left_lng,
                 Assignments.bottom_right_lat,
                 Assignments.bottom_right_lng,
                 Assignments.use_fence,
                 Assignments.collection_id,
-                Users.organization,
+                Users.organization_id,
+                Organizations.name,
+                Organizations.description,
                 Questions.question_text,
                 Questions.question_type_id,
                 Questions.description,
@@ -624,9 +573,14 @@ class Assignments(Base):
                 Questions.answer7,
                 Questions.answer8,
                 Questions.answer9,
-                func.count(Posts.post_id),
-            ).outerjoin(
+                Languages.language_id,
+                Languages.language_code,
+                func.count(distinct(Posts.post_id)),
+            ).join(
                 Users, Users.user_id == Assignments.user_id,
+            ).join(
+                Organizations, Users.organization_id == \
+                    Organizations.organization_id,
             ).join(
                 QuestionAssignments,
                 QuestionAssignments.assignment_id == \
@@ -634,87 +588,63 @@ class Assignments(Base):
             ).join(
                 Questions,Questions.question_id == \
                     QuestionAssignments.question_id,
+            ).join(
+                Languages,Languages.language_id == \
+                    Questions.language_id,
             ).outerjoin(
-                Posts,Posts.assignment_id == Assignments.assignment_id,
+                Posts, Posts.assignment_id == \
+                    Assignments.assignment_id,
             ).group_by(
                 Assignments.assignment_id,
+                #Users.user_id,
+                #Questions.question_id,
+                #Languages.language_id,
+            #).outerjoin(
+            #    Posts, Posts.assignment_id == \
+            #        Assignments.assignment_id,
+            #).filter(
+            #    Posts.assignment_id == \
+            #)       Assignments.assignment_id
+            #).filter(
+            #    Posts.deleted == False,
             ).order_by(
-                desc(Assignments.publish_datetime),
+                desc(Assignments.assignment_id),
             )
-            #assignments = assignments_query.all()
-            total_assignment_count = assignments_query.count()
-            #if start == 0 and count == 0:
-            #    assignments = assignments_query.all()
-            #else:
-            assignments = assignments_query.slice(start, start+count).all()
-        return assignments, total_assignment_count
+        return assignments_query
+
+    @classmethod
+    def get_all_with_questions(cls, session, token, \
+            start=0, count=0):
+        with transaction.manager:
+            assignments = Assignments._build_assignments_query(session).filter(
+                #
+            ).slice(start, start+count).all()
+        return assignments #, total_assignment_count
 
     @classmethod
     def get_all_open_with_questions(cls, session, language_code, lat, lng):
         with transaction.manager:
-            language = Languages.get_from_code(session,language_code)
-            assignments = session.query(
-                Assignments.assignment_id,
-                Assignments.publish_datetime,
-                Assignments.expire_datetime,
-                Assignments.name,
-                #Assignments.assignment_unique_id,
-                Assignments.top_left_lat,
-                Assignments.top_left_lng,
-                Assignments.bottom_right_lat,
-                Assignments.bottom_right_lng,
-                Assignments.use_fence,
-                Assignments.collection_id,
-                Users.organization,
-                Questions.question_text,
-                Questions.question_type_id,
-                Questions.description,
-                Questions.answer0,
-                Questions.answer1,
-                Questions.answer2,
-                Questions.answer3,
-                Questions.answer4,
-                Questions.answer5,
-                Questions.answer6,
-                Questions.answer7,
-                Questions.answer8,
-                Questions.answer9,
-                func.count(Posts.post_id),
-            ).outerjoin(
-                Users, Users.user_id == Assignments.user_id,
-            ).join(
-                QuestionAssignments,
-                QuestionAssignments.assignment_id == \
-                    Assignments.assignment_id,
-            ).join(
-                Questions,Questions.question_id == \
-                    QuestionAssignments.question_id,
-            ).outerjoin(
-                Posts,Posts.assignment_id == Assignments.assignment_id,
-            ).filter(
+            assignments = Assignments._build_assignments_query(session).filter(
                 # we add offsets so we can do simple comparisons
                 Assignments.top_left_lat + 90 > lat + 90,
                 Assignments.top_left_lng + 180 < lng + 180,
                 Assignments.bottom_right_lat + 90 < lat + 90,
                 Assignments.bottom_right_lng + 180 > lng + 180,
-                Questions.language_id == language.language_id,
-                Assignments.expire_datetime >= datetime.datetime.now(), #Assignments.publish_datetime,
-            ).group_by(
-                Assignments.assignment_id,
-            ).order_by(
-                desc(Assignments.publish_datetime),
-            ).all()
+                Languages.language_code == language_code,
+                Assignments.expire_datetime >= datetime.datetime.now(),
+            ).all() #.slice(start, start+count).all()
         return assignments
 
     @classmethod
-    def create_from_http(cls, session, token, name, life_time, top_left_lat, \
+    def create_from_http(cls, session, user_id, name, life_time, top_left_lat, \
             top_left_lng, bottom_right_lat, bottom_right_lng, use_fence=True):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
+            #user = Users.get_from_token(session, token)
             assignment = None
-            if user != None:
+            #if user != None:
+            if True:
                 assignment = Assignments(
-                    user_id = user.user_id,
+                    user_id = user_id,
                     publish_datetime = datetime.datetime.now(),
                     expire_datetime = datetime.datetime.now() + \
                         datetime.timedelta(hours=life_time),
@@ -839,10 +769,10 @@ class Questions(Base):
     answer9 = Column(Text)
 
     @classmethod
-    def create_from_http(cls, session, token, language_code, question_text,
+    def add_question(cls, session, user_id, language_code, question_text,
             description, question_type, answers):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
+            #user = Users.get_from_token(session, token)
             question = None
             if len(answers) == 10:
                 language = Languages.get_from_code(session, language_code)
@@ -851,7 +781,7 @@ class Questions(Base):
                     question_type
                 )
                 question = Questions(
-                    user_id = user.user_id,
+                    user_id = user_id,
                     language_id = language.language_id,
                     question_text = question_text,
                     description = description,
@@ -997,7 +927,7 @@ class Posts(Base):
             )
             if assignment_id == None \
                    or assignment_id == '' \
-                   or assignment_id == 0:
+                   or assignment_id <= 0:
                 assignment_id = None
             post = cls(
                 client_id = client_id,
@@ -1026,117 +956,11 @@ class Posts(Base):
                 )
                 session.add(post_media_object)
             transaction.commit()
-        #Notifications.create_notification(
-        #    session,
-        #    user.user_id,
-        #    'post_successful',
-        #    json.dumps({'post_id': post.post_id, 'post_text': ''}),
-        #)
-        return post #, created)
-
-    @classmethod
-    def get_all_from_client_id(cls, session, client_id, deleted=False):
-        with transaction.manager:
-            posts = session.query(
-                Posts.post_id,
-                #Posts.title,
-                Posts.post_datetime,
-                Posts.deleted,
-                Posts.lat,
-                Posts.lng,
-                Posts.assignment_id,
-                Clients.verified,
-                Clients.client_id,
-                Clients.first_name,
-                Clients.last_name,
-                Clients.organization,
-                Languages.language_code,
-                Languages.name,
-            ).join(
-                Clients, Clients.client_id == Posts.client_id,
-            ).join(
-                Languages, Languages.language_id == Posts.language_id,
-            ).filter(
-                Posts.client_id == Clients.client_id,
-                Posts.language_id == Languages.language_id,
-                Posts.deleted == deleted,
-                Posts.client_id == client_id,
-            ).all()
-        return posts
-
-    @classmethod
-    def get_from_post_id(cls, session, post_id):
-        with transaction.manager:
-            post = session.query(
-                Posts,
-            ).filter(
-                Posts.post_id == post_id,
-            ).first()
         return post
 
     @classmethod
-    def get_count_from_client_id(cls, session, client_id):
-        with transaction.manager:
-            post_count = session.query(
-                Posts.client_id,
-            ).filter(
-                Posts.client_id == client_id,
-            ).count()
-        return post_count 
-
-    @classmethod
-    def get_with_media_objects_from_post_id(cls, session, post_id):
-        with transaction.manager:
-            posts_query = session.query(
-                Posts.post_id,
-                Posts.assignment_id,
-                Posts.client_id,
-                #Posts.title,
-                Posts.post_datetime,
-                Posts.deleted,
-                Posts.lat,
-                Posts.lng,
-                MediaObjects.media_object_id,
-                MediaObjects.media_id,
-                MediaObjects.file_name,
-                MediaObjects.caption,
-                MediaObjects.media_text,
-                MediaTypes.name,
-                MediaTypes.description,
-                Clients.verified,
-                Clients.cuid,
-                Languages.language_code,
-                Languages.name,
-            ).join(
-                PostMediaObjects, #PostMediaObjects.media_object_id == \
-                    #MediaObjects.media_object_id,
-            ).join(
-                MediaObjects, #MediaObjects.media_object_id == \
-                    #PostMediaObjects.media_object_id,
-            ).join(
-                MediaTypes, #MediaTypes.media_type_id == \
-                    #MediaObjects.media_type_id,
-            ).join(
-                Clients, Clients.client_id == Clients.client_id,
-            ).join(
-                Languages,
-            ).filter(
-                # Posts.assignment_id == assignment_id,
-                #Posts.post_id == post_id,
-            ).order_by(
-                 desc(Posts.post_datetime),
-            ).group_by(
-                 Posts.post_id,
-            )
-            total_post_count = posts_query.count()
-            posts = posts_query.filter(
-                Posts.post_id == post_id,
-            ).all()
-        return posts, total_post_count
-
-    @classmethod
-    def get_posts(cls, session, deleted=False, start=0, count=0):
-        with transaction.manager:
+    def _build_posts_query(cls, session):
+        if True:
             posts_query = session.query(
                 Posts.post_id,
                 #Posts.assignment_id,
@@ -1166,198 +990,85 @@ class Posts(Base):
             ).join(
                 MediaTypes,
             ).join(
-                Clients, Clients.client_id == Posts.client_id, 
+                Clients, Clients.client_id == Posts.client_id,
             ).join(
                 Languages,
             ).outerjoin(
                 Assignments, Assignments.assignment_id == \
                     Posts.assignment_id,
-            ).filter(
-                # Posts.assignment_id == assignment_id,
-                Posts.deleted == deleted,
-            ).order_by(
-                 desc(Posts.post_datetime),
+            ).outerjoin(
+                CollectionPosts, CollectionPosts.post_id == \
+                    Posts.post_id,
             ).group_by(
-                 Posts.post_id,
+                Posts.post_id,
+            ).order_by(
+                desc(Posts.post_datetime),
             )
-            total_post_count = posts_query.count()
-            #posts = posts_query.limit(256).all()
-            if start == 0 and count == 0:
-                posts = posts_query.all()
-            else:
-                posts = posts_query.slice(start, start+count).all()
-        return posts, total_post_count
+        return posts_query
 
+    @classmethod
+    def get_from_post_id(cls, session, post_id):
+        with transaction.manager:
+            post = session.query(
+                Posts,
+            ).filter(
+                Posts.post_id == post_id,
+            ).first()
+        return post
+
+    @classmethod
+    def get_count_from_client_id(cls, session, client_id):
+        with transaction.manager:
+            post_count = session.query(
+                Posts.client_id,
+            ).filter(
+                Posts.client_id == client_id,
+            ).count()
+        return post_count 
+
+    @classmethod
+    def get_with_media_objects_from_post_id(cls, session, post_id):
+        with transaction.manager:
+            posts = Posts._build_posts_query(session).filter(
+                Posts.post_id == post_id,
+            ).all()
+        return posts
+
+    @classmethod
+    def get_posts(cls, session, deleted=False, start=0, count=0):
+        with transaction.manager:
+            posts = Posts._build_posts_query(session).filter(
+                Posts.deleted == deleted,
+            ).slice(start, start+count).all()
+        return posts
 
     @classmethod
     def get_all_from_assignment_id(cls, session, assignment_id, \
             deleted=False, start=0, count=0):
         with transaction.manager:
-            posts_query = session.query(
-                Posts.post_id,
-                Posts.assignment_id,
-                Posts.client_id,
-                #Posts.title,
-                Posts.post_datetime,
-                Posts.deleted,
-                Posts.lat,
-                Posts.lng,
-                MediaObjects.media_object_id,
-                MediaObjects.media_id,
-                MediaObjects.file_name,
-                MediaObjects.caption,
-                MediaObjects.media_text,
-                MediaTypes.name,
-                MediaTypes.description,
-                Clients.verified,
-                Clients.client_id,
-                Languages.language_code,
-                Languages.name,
-            ).join(
-                PostMediaObjects,
-                #PostMediaObjects.post_id == \
-                #    Posts.post_id,
-            ).join(
-                MediaObjects,
-                #MediaObjects.media_object_id == \
-                #    MediaObjects.media_object_id,
-            ).join(
-                MediaTypes,
-                #MediaTypes.media_type_id == \
-                #    MediaObjects.media_type_id,
-            ).join(
-                Clients,
-                Clients.client_id == \
-                    Posts.client_id,
-            ).join(
-                Languages,
-                #Languages.language_id ==
-                #    Posts.language_id,
-            ).filter(
+            posts = Posts._build_posts_query(session).filter(
                 Posts.assignment_id == assignment_id,
                 Posts.deleted == deleted,
-            ).order_by(
-                 desc(Posts.post_datetime),
-            ).group_by(
-                 Posts.post_id,
-            )
-            total_post_count = posts_query.count()
-            if start == 0 and count == 0:
-                posts = posts_query.all()
-            else:
-                posts = posts_query.slice(start, start+count)
-        return posts, total_post_count
+            ).slice(start, start+count).all()
+        return posts #, total_post_count
 
     @classmethod
     def get_all_from_collection_id(cls, session, collection_id,
             start=0, count=0):
         with transaction.manager:
-            posts_query = session.query(
-                Posts.post_id,
-                Posts.assignment_id,
-                Posts.client_id,
-                #Posts.title,
-                Posts.post_datetime,
-                Posts.deleted,
-                Posts.lat,
-                Posts.lng,
-                MediaObjects.media_object_id,
-                MediaObjects.media_id,
-                MediaObjects.file_name,
-                MediaObjects.caption,
-                MediaObjects.media_text,
-                MediaTypes.name,
-                MediaTypes.description,
-                Clients.verified,
-                Clients.cuid,
-                Languages.language_code,
-                Languages.name,
-                #CollectionPosts,
-            ).join(
-                PostMediaObjects, PostMediaObjects.post_id == \
-                    Posts.post_id,
-            ).join(
-                MediaObjects, MediaObjects.media_object_id == \
-                    PostMediaObjects.media_object_id,
-            ).join(
-                MediaTypes, MediaTypes.media_type_id == \
-                    MediaObjects.media_type_id,
-            ).join(
-                Clients, Clients.client_id == Posts.client_id, 
-            ).join(
-                Languages, Languages.language_id == \
-                    Posts.language_id,
-            ).join(
-                CollectionPosts, CollectionPosts.post_id == \
-                    Posts.post_id,
-            ).filter(
+            posts = Posts._build_posts_query(session).filter(
                 CollectionPosts.collection_id == collection_id,
-            ).order_by(
-                 desc(Posts.post_datetime),
-            ).group_by(
-                Posts.post_id,
-            )
-            total_post_count = posts_query.count()
-            if start == 0 and count == 0:
-                posts = posts_query.all()
-            else:
-                posts = posts_query.slice(start, start+count)
-        return posts, total_post_count
+            ).slice(start, start+count).all()
+        return posts
 
     @classmethod
     def get_all_from_cuid(cls, session, cuid,
             start=0, count=0):
         with transaction.manager:
-            client = Clients.get_client_by_cuid(
-                session = session,
-                cuid = cuid,
-                lat = 0,
-                lng = 0,
-                create = False,
-            )
-            posts_query = session.query(
-                Posts.post_id,
-                Posts.assignment_id,
-                Posts.client_id,
-                #Posts.title,
-                Posts.post_datetime,
-                Posts.deleted,
-                Posts.lat,
-                Posts.lng,
-                MediaObjects.media_object_id,
-                MediaObjects.media_id,
-                MediaObjects.file_name,
-                MediaObjects.caption,
-                MediaObjects.media_text,
-                MediaTypes.name,
-                MediaTypes.description,
-                Clients.verified,
-                Clients.cuid,
-                Languages.language_code,
-                Languages.name,
-            ).join(
-                PostMediaObjects,
-            ).join(
-                MediaObjects,
-            ).join(
-                MediaTypes,
-            ).join(
-                Clients,Clients.client_id == Posts.client_id,
-            ).join(
-                Languages,
-            ).filter(
-                Posts.client_id == Clients.client_id,
-            ).order_by(
-                desc(Posts.post_datetime),
-            ).group_by(
-                Posts.post_id,
-            )
-            total_post_count = posts_query.count()
-            if start == 0 and count == 0:
-                posts = posts_query.all()
-            else:
-                posts = posts_query.slice(start, start+count)
-        return posts, total_post_count
+            posts = Posts._build_posts_query(session).filter(
+                Clients.cuid == cuid,
+            ).slice(start, start+count).all()
+        return posts #, total_post_count
 
     @classmethod
     def delete_post(cls, session, post_id):
@@ -1507,9 +1218,9 @@ class Stories(Base):
     edited_datetime = Column(DateTime, nullable=True)
     title = Column(Text)
     tags = Column(Text)
-    top_text = Column(Text)
-    media_object_id = Column(Integer, \
-        ForeignKey('mediaobjects.media_object_id'), nullable=True)
+    #top_text = Column(Text)
+    #media_object_id = Column(Integer, \
+    #    ForeignKey('mediaobjects.media_object_id'), nullable=True)
     contents = Column(Text)
     top_left_lat = Column(Float)
     top_left_lng = Column(Float)
@@ -1519,30 +1230,28 @@ class Stories(Base):
     language_id = Column(Integer, ForeignKey('languages.language_id'))
 
     @classmethod
-    def create_from_http(cls, session, token, title, tags, top_text, \
-            media_id, contents, top_left_lat, top_left_lng, \
-            bottom_right_lat, bottom_right_lng, use_fence=True, \
-            language_code=''):
+    def add_story(cls, session, user_id, title, tags, contents, top_left_lat,\
+            top_left_lng, bottom_right_lat, bottom_right_lng, language_code):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
-            media_object = MediaObjects.get_from_media_id(
-                session,
-                media_id,
-            )
-            if media_object == None:
-                media_object_id = None
-            else:
-                media_object_id = media_object.media_object_id
+            #user = Users.get_from_token(session, token)
+            #media_object = MediaObjects.get_from_media_id(
+            #    session,
+            #    media_id,
+            #)
+            #if media_object == None:
+            #    media_object_id = None
+            #else:
+            #    media_object_id = media_object.media_object_id
             language = Languages.get_from_code(session, language_code)
             story = cls(
-                user_id = user.user_id,
+                user_id = user_id,
                 story_unique_id = str(uuid.uuid4()),
                 publish_datetime = datetime.datetime.now(),
                 edited_datetime = None,
                 title = title,
                 tags = tags,
-                top_text = top_text,
-                media_object_id = media_object_id,
+                #top_text = top_text,
+                #media_object_id = media_object_id,
                 contents = contents,
                 top_left_lat = top_left_lat,
                 top_left_lng = top_left_lng,
@@ -1564,7 +1273,7 @@ class Stories(Base):
                 Stories.edited_datetime,
                 Stories.title,
                 Stories.tags,
-                Stories.top_text,
+                #Stories.top_text,
                 Stories.contents,
                 Stories.top_left_lat,
                 Stories.top_left_lng,
@@ -1572,15 +1281,19 @@ class Stories(Base):
                 Stories.bottom_right_lng,
                 Users.first_name,
                 Users.last_name,
-                Users.organization,
+                #Users.organization,
+                Organizations.organization_id,
+                Organizations.name,
                 Users.email,
                 MediaObjects.file_name,
                 MediaObjects.media_id,
             ).join(
                 Users,Stories.user_id == Users.user_id,
-            ).outerjoin(
-                MediaObjects,Stories.media_object_id == \
-                    MediaObjects.media_object_id,
+            ).join(
+                Organizations,
+            #).outerjoin(
+            #    MediaObjects,Stories.media_object_id == \
+            #        MediaObjects.media_object_id,
             )
             stories_filter_query = stories_query
             if language_code != '':
@@ -1683,10 +1396,9 @@ class Collections(Base):
     #private = Column(Boolean)
 
     @classmethod
-    def get_all_from_http(cls, session, token):
-        with transaction.manager:
-            user = Users.get_from_token(session, token)
-            collections = session.query(
+    def _build_collections_query(cls, session):
+        if True:
+            collections_query = session.query(
                 Collections.collection_id,
                 Collections.user_id,
                 Collections.collection_datetime,
@@ -1701,16 +1413,24 @@ class Collections(Base):
                 CollectionPosts, CollectionPosts.collection_id == \
                     Collections.collection_id,
             ).outerjoin(
-                Posts, Posts.post_id == CollectionPosts.post_id,
+                Posts, Posts.post_id == \
+                    CollectionPosts.post_id,
             ).outerjoin(
                 Assignments, Assignments.collection_id == \
                     Collections.collection_id,
-            ).filter(
-                Collections.user_id == user.user_id,
-            ).order_by(
-                desc(Collections.collection_datetime),
             ).group_by(
                 Collections.collection_id,
+                #Assignments.assignment_id,
+            ).order_by(
+                desc(Collections.collection_id),
+            )
+        return collections_query
+
+    @classmethod
+    def get_all_from_user_id(cls, session, user_id):
+        with transaction.manager:
+            collections = Collections._build_collections_query(session).filter(
+                Collections.user_id == user_id,
             ).all()
         return collections
 
@@ -1725,12 +1445,12 @@ class Collections(Base):
         return collection
 
     @classmethod
-    def create_new_collection_from_http(cls, session, token, name,
+    def add_collection(cls, session, user_id, name,
             description='', tags=''):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
+            #user = Users.get_from_token(session, token)
             collection = cls(
-                user_id = user.user_id,
+                user_id = user_id, #user.user_id,
                 collection_datetime = datetime.datetime.now(),
                 name = name,
                 description = description,
@@ -1804,29 +1524,6 @@ class CollectionPosts(Base):
 class Notifications(Base):
 
     """ This table holds notifications for a user.
-
-        valid types:
-            post_successful
-                payload = {
-                    'post_id': 0,
-                    'title': '',
-                }
-
-            post_viewed
-                payload = {
-                    'organization': '',
-                }
-
-            new_message
-                payload = {
-                    'organization': '',
-                }
-
-            message_sent
-                payload = {
-                    'message_subject': ''
-                }
-
     """
 
     __tablename__ = 'notifications'
@@ -2143,6 +1840,54 @@ class Subscribers(Base):
             ).all()
         return subscribers
 
+class Organizations(Base):
+
+    __tablename__ = 'organizations'
+    organization_id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    description = Column(Text, nullable=True)
+    contact_name = Column(Text, nullable=True)
+    contact_email = Column(Text, nullable=True)
+    creation_datetime = Column(DateTime)
+
+    @classmethod
+    def add_organization(cls, session, name, description, contact_name,\
+             contact_email):
+        with transaction.manager:
+            organization = Organizations(
+                name = name,
+                description = description,
+                contact_name = contact_name,
+                contact_email = contact_email,
+                creation_datetime = datetime.datetime.now(),
+            )
+            session.add(organization)
+            transaction.commit()
+        return organization
+
+    @classmethod
+    def get_from_id(cls, session, organization_id):
+        with transaction.manager:
+            organization = session.query(
+                Organizations,
+            ).filter(
+                Organizations.organization_id == organization_id,
+            ).first()
+        return organization
+
+    @classmethod
+    def get_all(cls, session):
+        with transaction.manager:
+            organizations = session.query(
+                Organizations.organization_id,
+                Organizations.name,
+                Organizations.description,
+                Organizations.contact_name,
+                Organizations.contact_email,
+                Organizations.creation_datetime,
+            ).all()
+        return organizations
+
 class Zipcodes(Base):
 
     __tablename__ = 'zipcodes'
@@ -2153,10 +1898,12 @@ class Zipcodes(Base):
     lat = Column(Float)
     lng = Column(Float)
     timezone = Column(Integer)
+    #geom = Column(Geometry('POLYGON'), nullable=False)
+    #geom = Column(Geometry('POLYGON'), nullable=False)
 
     @classmethod
     def add_zipcode(cls, session, _zipcode, city, state_code, lat, lng, 
-            timezone):
+            timezone, polygon_string):
         with transaction.manager:
             zipcode = Zipcodes(
                 zipcode = _zipcode,
@@ -2164,6 +1911,8 @@ class Zipcodes(Base):
                 state_code = state_code,
                 lat = lat,
                 lng = lng,
+                timezone = timezone,
+                geom = polygon_string
             )
             session.add(zipcode)
             transaction.commit()

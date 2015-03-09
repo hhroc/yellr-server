@@ -141,6 +141,7 @@ def run_tests():
         },
         'POST',
     )
+    """
     valid = _validate(
         {
             "organization": {
@@ -167,6 +168,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/get_access_token.json did not validate")
+    """
     token = payload['token']
 
     success, payload = _execute_test(
@@ -180,6 +182,7 @@ def run_tests():
         },
         'GET',
     )
+    """
     valid = _validate(
         {
             "languages": {
@@ -198,8 +201,9 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/get_languages.json did not validate")
+    """
     languages = payload['languages']
-
+    
     success, payload = _execute_test(
         'admin/get_question_types.json',
         token,
@@ -246,6 +250,7 @@ def run_tests():
         },
         'POST',
     )
+    """
     valid = _validate(
         {
             "question_text": {
@@ -280,6 +285,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/create_question.json did not validate")
+    """
     question_id = payload['question_id']
 
     success, payload = _execute_test(
@@ -343,6 +349,7 @@ def run_tests():
         },
         'POST',
     )
+    '''
     valid = _validate(
         {
             "question_text": {
@@ -377,6 +384,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/create_question.json did not validate")
+    '''
     question_two_id = payload['question_id']
 
     success, payload = _execute_test(
@@ -423,10 +431,10 @@ def run_tests():
 
 
 
-    random_client_id = str(uuid.uuid4())
+    random_cuid = str(uuid.uuid4())
     success, payload = _execute_test(
         'get_assignments.json',
-        random_client_id,
+        random_cuid,
         _language_code,
         _lat,
         _lng,
@@ -522,9 +530,9 @@ def run_tests():
     #
     # Create our Client ID """
     #
-    client_id_a = str(uuid.uuid4())
-    client_id_b = str(uuid.uuid4())
-    client_id_c = str(uuid.uuid4())
+    cuid_a = str(uuid.uuid4())
+    cuid_b = str(uuid.uuid4())
+    cuid_c = str(uuid.uuid4())
 
     #
     # Create response post A
@@ -533,12 +541,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'media_type': 'text',
             'media_text': 'Hopefully staying awake long enough to see the ball drop ... :/',
         },
@@ -552,12 +560,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'assignment_id': assignment_id,
             #'title': '',
             #'language_code': 'en',
@@ -568,7 +576,7 @@ def run_tests():
         'POST',
     )
     post_id_a = payload['post_id']
-    log('Post ID: {0}'.format(post_id_a))
+    log('Post ID A: {0}'.format(post_id_a))
     log('----')
     log('')
     log('')
@@ -599,7 +607,7 @@ def run_tests():
         _lat,
         _lng,
         {
-            'client_id': client_id_a,
+            'cuid': cuid_a,
         },
         'GET',
     )
@@ -636,12 +644,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        client_id_b,
+        cuid_b,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_b,
+            #'cuid': cuid_b,
             'media_type': 'text',
             'media_text': 'Going out to Da CLUB!!!',
         },
@@ -655,12 +663,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        client_id_b,
+        cuid_b,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_b,
+            #'cuid': cuid_b,
             'assignment_id': assignment_id,
             #'title': '',
             #'language_code': 'en',
@@ -683,12 +691,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        client_id_c,
+        cuid_c,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_c,
+            #'cuid': cuid_c,
             'media_type': 'text',
             'media_text': 'I like turtles.',
         },
@@ -702,12 +710,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        client_id_c,
+        cuid_c,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_c,
+            #'cuid': cuid_c,
             'assignment_id': assignment_id,
             #'title': '',
             #'language_code': 'en',
@@ -882,12 +890,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'media_type': 'text',
             'media_text': 'I saw a policeman help walk an old lady accross the street today.',
         },
@@ -901,12 +909,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'assignment_id': '0',
             #'title': '',
             #'language_code': 'en',
@@ -928,12 +936,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'media_type': 'image',
         },
         'POST',
@@ -947,12 +955,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'assignment_id': '0',
             #'title': '',
             #'language_code': 'en',
@@ -987,12 +995,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'upload_media.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'media_type': 'image',
         },
         'POST',
@@ -1006,12 +1014,12 @@ def run_tests():
 
     success, payload = _execute_test(
         'publish_post.json',
-        client_id_a,
+        cuid_a,
         _language_code,
         _lat,
         _lng,
         {
-            #'client_id': client_id_a,
+            #'cuid': cuid_a,
             'assignment_id': '',
             #'title': '',
             #'language_code': 'en',
@@ -1096,6 +1104,7 @@ def run_tests():
     )
     total_posts = payload['posts']
     if len(total_posts) < 5:
+        print total_posts
         raise Exception("Not all posts were returned.")
     log('Total Post Count: {0}'.format(len(total_posts)))
     log('----')
@@ -1165,8 +1174,39 @@ def run_tests():
     log('')
     log('')
 
+    success, payload = _execute_test(
+        'admin/get_organizations.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # no fields required
+        },
+        'GET',
+    )
+    if success == False:
+        raise Exception("Could not get organization list.")
+    organizations = payload['organizations']
+    
+    success, payload = _execute_test(
+        'admin/add_organization.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'name': 'Temp Org',
+            'description': 'Now we\'re here, now we\'re ...',
+            'contact_name': 'Anyone.',
+            'contact_email': 'a@a.com',
+        },
+        'POST',
+    )
+    new_organization_id = payload['organization_id']
 
-    new_user_client_id = str(uuid.uuid4())
+
+    new_user_cuid = str(uuid.uuid4())
     new_username = 'temp_user'
     new_password = hashlib.sha256('password123').hexdigest()
 
@@ -1178,13 +1218,14 @@ def run_tests():
         _lng,
         {
             'user_type': 'admin',
-            'client_id': new_user_client_id,
+            'cuid': new_user_cuid,
             'username': new_username,
             'password': new_password,
             'first_name': 'Temp',
             'last_name': 'User',
             'email': 'temp@user.com',
-            'organization': 'The Temp Group',
+            #'organization': 'The Temp Group',
+            'organization_id': new_organization_id,
             'fence_top_left_lat': 43.4,
             'fence_top_left_lng': -77.9,
             'fence_bottom_right_lat': 43.0,
