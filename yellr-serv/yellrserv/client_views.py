@@ -508,7 +508,7 @@ def get_stories(request):
         for story_unique_id, publish_datetime, edited_datetime, title, tags, \
                 contents, top_left_lat, top_left_lng, bottom_right_lat, \
                 bottom_right_lng, first_name, last_name, organization_id, \
-                organization_name, email, media_file_name, media_id in stories:
+                organization_name, email in stories:
             ret_stories.append({
                 'story_unique_id': story_unique_id,
                 'publish_datetime': str(publish_datetime),
