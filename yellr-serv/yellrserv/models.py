@@ -1285,12 +1285,13 @@ class Stories(Base):
                 Organizations.organization_id,
                 Organizations.name,
                 Users.email,
-                MediaObjects.file_name,
-                MediaObjects.media_id,
+                #MediaObjects.file_name,
+                #MediaObjects.media_id,
             ).join(
                 Users,Stories.user_id == Users.user_id,
             ).join(
-                Organizations,
+                Organizations, #Organizations.organization_id == \
+                    #Users.organization_id,
             #).outerjoin(
             #    MediaObjects,Stories.media_object_id == \
             #        MediaObjects.media_object_id,
