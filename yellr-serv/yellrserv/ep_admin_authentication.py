@@ -37,6 +37,9 @@ def admin_get_access_token(request):
             'bottom_right_lng': fence.bottom_right_lng,
         }
 
+        # save the token to the session
+        request.session['token'] = token
+
         result['success'] = True
 
     except Exception, e:
