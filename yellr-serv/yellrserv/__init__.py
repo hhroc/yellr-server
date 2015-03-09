@@ -76,6 +76,10 @@ def main(global_config, **settings):
     config.add_route('admin/create_user.json','admin/create_user.json')
     config.add_route('admin/get_post.json', 'admin/get_post.json')
     config.add_route('admin/delete_post.json', 'admin/delete_post.json')
+    config.add_route('admin/get_organizations.json', 'admin/get_organizations.json')
+    config.add_route('admin/add_organization.json', 'admin/add_organization.json')
+    config.add_route('admin/check_logged_in.json', 'admin/check_logged_in.json')
+    config.add_route('admin/logout.json', 'admin/logout.json')
 
     # client views
     #config.add_route('server_info.json','server_info.json')

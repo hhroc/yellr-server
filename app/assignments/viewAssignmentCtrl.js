@@ -4,9 +4,9 @@ angular
     .module('Yellr')
     .controller('viewAssignmentCtrl',
     ['$scope', '$stateParams', '$location', '$rootScope',
-        'assignmentApiService', 'formatPosts',
+        'assignmentApiService', 'formatPosts', 'collectionApiService',
     function ($scope, $stateParams, $location, $rootScope,
-              assignmentApiService, formatPosts) {
+              assignmentApiService, formatPosts, collectionApiService) {
 
         if ($rootScope.user === undefined) {
             $location.path('/login');
@@ -21,6 +21,20 @@ angular
             { name: 'Video Post', type: 'video' }
         ];
         $scope.selectedType = 'all';
+
+        /**
+         * Adds the given post to a collection
+         *
+         * @return void
+         */
+        $scope.addPostToCollection = function (post, collection) {
+            collectionApiService.addPost($scope.user.token,
+                                         collection.collection_id,
+                                         post.post_id)
+            .success(function (data) {
+                collection.post_count++;
+            });
+        };
 
         /**
          * Create view assignments function
@@ -42,4 +56,11 @@ angular
             console.log(formatPosts(data.posts));
             $scope.posts = formatPosts(data.posts);
         });
+
+        collectionApiService.getAllCollections($scope.user.token)
+            .success(function (data) {
+
+            $scope.collections = data.collections;
+        });
+
     }]);
