@@ -596,9 +596,9 @@ class Assignments(Base):
                     Assignments.assignment_id,
             ).group_by(
                 Assignments.assignment_id,
-                Users.user_id,
-                Questions.question_id,
-                Languages.language_id,
+                #Users.user_id,
+                #Questions.question_id,
+                #Languages.language_id,
             #).outerjoin(
             #    Posts, Posts.assignment_id == \
             #        Assignments.assignment_id,
@@ -999,6 +999,8 @@ class Posts(Base):
             ).outerjoin(
                 CollectionPosts, CollectionPosts.post_id == \
                     Posts.post_id,
+            ).group_by(
+                Posts.post_id,
             ).order_by(
                 desc(Posts.post_datetime),
             )
@@ -1414,7 +1416,7 @@ class Collections(Base):
                     Collections.collection_id,
             ).group_by(
                 Collections.collection_id,
-                Assignments.assignment_id,
+                #Assignments.assignment_id,
             ).order_by(
                 desc(Collections.collection_id),
             )
