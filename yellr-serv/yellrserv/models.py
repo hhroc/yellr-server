@@ -1273,7 +1273,7 @@ class Stories(Base):
                 Stories.edited_datetime,
                 Stories.title,
                 Stories.tags,
-                Stories.top_text,
+                #Stories.top_text,
                 Stories.contents,
                 Stories.top_left_lat,
                 Stories.top_left_lng,
@@ -1281,15 +1281,19 @@ class Stories(Base):
                 Stories.bottom_right_lng,
                 Users.first_name,
                 Users.last_name,
-                Users.organization,
+                #Users.organization,
+                Organizations.organization_id,
+                Organizations.name,
                 Users.email,
                 MediaObjects.file_name,
                 MediaObjects.media_id,
             ).join(
                 Users,Stories.user_id == Users.user_id,
-            ).outerjoin(
-                MediaObjects,Stories.media_object_id == \
-                    MediaObjects.media_object_id,
+            ).join(
+                Organizations,
+            #).outerjoin(
+            #    MediaObjects,Stories.media_object_id == \
+            #        MediaObjects.media_object_id,
             )
             stories_filter_query = stories_query
             if language_code != '':
