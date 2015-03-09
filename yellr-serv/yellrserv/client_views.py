@@ -58,6 +58,8 @@ system_status = {
 @view_config(route_name='index', renderer='templates/index.mak')
 def index(request):
 
+    ret_latest_stories = []
+
     try:
     #if True:
 
@@ -68,7 +70,7 @@ def index(request):
             language_code = 'en',
         )
 
-        ret_latest_stories = []
+        #ret_latest_stories = []
         for story_unique_id, publish_datetime, edited_datetime, title, tags, \
                 top_text, contents, top_left_lat, top_left_lng, \
                 bottom_right_lat, bottom_right_lng, first_name, last_name, \
@@ -476,8 +478,8 @@ def get_stories(request):
 
     result = {'success': False}
 
-    try:
-
+    #try:
+    if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -504,16 +506,16 @@ def get_stories(request):
 
         ret_stories = []
         for story_unique_id, publish_datetime, edited_datetime, title, tags, \
-                top_text, contents, top_left_lat, top_left_lng, \
-                bottom_right_lat, bottom_right_lng, first_name, last_name, \
-                organization, email, media_file_name, media_id in stories:
+                contents, top_left_lat, top_left_lng, bottom_right_lat, \
+                bottom_right_lng, first_name, last_name, organization_id, \
+                organization_name, email, media_file_name, media_id in stories:
             ret_stories.append({
                 'story_unique_id': story_unique_id,
                 'publish_datetime': str(publish_datetime),
                 'edited_datetime': str(edited_datetime),
                 'title': title,
                 'tags': tags,
-                'top_text': top_text,
+                #'top_text': top_text,
                 #'contents': contents,
                 'contents_rendered': markdown.markdown(contents),
                 'top_left_lat': top_left_lat,
@@ -522,18 +524,18 @@ def get_stories(request):
                 'bottom_right_lng': bottom_right_lng,
                 'author_first_name': first_name,
                 'author_last_name': last_name,
-                'author_organization': organization,
+                'author_organization': organization_name,
                 'author_email': email,
-                'banner_media_file_name': media_file_name,
-                'banner_media_id': media_id,
+                #'banner_media_file_name': media_file_name,
+                #'banner_media_id': media_id,
             })
 
         result['total_story_count'] = total_story_count
         result['stories'] = ret_stories
         result['success'] = True
 
-    except:
-        pass
+    #except:
+    #    pass
 
     client_id = None
     if client != None:
