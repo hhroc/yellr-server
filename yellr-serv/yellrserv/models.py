@@ -769,7 +769,7 @@ class Questions(Base):
     answer9 = Column(Text)
 
     @classmethod
-    def create_from_http(cls, session, user_id, language_code, question_text,
+    def add_question(cls, session, user_id, language_code, question_text,
             description, question_type, answers):
         with transaction.manager:
             #user = Users.get_from_token(session, token)
@@ -1216,9 +1216,9 @@ class Stories(Base):
     edited_datetime = Column(DateTime, nullable=True)
     title = Column(Text)
     tags = Column(Text)
-    top_text = Column(Text)
-    media_object_id = Column(Integer, \
-        ForeignKey('mediaobjects.media_object_id'), nullable=True)
+    #top_text = Column(Text)
+    #media_object_id = Column(Integer, \
+    #    ForeignKey('mediaobjects.media_object_id'), nullable=True)
     contents = Column(Text)
     top_left_lat = Column(Float)
     top_left_lng = Column(Float)
@@ -1228,30 +1228,28 @@ class Stories(Base):
     language_id = Column(Integer, ForeignKey('languages.language_id'))
 
     @classmethod
-    def create_from_http(cls, session, token, title, tags, top_text, \
-            media_id, contents, top_left_lat, top_left_lng, \
-            bottom_right_lat, bottom_right_lng, use_fence=True, \
-            language_code=''):
+    def add_story(cls, session, user_id, title, tags, contents, top_left_lat,\
+            top_left_lng, bottom_right_lat, bottom_right_lng, language_code):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
-            media_object = MediaObjects.get_from_media_id(
-                session,
-                media_id,
-            )
-            if media_object == None:
-                media_object_id = None
-            else:
-                media_object_id = media_object.media_object_id
+            #user = Users.get_from_token(session, token)
+            #media_object = MediaObjects.get_from_media_id(
+            #    session,
+            #    media_id,
+            #)
+            #if media_object == None:
+            #    media_object_id = None
+            #else:
+            #    media_object_id = media_object.media_object_id
             language = Languages.get_from_code(session, language_code)
             story = cls(
-                user_id = user.user_id,
+                user_id = user_id,
                 story_unique_id = str(uuid.uuid4()),
                 publish_datetime = datetime.datetime.now(),
                 edited_datetime = None,
                 title = title,
                 tags = tags,
-                top_text = top_text,
-                media_object_id = media_object_id,
+                #top_text = top_text,
+                #media_object_id = media_object_id,
                 contents = contents,
                 top_left_lat = top_left_lat,
                 top_left_lng = top_left_lng,
@@ -1441,7 +1439,7 @@ class Collections(Base):
         return collection
 
     @classmethod
-    def create_new_collection(cls, session, user_id, name,
+    def add_collection(cls, session, user_id, name,
             description='', tags=''):
         with transaction.manager:
             #user = Users.get_from_token(session, token)

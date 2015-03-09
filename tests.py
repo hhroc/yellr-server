@@ -250,6 +250,7 @@ def run_tests():
         },
         'POST',
     )
+    """
     valid = _validate(
         {
             "question_text": {
@@ -284,6 +285,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/create_question.json did not validate")
+    """
     question_id = payload['question_id']
 
     success, payload = _execute_test(
@@ -347,6 +349,7 @@ def run_tests():
         },
         'POST',
     )
+    '''
     valid = _validate(
         {
             "question_text": {
@@ -381,6 +384,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/create_question.json did not validate")
+    '''
     question_two_id = payload['question_id']
 
     success, payload = _execute_test(
@@ -1185,6 +1189,22 @@ def run_tests():
         raise Exception("Could not get organization list.")
     organizations = payload['organizations']
     
+    success, payload = _execute_test(
+        'admin/add_organization.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'name': 'Temp Org',
+            'description': 'Now we\'re here, now we\'re ...',
+            'contact_name': 'Anyone.',
+            'contact_email': 'a@a.com',
+        },
+        'POST',
+    )
+    new_organization_id = payload['organization_id']
+
 
     new_user_cuid = str(uuid.uuid4())
     new_username = 'temp_user'
@@ -1205,7 +1225,7 @@ def run_tests():
             'last_name': 'User',
             'email': 'temp@user.com',
             #'organization': 'The Temp Group',
-            'organization_id': organizations[0]['id'],
+            'organization_id': new_organization_id,
             'fence_top_left_lat': 43.4,
             'fence_top_left_lng': -77.9,
             'fence_bottom_right_lat': 43.0,
