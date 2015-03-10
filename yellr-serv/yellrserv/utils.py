@@ -169,8 +169,8 @@ def _decode_posts(posts):
             # itterate throught the list, and build our resposne
             index = 0
             for post_id, client_id, post_datetime, deleted, \
-                    lat, lng, media_object_id, media_id, file_name, \
-                    caption, media_text, media_type_name, \
+                    lat, lng, approved, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, cuid, \
                     language_code, language_name, assignment_id, \
                     assignment_name in posts:
@@ -189,6 +189,7 @@ def _decode_posts(posts):
                         'deleted': deleted,
                         'lat': lat,
                         'lng': lng,
+                        'approved': approved,
                         'verified_user': bool(verified),
                         'client_id': client_id,
                         'language_code': language_code,
