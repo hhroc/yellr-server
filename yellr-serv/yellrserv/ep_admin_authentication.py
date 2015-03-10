@@ -7,6 +7,7 @@ import admin_utils
 def admin_get_access_token(request):
 
     result = {'success': False}
+    status_code = 200
 
     try:
     #if True:
@@ -21,6 +22,7 @@ def admin_get_access_token(request):
 
         user, org, token, fence = admin_utils.authenticate(username, password)
         if user == None or token == None or fence == None:
+            status_code = 403
             raise Exception("Invalid authorization or bad credentials.")
 
         result['token'] = token
@@ -43,9 +45,10 @@ def admin_get_access_token(request):
         result['success'] = True
 
     except Exception, e:
+        status_code = 400
         result['error'] = str(e)
 
-    return utils.make_response(result)
+    return utils.make_response(result, status_code)
 
 @view_config(route_name='admin/check_logged_in.json')
 def admin_check_loged_in(request):
@@ -66,7 +69,7 @@ def admin_check_loged_in(request):
     except Exception, e:
         result['error_text'] = str(e)
 
-    return urils.make_response(result)
+    return utils.make_response(result)
 
 
 @view_config(route_name='admin/logout.json')

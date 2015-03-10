@@ -139,3 +139,32 @@ def admin_delete_post(request):
 
     return utils.make_response(result)
 
+@view_config(route_name='admin/approve_post.json')
+def admin_approve_post(request):
+
+    result = {'success': False}
+
+    try:
+    #if True:
+
+        valid, user = admin_utils.check_token(request)
+        if valid == False:
+            raise Exception("Invalid authorization or bad credentials.")
+
+        try:
+            post_id = request.POST['post_id']
+        except:
+            raise Exception('Invalid or missing field.')
+
+        post = admin_utils.approve_post(
+            post_id = post_id,
+        )
+
+        result['post_id'] = post.post_id
+        result['success'] = True
+
+    except Exception, e:
+        result['error_text'] = str(e)
+
+    return utils.make_response(result)
+

@@ -134,6 +134,16 @@ def create_user(user_type_id, user_type_name, user_name, password, first_name,\
 
     return new_user
 
+def change_password(username, password):
+
+    user = Users.change_password(
+        session = DBSession,
+        username = username,
+        password = password,
+    )
+
+    return user
+
 def get_languages():
 
     languages = Languages.get_all(
@@ -186,6 +196,15 @@ def get_post(post_id):#, start, count):
 def delete_post(post_id):
 
     post = Posts.delete_post(
+        session = DBSession,
+        post_id = post_id,
+    )
+
+    return post
+
+def approve_post(post_id):
+
+    post = Posts.approve_post(
         session = DBSession,
         post_id = post_id,
     )
