@@ -11,6 +11,7 @@ import mutagen.mp4
 
 #from utils import utils.make_response
 import utils
+import client_utils
 
 import urllib
 
@@ -491,7 +492,7 @@ def get_stories(request):
             if 'start' in reqeusts.GET:
                 start = int(float(request.GET['start']))
             if 'count' in request.GET:
-                count = int(float(request.GET['start']))
+                count = int(float(request.GET['count']))
         except:
             pass
 
@@ -655,8 +656,8 @@ def upload_media(request):
     result = {'success': False}
     status_code = 200
 
-    try:
-    #if True:
+    #try:
+    if True:
         success, error_text, language_code, lat, lng, \
             client = register_client(request)
         if success == False:
@@ -668,7 +669,7 @@ def upload_media(request):
             error_text = "Missing media type field"
             raise Exception(error_text)
 
-        file_name = ''
+        ret_file_name = ''
         preview_file_name = ''
         file_path = ''
         if media_type == 'image' or media_type == 'video' \
@@ -682,15 +683,15 @@ def upload_media(request):
                 result['error_text'] = 'Missing or invalid file field'
                 raise Exception('Invalid media_file field.')
 
-            media_extention="processing"
+            #media_extention="processing"
 
             # generate a unique file name to store the file to
-            unique = uuid.uuid4()
-            file_name = '{0}'.format(unique) #,media_extention)
-            file_path = os.path.join(system_config['upload_dir'], file_name)
+            unique = str(uuid.uuid4())
+            #file_name = '{0}'.format(unique) #,media_extention)
+            temp_file_name = os.path.join(system_config['upload_dir'], unique)
 
             # write file to temp location, and then to disk
-            temp_file_path = file_path + '~'
+            temp_file_path = temp_file_name + '~'
             output_file = open(temp_file_path, 'wb')
 
             # Finally write the data to disk
@@ -715,15 +716,17 @@ def upload_media(request):
                     'image/tiff',
                 ]
 
-                #if not mime_type in allowed_image_types:
-                     
+                #if not mime_type in allowed_image_types:     
                 #    raise Exception("Unsupported Image Type: %s" % mime_type)
 
                 # convert to jpeg from whatever format it was
                 try:
                     
-                    subprocess.call(['convert', temp_file_path, '{0}.jpg'.format(temp_file_path)])
-                    temp_file_path = '{0}.jpg'.format(temp_file_path)
+                    subprocess.call(['convert', temp_file_path, '{0}.jpg'.format(temp_file_name)])
+                    image_file_path = '{0}.jpg'.format(temp_file_name)
+
+                    os.remove(temp_file_path)
+                    ret_file_name = image_file_path
 
                 except Exception, ex:
                     error_text = "Error converting image: {0}".format(ex)
@@ -733,7 +736,7 @@ def upload_media(request):
                 try:
 
                     # strip meta data
-                    subprocess.call(['mogrify', '-strip', temp_file_path])
+                    subprocess.call(['mogrify', '-strip', image_file_path])
                     
                 except Exception, ex:
                     error_text = "Error removing metadata: {0}".format(ex)
@@ -745,7 +748,7 @@ def upload_media(request):
                     preview_file_name = '{0}p.jpg'.format(unique)
                     file_path_image_preview = os.path.join(system_config['upload_dir'], preview_file_name)
 
-                    subprocess.call(['convert', temp_file_path, '-resize', '450', '-size', '450', \
+                    subprocess.call(['convert', image_file_path, '-resize', '450', '-size', '450', \
                         file_path_image_preview])
 
                 except Exception, ex:
@@ -754,8 +757,10 @@ def upload_media(request):
 
                 file_path = "{0}.jpg".format(file_path)
 
+            
             #process video files
             elif media_type == 'video':
+                '''
                 #I can't seem to find any evidence of PII in mpg metadata
                 if mimetype == "video/mpeg":
                     media_extention = 'mpg'
@@ -773,10 +778,12 @@ def upload_media(request):
                 else:
                     error_text = 'invalid video file'
                     raise Exception('')
+                '''
+                pass
 
             #process audio files
             elif media_type == 'audio':
-
+                '''
                 #mp3 file
                 if mimetype == "audio/mpeg":
                     media_extention = 'mp3'
@@ -804,12 +811,14 @@ def upload_media(request):
                 else:
                     error_text = 'invalid audio file'
                     raise Exception('')
+                '''
+                pass
 
             #I don't think the user has a way to upload files of this type besides typing in the box
             #so it doesn't need as robust detection.
             elif media_type == 'text':
-                media_extention = 'txt'
-
+                #media_extention = 'txt'
+                pass
             else:
                 error_text = 'invalid media type'
                 raise Exception('')
@@ -819,11 +828,11 @@ def upload_media(request):
             #file_path = file_path.replace("processing", media_extention)
 
             # rename once we are valid
-            os.rename(temp_file_path, file_path)
-             
+            #os.rename(temp_file_path, file_path)
+            #os.remove(temp_file_path)
 
-            result['file_name'] = os.path.basename(file_path)
-            result['preview_file_name'] = os.path.basename(preview_file_name)
+            #result['file_name'] = os.path.basename(file_path)
+            #result['preview_file_name'] = os.path.basename(preview_file_name)
 
         #except:
             #result['error_text'] = 'Missing or invalid media_file contents.'
@@ -851,7 +860,7 @@ def upload_media(request):
             session = DBSession,
             client_id = client.client_id,
             media_type_text = media_type,
-            file_name = os.path.basename(file_path),
+            file_name = os.path.basename(ret_file_name), #os.path.basename(file_path),
             caption = caption,
             media_text = media_text,
         )
@@ -860,11 +869,11 @@ def upload_media(request):
         result['success'] = True
         #result['new_user'] = created
         #result['media_text'] = media_text
-        result['error_text'] = ''
+        #result['error_text'] = ''
 
-    except:
-        status_code = 400
-        pass
+    #except:
+    #    status_code = 400
+    #    pass
 
     client_id = None
     if client != None:
@@ -1009,5 +1018,87 @@ def verify_user(request):
     )
 
     return utils.make_response(result)
+@view_config(route_name='get_approved_posts.json')
+def get_approved_posts(request):
 
+    result = {'success': False}
+
+    #try:
+    if True:
+
+        success, error_text, language_code, lat, lng, \
+            client = register_client(request)
+        if success == False:
+            raise Exception(error_text)
+
+        start = 0
+        count = 50
+        try:
+            if 'start' in reqeusts.GET:
+                start = int(float(request.GET['start']))
+            if 'count' in request.GET:
+                count = int(float(request.GET['count']))
+        except:
+            pass
+
+        #user,created = Users.get_from_client_id(
+        #    session = DBSession,
+        #    client_id = client.client_id,
+        #)
+
+        #client = Clients.get_client_by_cuid(
+        #    session = DBSession,
+        #    cuid = cuid,
+        #)
+
+        posts = client_utils.get_approved_posts(
+            client_id = client.client_id,
+            language_code = language_code,
+            lat = lat,
+            lng = lng,
+            start = start,
+            count = count,
+        )
+
+        result['posts'] = posts
+
+        #post_count = Posts.get_count_from_client_id(
+        #    session = DBSession,
+        #    client_id = client.client_id,
+        #)
+
+        #result['client_id'] = client.client_id
+        #result['first_name'] = client.first_name
+        #result['last_name'] = client.last_name
+        #result['organization'] = '' #client.organization
+        #result['email'] = client.email
+        #result['verified']  = client.verified
+
+        #result['post_count'] = post_count
+        #result['post_view_count'] = client.post_view_count
+        #result['post_used_count'] = client.post_used_count
+
+        result['success'] = True
+
+    #except:
+    #    pass
+
+    client_id = None
+    if client != None:
+        client_id = client.client_id
+    ClientLogs.log(
+        session = DBSession,
+        client_id = client_id,
+        url = 'get_approved_posts.json',
+        lat = lat,
+        lng = lng,
+        request = json.dumps({
+            'get': '{0}'.format(request.GET),
+            'post': '{0}'.format(request.POST),
+        }),
+        result = json.dumps(result),
+        success = success,
+    )
+
+    return utils.make_response(result)
 

@@ -81,6 +81,7 @@ def main(global_config, **settings):
     config.add_route('admin/check_logged_in.json', 'admin/check_logged_in.json')
     config.add_route('admin/logout.json', 'admin/logout.json')
     config.add_route('admin/change_password.json', 'admin/change_password.json')
+    config.add_route('admin/approve_post.json','admin/approve_post.json')
 
     # client views
     #config.add_route('server_info.json','server_info.json')
@@ -101,6 +102,7 @@ def main(global_config, **settings):
     config.add_route('publish_post.json','publish_post.json')
     config.add_route('get_profile.json', 'get_profile.json')
     config.add_route('verify_client.json', 'verify_client.json')
+    config.add_route('get_approved_posts.json', 'get_approved_posts.json')
 
     config.scan()
     return config.make_wsgi_app()

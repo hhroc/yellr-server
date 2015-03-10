@@ -1310,6 +1310,34 @@ def run_tests():
     log('')
     log('')
 
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': post_id_a,
+        },
+        'POST',
+    )
+    log('----')
+
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': post_id_b,
+        },
+        'POST',
+    )
+    log('----')
+
+
+
     log("Done with Tests")
     log("")
 

@@ -202,6 +202,15 @@ def delete_post(post_id):
 
     return post
 
+def approve_post(post_id):
+
+    post = Posts.approve_post(
+        session = DBSession,
+        post_id = post_id,
+    )
+
+    return post
+
 def get_response_posts(assignment_id, start, count, deleted):
 
     posts = Posts.get_all_from_assignment_id(
