@@ -141,6 +141,7 @@ def run_tests():
         },
         'POST',
     )
+    """
     valid = _validate(
         {
             "organization": {
@@ -167,6 +168,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/get_access_token.json did not validate")
+    """
     token = payload['token']
 
     success, payload = _execute_test(
@@ -180,6 +182,7 @@ def run_tests():
         },
         'GET',
     )
+    """
     valid = _validate(
         {
             "languages": {
@@ -198,8 +201,9 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/get_languages.json did not validate")
+    """
     languages = payload['languages']
-
+    
     success, payload = _execute_test(
         'admin/get_question_types.json',
         token,
@@ -246,6 +250,7 @@ def run_tests():
         },
         'POST',
     )
+    """
     valid = _validate(
         {
             "question_text": {
@@ -280,6 +285,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/create_question.json did not validate")
+    """
     question_id = payload['question_id']
 
     success, payload = _execute_test(
@@ -343,6 +349,7 @@ def run_tests():
         },
         'POST',
     )
+    '''
     valid = _validate(
         {
             "question_text": {
@@ -377,6 +384,7 @@ def run_tests():
     )
     if not valid == True:
         raise Exception("admin/create_question.json did not validate")
+    '''
     question_two_id = payload['question_id']
 
     success, payload = _execute_test(
@@ -1166,6 +1174,37 @@ def run_tests():
     log('')
     log('')
 
+    success, payload = _execute_test(
+        'admin/get_organizations.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # no fields required
+        },
+        'GET',
+    )
+    if success == False:
+        raise Exception("Could not get organization list.")
+    organizations = payload['organizations']
+    
+    success, payload = _execute_test(
+        'admin/add_organization.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'name': 'Temp Org',
+            'description': 'Now we\'re here, now we\'re ...',
+            'contact_name': 'Anyone.',
+            'contact_email': 'a@a.com',
+        },
+        'POST',
+    )
+    new_organization_id = payload['organization_id']
+
 
     new_user_cuid = str(uuid.uuid4())
     new_username = 'temp_user'
@@ -1185,7 +1224,8 @@ def run_tests():
             'first_name': 'Temp',
             'last_name': 'User',
             'email': 'temp@user.com',
-            'organization': 'The Temp Group',
+            #'organization': 'The Temp Group',
+            'organization_id': new_organization_id,
             'fence_top_left_lat': 43.4,
             'fence_top_left_lng': -77.9,
             'fence_bottom_right_lat': 43.0,
@@ -1216,6 +1256,86 @@ def run_tests():
     log('----')
     log('')
     log('')
+
+    new_password_2 = hashlib.sha256('password123').hexdigest()
+
+    success, payload = _execute_test(
+        'admin/change_password.json',
+        new_user_token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'username': new_username,
+            'password': new_password_2,
+        },
+        'POST',
+    )
+    #new_user_token_2 = payload['token']
+    #log('Got New User Token: {0}'.format(new_user_token))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/get_access_token.json',
+        None,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'username': new_username,
+            'password': new_password_2
+        },
+        'POST',
+    )
+    new_user_token_2 = payload['token']
+    log('Got New User Token: {0}'.format(new_user_token))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/check_logged_in.json',
+        new_user_token_2,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # does not take any params
+        },
+        'GET',
+    )
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': post_id_a,
+        },
+        'POST',
+    )
+    log('----')
+
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': post_id_b,
+        },
+        'POST',
+    )
+    log('----')
+
 
 
     log("Done with Tests")

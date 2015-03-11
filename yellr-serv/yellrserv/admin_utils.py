@@ -10,12 +10,12 @@ from pyramid.response import Response
 
 from .models import (
     DBSession,
-    #UserTypes,
+    UserTypes,
     Users,
     #Clients,
     Assignments,
-    #Questions,
-    #QuestionAssignments,
+    Questions,
+    QuestionAssignments,
     QuestionTypes,
     Languages,
     Posts,
@@ -29,7 +29,8 @@ from .models import (
     Messages,
     Notifications,
     UserGeoFences,
-    )
+    Organizations,
+)
 
 def check_token(request):
     """ validates token against database """
@@ -61,7 +62,7 @@ def authenticate(username, password):
         token = None
         fence = None
 
-        user, token = Users.authenticate(DBSession, username, password)
+        user, org, token = Users.authenticate(DBSession, username, password)
 
         if token == None:
             result['error_text'] = 'Invalid credentials'
@@ -73,35 +74,91 @@ def authenticate(username, password):
                 user_id = user.user_id,
             )
 
-    return user, token, fence
+    return user, org, token, fence
+
+def check_super_user(user_type_id):
+
+    # we need to make sure that the user trying to create the
+    # new user has the right access level
+    system_user_type = UserTypes.get_from_name(
+        session = DBSession,
+        name = 'system',
+    )
+    admin_user_type = UserTypes.get_from_name(
+        session = DBSession,
+        name = 'admin',
+    )
+    moderator_user_type = UserTypes.get_from_name(
+        session = DBSession,
+        name = 'moderator',
+    )
+
+    is_super_user = False
+    if user_type_id == system_user_type.user_type_id or \
+            user_type_id == admin_user_type.user_type_id or \
+            user_type_id == moderator_user_type.user_type_id:
+        is_super_user = True
+
+    return is_super_user
+
+def create_user(user_type_id, user_type_name, user_name, password, first_name,\
+         last_name, email, organization_id, top_left_lat, top_left_lng,\
+         bottom_right_lat, bottom_right_lng):
+
+    user_type = UserTypes.get_from_name(
+        session = DBSession,
+        name = user_type_name,
+    )
+
+    new_user = None
+    if user_type is not None and check_super_user(user_type_id) is True:
+        user_geo_fence = UserGeoFences.create_fence(
+            session = DBSession,
+            top_left_lat = top_left_lat,
+            top_left_lng = top_left_lng,
+            bottom_right_lat = bottom_right_lat,
+            bottom_right_lng = bottom_right_lng,
+        )
+
+        new_user = Users.create_new_user(
+            session = DBSession,
+            user_type_id = user_type.user_type_id,
+            user_geo_fence_id = user_geo_fence.user_geo_fence_id,
+            user_name = user_name,
+            password = password,
+            first_name = first_name,
+            last_name = last_name,
+            email = email,
+            organization_id = organization_id,
+        )
+
+    return new_user
+
+def change_password(username, password):
+
+    user = Users.change_password(
+        session = DBSession,
+        username = username,
+        password = password,
+    )
+
+    return user
 
 def get_languages():
 
-    languages = Languages.get_all(DBSession)
+    languages = Languages.get_all(
+        session = DBSession
+    )
 
-    ret_languages = []
-    for language_code, name in languages:
-        ret_languages.append({
-            'name': name,
-            'code': language_code,
-        })
-
-    return ret_languages
+    return utils._decode_languages(languages)
 
 def get_question_types():
 
-    question_types = QuestionTypes.get_all(DBSession)
+    question_types = QuestionTypes.get_all(
+        session = DBSession
+    )
 
-    ret_question_types = []
-    for question_type_id, question_type_text, question_type_description \
-            in question_types:
-        ret_question_types.append({
-            'question_type_id': question_type_id,
-            'question_type_text': question_type_text,
-            'question_type_description': question_type_description,
-        })
-
-    return ret_question_types
+    return utils._decode_question_types(question_types)
 
 def get_assignments(start, count):
 
@@ -114,85 +171,6 @@ def get_assignments(start, count):
 
     return utils._decode_assignments(assignments)
 
-'''
-
-def _decode_assignments(assignments):
-
-    if True:
-
-        ret_assignments = []
-
-        if len(assignments) > 0 and assignments[0][0] != None:
-
-            seen_assignment_ids = []
-            assignment = {}
-
-            # itterate throught he list, and build our resposne
-            index = 0
-            for assignment_id, publish_datetime, expire_datetime, name, \
-                    top_left_lat, top_left_lng, bottom_right_lat, \
-                    bottom_right_lng, use_fence, collection_id, organization, \
-                    question_text, question_type_id, question_description, \
-                    answer0, answer1, answer2, answer3, answer4, answer5, \
-                    answer6, answer7, answer8, answer9, language_id, \
-                    language_code in assignments:
-
-                if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
-
-                    # add our existing assignment to the list of assignments
-                    # to return
-                    if assignment:
-                        ret_assignments.append(assignment)
-
-                    # build our assignment with no question(s)
-                    assignment = {
-                        'assignment_id': assignment_id,
-                        'publish_datetime': str(publish_datetime),
-                        'expire_datetime': str(expire_datetime),
-                        'name': name,
-                        'top_left_lat': top_left_lat,
-                        'top_left_lng': top_left_lng,
-                        'bottom_right_lat': bottom_right_lat,
-                        'bottom_right_lng': bottom_right_lng,
-                        #'use_fence': use_fence,
-                        'organization': organization,
-                        'questions': [],
-                        #'post_count': post_count,
-                        'language_code': language_code,
-                    }
-
-                    # record that we have seen the assignment_id
-                    seen_assignment_ids.append(assignment_id)
-
-                # build our question
-                question = {
-                    'question_text': question_text,
-                    'question_type_id': question_type_id,
-                    'description': question_description,
-                    'answer0': answer0,
-                    'answer1': answer1,
-                    'answer2': answer2,
-                    'answer3': answer3,
-                    'answer4': answer4,
-                    'answer5': answer5,
-                    'answer6': answer6,
-                    'answer7': answer7,
-                    'answer8': answer8,
-                    'answer9': answer9,
-                }
-
-                # add the question to the current assignment
-                assignment['questions'].append(question)
-
-                if index == len(assignments)-1:
-                    ret_assignments.append(assignment)
-
-                index += 1
-
-    return ret_assignments
-
-'''
-
 def get_posts(start, count, deleted):
 
     posts = Posts.get_posts(
@@ -202,7 +180,7 @@ def get_posts(start, count, deleted):
         count = count,
     )
    
-    return _decode_posts(posts)
+    return utils._decode_posts(posts)
 
 def get_post(post_id):#, start, count):
 
@@ -213,7 +191,25 @@ def get_post(post_id):#, start, count):
         #count = count,
     )
 
-    return _decode_posts(posts)
+    return utils._decode_posts(posts)
+
+def delete_post(post_id):
+
+    post = Posts.delete_post(
+        session = DBSession,
+        post_id = post_id,
+    )
+
+    return post
+
+def approve_post(post_id):
+
+    post = Posts.approve_post(
+        session = DBSession,
+        post_id = post_id,
+    )
+
+    return post
 
 def get_response_posts(assignment_id, start, count, deleted):
 
@@ -225,11 +221,7 @@ def get_response_posts(assignment_id, start, count, deleted):
         count = count,
     )
 
-    print "\n\nResponse Posts (count: {0}): ".format(len(posts))
-    print posts
-    print "\n\n"
-
-    return _decode_posts(posts)
+    return utils._decode_posts(posts)
 
 def get_collection_posts(collection_id, start, count):
 
@@ -240,7 +232,7 @@ def get_collection_posts(collection_id, start, count):
         count = count,
     )
 
-    return _decode_posts(posts)
+    return utils._decode_posts(posts)
 
 def get_client_posts(cuid, start, count):
 
@@ -251,80 +243,7 @@ def get_client_posts(cuid, start, count):
         count = count,
     )
 
-    return _decode_posts(posts)
-
-def _decode_posts(posts):
-
-    print "\n\nPOSTS:\n\n"
-    print posts
-    print "\n\n"
-
-    if True:
-
-        ret_posts = []
-
-        if len(posts) > 0 and posts[0][0] != None:
-
-            seen_post_ids = []
-            post = {}
-
-            # itterate throught the list, and build our resposne
-            index = 0
-            for post_id, client_id, post_datetime, deleted, \
-                    lat, lng, media_object_id, media_id, file_name, \
-                    caption, media_text, media_type_name, \
-                    media_type_description, verified, cuid, \
-                    language_code, language_name, assignment_id, \
-                    assignment_name in posts:
-
-                if (post_id not in seen_post_ids) or (index == len(posts)-1):
-
-                    if post:
-
-                        ret_posts.append(post)
-
-                    post = {
-                        'post_id': post_id,
-                        'client_id': client_id,
-                        #'title': title,
-                        'post_datetime': str(post_datetime),
-                        'deleted': deleted,
-                        'lat': lat,
-                        'lng': lng,
-                        'verified_user': bool(verified),
-                        'client_id': client_id,
-                        'language_code': language_code,
-                        'language_name': language_name,
-                        'assignment_id': assignment_id,
-                        'assignment_name': assignment_name,
-                        'media_objects': []
-                    }
-
-                    seen_post_ids.append(post_id)
-                
-                preview_file_name = ''
-                if not file_name == "":
-                    root_file_name = os.path.splitext(file_name)[0]
-                    file_extention = os.path.splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
-                media_object = {
-                    'media_id': media_id,
-                    'file_name': file_name,
-                    'preview_file_name': preview_file_name,
-                    'caption': caption,
-                    'media_text': media_text,
-                    'media_type_name': media_type_name,
-                    'media_type_description': media_type_description,
-                }
-
-                post['media_objects'].append(media_object)
-
-                if index == len(posts)-1:
-                    ret_posts.append(post)
-
-                index += 1
-
-    return ret_posts
+    return utils._decode_posts(posts)
 
 def get_collections(user_id):
 
@@ -333,27 +252,143 @@ def get_collections(user_id):
        user_id = user_id,
     )
 
-    return _decode_collections(collections)
+    return utils._decode_collections(collections)
 
-def _decode_collections(collections):
+def create_collection(user_id, name, description, tags):
 
-    if True:
+    collection = Collections.add_collection( #_from_http(
+        session = DBSession,
+        user_id = user_id,
+        name = name,
+        description = description,
+        tags = tags,
+    )
 
-        ret_collections = []
+    return collection
 
-        for collection_id, user_id, collection_datetime, name, description, \
-                tags, enabled, assignment_id, assignment_name, post_count \
-                in collections:
-            ret_collections.append({
-                'collection_id': collection_id,
-                'collection_datetime': str(collection_datetime),
-                'name': name,
-                'decription': description,
-                'tags': tags,
-                'enabled': enabled,
-                'assignment_id': assignment_id,
-                'assignment_name': assignment_name,
-                'post_count': post_count,
-            })
+def add_post_to_collection(collection_id, post_id):
 
-    return ret_collections
+    _collection = Collections.get_from_collection_id(
+        session = DBSession,
+        collection_id = collection_id,
+    )
+
+    _post = Posts.get_from_post_id(
+        session = DBSession,
+        post_id = post_id,
+    )
+
+    collection_post = None
+    if _collection is not None and _post is not None:
+        collection_post = Collections.add_post_to_collection(
+            session = DBSession,
+            collection_id = collection_id,
+            post_id = post_id,
+        )
+
+    return collection_post
+
+def get_organizations():
+
+    organizations = Organizations.get_all(
+        session = DBSession,
+    )
+
+    return utils._decode_organizations(organizations)
+
+def create_organization(user_type_id, name, description, contact_name, \
+        contact_email):
+
+    organization = None
+    if check_super_user(user_type_id):
+
+        organization = Organizations.add_organization( #_from_http(
+            session = DBSession,
+            name = name,
+            description = description,
+            contact_name = contact_name,
+            contact_email = contact_email,
+        )
+
+    return organization
+
+def create_question(user_id, language_code, question_text, description, \
+        question_type, answers):
+
+    # back fill with empty strings
+    for i in range(len(answers),10):
+        answers.append('')
+
+    question = Questions.add_question(
+        session = DBSession,
+        user_id = user_id,
+        language_code = language_code,
+        question_text = question_text,
+        description = description,
+        question_type = question_type,
+        answers = answers,
+    )
+
+    return question
+
+def create_assignment(user_id, name, life_time, top_left_lat, top_left_lng, \
+        bottom_right_lat, bottom_right_lng, questions):
+
+    # create assignment
+    assignment = Assignments.create_from_http(
+        session = DBSession,
+        user_id = user_id,
+        name = name,
+        life_time = life_time,
+        #geo_fence = geo_fence,
+        top_left_lat = top_left_lat,
+        top_left_lng = top_left_lng,
+        bottom_right_lat = bottom_right_lat,
+        bottom_right_lng = bottom_right_lng,
+    )
+
+    collection = Collections.add_collection( #_from_http(
+        session = DBSession,
+        user_id = user_id,
+        name = name, #"{0} (A)".format(name), #, assignment.assignment_id),
+        description = "",
+        tags = "",
+    )
+
+    Assignments.set_collection(
+        session = DBSession,
+        assignment_id = assignment.assignment_id,
+        collection_id = collection.collection_id,
+    )
+
+    # assign question to assignment
+    for question_id in questions:
+        QuestionAssignments.create(
+            DBSession,
+            assignment.assignment_id,
+            question_id,
+        )
+
+    return assignment, collection
+
+def create_story(user_id, title, tags, contents, top_left_lat, top_left_lng, \
+         bottom_right_lat, bottom_right_lng, language_code):
+
+    story = Stories.add_story(
+        session = DBSession,
+        #token = user.token,
+        user_id = user_id,
+        title = title,
+        tags = tags,
+        #top_text = top_text,
+        #media_id = banner_media_id,
+        contents = contents,
+        top_left_lat = top_left_lat,
+        top_left_lng = top_left_lng,
+        bottom_right_lat = bottom_right_lat,
+        bottom_right_lng = bottom_right_lng,
+        #use_fence = use_fense,
+        language_code = language_code,
+    )
+
+    return story

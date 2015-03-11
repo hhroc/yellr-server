@@ -17,6 +17,7 @@ from sqlalchemy import (
     Integer,
     Text,
     DateTime,
+    Date,
     Boolean,
     Float,
     CHAR,
@@ -31,6 +32,7 @@ from sqlalchemy import (
     func,
     text,
     distinct,
+    cast,
 )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -105,7 +107,8 @@ class Users(Base):
     user_name = Column(Text)
     first_name = Column(Text)
     last_name = Column(Text)
-    organization = Column(Text)
+    #organization = Column(Text)
+    organization_id = Column(Integer, ForeignKey('organizations.organization_id'))
     email = Column(Text)
     pass_salt = Column(Text)
     pass_hash = Column(Text)
@@ -116,7 +119,7 @@ class Users(Base):
 
     @classmethod
     def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
-            user_name, password, first_name, last_name, email, organization):
+            user_name, password, first_name, last_name, email, organization_id):
         user = None
         with transaction.manager:
             pass_salt=str(uuid.uuid4())
@@ -129,7 +132,8 @@ class Users(Base):
                 user_geo_fence_id = user_geo_fence_id, 
                 first_name = first_name,
                 last_name = last_name,
-                organization = organization,
+                #organization = organization,
+                organization_id = organization_id,
                 email = email,
                 user_name = user_name,
                 pass_salt = pass_salt,
@@ -247,7 +251,8 @@ class Users(Base):
                         datetime.timedelta(hours=24)
                     session.add(user)
                     transaction.commit()
-        return user, token
+                    org = Organizations.get_from_id(session, user.organization_id)
+        return user, org, token
 
     @classmethod
     def validate_token(cls, session, token):
@@ -257,6 +262,35 @@ class Users(Base):
             if user.token_expire_datetime > datetime.datetime.now():
                 valid = True
         return valid, user
+
+    @classmethod
+    def invalidate_token(cls, session, token):
+        with transaction.manager:
+            user = Users.get_from_token(session, token)
+            if user != None:
+                user.token = ""
+                session.add(user)
+                transaction.commit()
+        return user
+
+    @classmethod
+    def change_password(cls, session, username, password):
+        with transaction.manager:
+            user = session.query(
+                Users,
+            ).filter(
+                Users.user_name == username,
+            ).first()
+            pass_salt=str(uuid.uuid4())
+            pass_hash = hashlib.sha256('{0}{1}'.format(
+                password,
+                pass_salt
+            )).hexdigest()
+            user.pass_salt = pass_salt
+            user.pass_hash = pass_hash
+            session.add(user)
+            transaction.commit()
+        return user
 
 class UserGeoFences(Base):
 
@@ -544,7 +578,9 @@ class Assignments(Base):
                 Assignments.bottom_right_lng,
                 Assignments.use_fence,
                 Assignments.collection_id,
-                Users.organization,
+                Users.organization_id,
+                Organizations.name,
+                Organizations.description,
                 Questions.question_text,
                 Questions.question_type_id,
                 Questions.description,
@@ -560,9 +596,12 @@ class Assignments(Base):
                 Questions.answer9,
                 Languages.language_id,
                 Languages.language_code,
-                func.count(Posts.post_id),
+                func.count(distinct(Posts.post_id)),
             ).join(
                 Users, Users.user_id == Assignments.user_id,
+            ).join(
+                Organizations, Users.organization_id == \
+                    Organizations.organization_id,
             ).join(
                 QuestionAssignments,
                 QuestionAssignments.assignment_id == \
@@ -578,9 +617,9 @@ class Assignments(Base):
                     Assignments.assignment_id,
             ).group_by(
                 Assignments.assignment_id,
-                Users.user_id,
-                Questions.question_id,
-                Languages.language_id,
+                #Users.user_id,
+                #Questions.question_id,
+                #Languages.language_id,
             #).outerjoin(
             #    Posts, Posts.assignment_id == \
             #        Assignments.assignment_id,
@@ -613,7 +652,7 @@ class Assignments(Base):
                 Assignments.bottom_right_lat + 90 < lat + 90,
                 Assignments.bottom_right_lng + 180 > lng + 180,
                 Languages.language_code == language_code,
-                Assignments.expire_datetime >= datetime.datetime.now(),
+                cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
             ).all() #.slice(start, start+count).all()
         return assignments
 
@@ -751,7 +790,7 @@ class Questions(Base):
     answer9 = Column(Text)
 
     @classmethod
-    def create_from_http(cls, session, user_id, language_code, question_text,
+    def add_question(cls, session, user_id, language_code, question_text,
             description, question_type, answers):
         with transaction.manager:
             #user = Users.get_from_token(session, token)
@@ -897,12 +936,14 @@ class Posts(Base):
     deleted = Column(Boolean)
     lat = Column(Float)
     lng = Column(Float)
+    approved = Column(Boolean)
 
     @classmethod
     def create_from_http(cls, session, client_id, assignment_id, #title, 
             language_code, lat, lng, media_objects=[]):
         # create post
         with transaction.manager:
+            # todo: error check this
             language = Languages.get_from_code(
                 session = session,
                 language_code = language_code
@@ -920,6 +961,7 @@ class Posts(Base):
                 deleted = False,
                 lat = lat,
                 lng = lng,
+                approved = False,
             )
             session.add(post)
             transaction.commit()
@@ -952,6 +994,7 @@ class Posts(Base):
                 Posts.deleted,
                 Posts.lat,
                 Posts.lng,
+                Posts.approved,
                 MediaObjects.media_object_id,
                 MediaObjects.media_id,
                 MediaObjects.file_name,
@@ -981,6 +1024,8 @@ class Posts(Base):
             ).outerjoin(
                 CollectionPosts, CollectionPosts.post_id == \
                     Posts.post_id,
+            ).group_by(
+                Posts.post_id,
             ).order_by(
                 desc(Posts.post_datetime),
             )
@@ -1062,6 +1107,36 @@ class Posts(Base):
             session.add(post)
             transaction.commit()
         return post
+
+    @classmethod
+    def approve_post(cls, session, post_id):
+        with transaction.manager:
+            post = session.query(
+                Posts,
+            ).filter(
+                Posts.post_id == post_id,
+            ).first()
+            post.approved = True
+            session.add(post)
+            transaction.commit()
+        return post
+
+
+    @classmethod
+    def get_all_approved_from_location(cls, session, language_code, lat, lng,
+            start=0, count=0):
+        with transaction.manager:
+            posts = Posts._build_posts_query(session).filter(
+                Posts.approved == True,
+                Assignments.top_left_lat + 90 > lat + 90,
+                Assignments.top_left_lng + 180 < lng + 180,
+                Assignments.bottom_right_lat + 90 < lat + 90,
+                Assignments.bottom_right_lng + 180 > lng + 180,
+                Languages.language_code == language_code,
+                cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
+            ).slice(start, start+count).all()
+        return posts
+ 
 
 # Posts indexes ... these will be important to implement soon
 
@@ -1198,9 +1273,9 @@ class Stories(Base):
     edited_datetime = Column(DateTime, nullable=True)
     title = Column(Text)
     tags = Column(Text)
-    top_text = Column(Text)
-    media_object_id = Column(Integer, \
-        ForeignKey('mediaobjects.media_object_id'), nullable=True)
+    #top_text = Column(Text)
+    #media_object_id = Column(Integer, \
+    #    ForeignKey('mediaobjects.media_object_id'), nullable=True)
     contents = Column(Text)
     top_left_lat = Column(Float)
     top_left_lng = Column(Float)
@@ -1210,30 +1285,28 @@ class Stories(Base):
     language_id = Column(Integer, ForeignKey('languages.language_id'))
 
     @classmethod
-    def create_from_http(cls, session, token, title, tags, top_text, \
-            media_id, contents, top_left_lat, top_left_lng, \
-            bottom_right_lat, bottom_right_lng, use_fence=True, \
-            language_code=''):
+    def add_story(cls, session, user_id, title, tags, contents, top_left_lat,\
+            top_left_lng, bottom_right_lat, bottom_right_lng, language_code):
         with transaction.manager:
-            user = Users.get_from_token(session, token)
-            media_object = MediaObjects.get_from_media_id(
-                session,
-                media_id,
-            )
-            if media_object == None:
-                media_object_id = None
-            else:
-                media_object_id = media_object.media_object_id
+            #user = Users.get_from_token(session, token)
+            #media_object = MediaObjects.get_from_media_id(
+            #    session,
+            #    media_id,
+            #)
+            #if media_object == None:
+            #    media_object_id = None
+            #else:
+            #    media_object_id = media_object.media_object_id
             language = Languages.get_from_code(session, language_code)
             story = cls(
-                user_id = user.user_id,
+                user_id = user_id,
                 story_unique_id = str(uuid.uuid4()),
                 publish_datetime = datetime.datetime.now(),
                 edited_datetime = None,
                 title = title,
                 tags = tags,
-                top_text = top_text,
-                media_object_id = media_object_id,
+                #top_text = top_text,
+                #media_object_id = media_object_id,
                 contents = contents,
                 top_left_lat = top_left_lat,
                 top_left_lng = top_left_lng,
@@ -1255,7 +1328,7 @@ class Stories(Base):
                 Stories.edited_datetime,
                 Stories.title,
                 Stories.tags,
-                Stories.top_text,
+                #Stories.top_text,
                 Stories.contents,
                 Stories.top_left_lat,
                 Stories.top_left_lng,
@@ -1263,15 +1336,20 @@ class Stories(Base):
                 Stories.bottom_right_lng,
                 Users.first_name,
                 Users.last_name,
-                Users.organization,
+                #Users.organization,
+                Organizations.organization_id,
+                Organizations.name,
                 Users.email,
-                MediaObjects.file_name,
-                MediaObjects.media_id,
+                #MediaObjects.file_name,
+                #MediaObjects.media_id,
             ).join(
                 Users,Stories.user_id == Users.user_id,
-            ).outerjoin(
-                MediaObjects,Stories.media_object_id == \
-                    MediaObjects.media_object_id,
+            ).join(
+                Organizations, #Organizations.organization_id == \
+                    #Users.organization_id,
+            #).outerjoin(
+            #    MediaObjects,Stories.media_object_id == \
+            #        MediaObjects.media_object_id,
             )
             stories_filter_query = stories_query
             if language_code != '':
@@ -1398,7 +1476,7 @@ class Collections(Base):
                     Collections.collection_id,
             ).group_by(
                 Collections.collection_id,
-                Assignments.assignment_id,
+                #Assignments.assignment_id,
             ).order_by(
                 desc(Collections.collection_id),
             )
@@ -1423,7 +1501,7 @@ class Collections(Base):
         return collection
 
     @classmethod
-    def create_new_collection(cls, session, user_id, name,
+    def add_collection(cls, session, user_id, name,
             description='', tags=''):
         with transaction.manager:
             #user = Users.get_from_token(session, token)
@@ -1817,6 +1895,54 @@ class Subscribers(Base):
             ).filter(
             ).all()
         return subscribers
+
+class Organizations(Base):
+
+    __tablename__ = 'organizations'
+    organization_id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    description = Column(Text, nullable=True)
+    contact_name = Column(Text, nullable=True)
+    contact_email = Column(Text, nullable=True)
+    creation_datetime = Column(DateTime)
+
+    @classmethod
+    def add_organization(cls, session, name, description, contact_name,\
+             contact_email):
+        with transaction.manager:
+            organization = Organizations(
+                name = name,
+                description = description,
+                contact_name = contact_name,
+                contact_email = contact_email,
+                creation_datetime = datetime.datetime.now(),
+            )
+            session.add(organization)
+            transaction.commit()
+        return organization
+
+    @classmethod
+    def get_from_id(cls, session, organization_id):
+        with transaction.manager:
+            organization = session.query(
+                Organizations,
+            ).filter(
+                Organizations.organization_id == organization_id,
+            ).first()
+        return organization
+
+    @classmethod
+    def get_all(cls, session):
+        with transaction.manager:
+            organizations = session.query(
+                Organizations.organization_id,
+                Organizations.name,
+                Organizations.description,
+                Organizations.contact_name,
+                Organizations.contact_email,
+                Organizations.creation_datetime,
+            ).all()
+        return organizations
 
 class Zipcodes(Base):
 

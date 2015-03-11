@@ -1,5 +1,6 @@
 import json
 import datetime
+import os
 
 import markdown
 
@@ -40,10 +41,41 @@ def make_response(resp_dict, status_code=200):
 
     return resp
 
-def admin_log(log_text):
+#def admin_log(log_text):
+#
+#    with open('log.txt', 'a') as f:
+#        f.write('[{0}] {1}\n'.format(str(datetime.datetime.now()),log_text))
 
-    with open('log.txt', 'a') as f:
-        f.write('[{0}] {1}\n'.format(str(datetime.datetime.now()),log_text))
+def _decode_languages(languages):
+
+    if True:
+
+        ret_languages = []
+        
+        for language_code, name in languages:
+            ret_languages.append({
+                'name': name,
+                'code': language_code,
+            })
+
+    return ret_languages
+
+
+def _decode_question_types(question_types):
+
+    if True:
+
+        ret_question_types = []
+    
+        for question_type_id, question_type_text, question_type_description \
+                in question_types:
+            ret_question_types.append({
+                'question_type_id': question_type_id,
+                'question_type_text': question_type_text,
+                'question_type_description': question_type_description,
+            })
+
+    return ret_question_types
 
 def _decode_assignments(assignments):
 
@@ -60,8 +92,9 @@ def _decode_assignments(assignments):
             index = 0
             for assignment_id, publish_datetime, expire_datetime, name, \
                     top_left_lat, top_left_lng, bottom_right_lat, \
-                    bottom_right_lng, use_fence, collection_id, organization, \
-                    question_text, question_type_id, question_description, \
+                    bottom_right_lng, use_fence, collection_id, org_id, \
+                    org_name, org_description, question_text, \
+                    question_type_id, question_description, \
                     answer0, answer1, answer2, answer3, answer4, answer5, \
                     answer6, answer7, answer8, answer9, language_id, \
                     language_code, post_count in assignments:
@@ -84,7 +117,9 @@ def _decode_assignments(assignments):
                         'bottom_right_lat': bottom_right_lat,
                         'bottom_right_lng': bottom_right_lng,
                         #'use_fence': use_fence,
-                        'organization': organization,
+                        'organization_id': org_id,
+                        'organization': org_name,
+                        'organization_description': org_description,
                         'questions': [],
                         'post_count': post_count,
                         'language_code': language_code,
@@ -120,8 +155,6 @@ def _decode_assignments(assignments):
 
     return ret_assignments
 
-<<<<<<< Updated upstream
-=======
 def _decode_posts(posts, clean=False):
 
     if True:
@@ -244,4 +277,3 @@ def _decode_organizations(organizations):
 
     return ret_organizations
 
->>>>>>> Stashed changes

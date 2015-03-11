@@ -72,7 +72,7 @@ def admin_get_post(request):
     return utils.make_response(result)
 
 @view_config(route_name='admin/get_client_posts.json')
-def admin_get_user_posts(request):
+def admin_get_client_posts(request):
 
     result = {'success': False}
 
