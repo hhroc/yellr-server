@@ -943,6 +943,7 @@ def run_tests():
         {
             #'cuid': cuid_a,
             'media_type': 'image',
+            'media_caption': 'I like our little city :).',
         },
         'POST',
         files={'media_file': open('./test_media/roc.jpg','rb')},
