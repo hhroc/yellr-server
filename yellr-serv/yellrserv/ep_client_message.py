@@ -54,16 +54,6 @@ def create_response_message(request):
         if success == False:
             raise Exception(error_text)
 
-        '''
-        message = Messages.create_response_message_from_http(
-            session = DBSession,
-            client_id = client_id,
-            parent_message_id = parent_message_id,
-            subject = subject,
-            text = text,
-        )
-        '''
-
         message = client_utils.create_response_message(
             client_id = client.client_id,
             parent_message_id = parent_message_id,
@@ -75,31 +65,11 @@ def create_response_message(request):
             result['message_id'] = message.message_id
             result['success'] = True
         else:
-            result['error_text'] = "Message already has posted response."
+            Exception("Message already has posted response.")
 
-    except:
-        pass
-
-    '''
-
-    client_id = None
-    if client != None:
-        client_id = client.client_id
-    ClientLogs.log(
-        session = DBSession,
-        client_id = client_id,
-        url = 'create_response_message.json',
-        lat = lat,
-        lng = lng,
-        request = json.dumps({
-            'get': '{0}'.format(request.GET),
-            'post': '{0}'.format(request.POST),
-        }),
-        result = json.dumps(result),
-        success = success,
-    )
-
-    '''
+    except Exception, e:
+        status_code = 400
+        response['error_text'] = str(e)
 
     client_utils.log_client_action(
         client = client,
@@ -111,5 +81,5 @@ def create_response_message(request):
         success = success,
     )
 
-    return utils.make_response(result)
+    return utils.make_response(result, status_code)
 
