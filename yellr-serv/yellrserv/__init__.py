@@ -102,7 +102,7 @@ def main(global_config, **settings):
     config.add_route('publish_post.json','publish_post.json')
     config.add_route('get_profile.json', 'get_profile.json')
     config.add_route('verify_client.json', 'verify_client.json')
-    config.add_route('get_approved_posts.json', 'get_approved_posts.json')
+    config.add_route('get_local_posts.json', 'get_local_posts.json')
 
     config.scan()
     return config.make_wsgi_app()

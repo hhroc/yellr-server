@@ -151,7 +151,7 @@ if __name__ == '__main__':
     log('----')
 
     success, payload = _execute_test(
-        'get_approved_posts.json',
+        'get_local_posts.json',
         random_client_id,
         _language_code,
         _lat,

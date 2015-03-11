@@ -15,8 +15,8 @@ import client_utils
 import utils
 from config import system_config
 
-@view_config(route_name='get_approved_posts.json')
-def get_approved_posts(request):
+@view_config(route_name='get_local_posts.json')
+def get_local_posts(request):
 
     result = {'success': False}
     status_code = 200
