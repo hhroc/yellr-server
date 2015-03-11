@@ -593,7 +593,7 @@ def run_tests():
     log('')
 
     success, payload = _execute_test(
-        'admin/get_user_posts.json',
+        'admin/get_client_posts.json',
         token,
         _language_code,
         _lat,

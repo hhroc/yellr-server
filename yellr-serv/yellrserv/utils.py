@@ -120,3 +120,128 @@ def _decode_assignments(assignments):
 
     return ret_assignments
 
+<<<<<<< Updated upstream
+=======
+def _decode_posts(posts, clean=False):
+
+    if True:
+
+        ret_posts = []
+
+        if len(posts) > 0 and posts[0][0] != None:
+
+            seen_post_ids = []
+            post = {}
+
+            # itterate throught the list, and build our resposne
+            index = 0
+            for post_id, client_id, post_datetime, deleted, \
+                    lat, lng, approved, media_object_id, media_id, \
+                    file_name, caption, media_text, media_type_name, \
+                    media_type_description, verified, cuid, \
+                    language_code, language_name, assignment_id, \
+                    assignment_name in posts:
+
+                if (post_id not in seen_post_ids) or (index == len(posts)-1):
+
+                    if post:
+
+                        ret_posts.append(post)
+
+                    post = {
+                        #'post_id': post_id,
+                        #'title': title,
+                        'post_datetime': str(post_datetime),
+                        #'deleted': deleted,
+                        #'lat': lat,
+                        #'lng': lng,
+                        #'approved': approved,
+                        #'verified_user': bool(verified),
+                        #'client_id': client_id,
+                        'language_code': language_code,
+                        'language_name': language_name,
+                        #'assignment_id': assignment_id,
+                        'assignment_name': assignment_name,
+                        'media_objects': []
+                    }
+
+                    if clean == False:
+                        post['post_id'] = post_id
+                        post['deleted'] = deleted
+                        post['lat'] = lat
+                        post['lng'] = lng
+                        post['approved'] = approved
+                        post['verified_user'] = bool(verified)
+                        post['client_id'] = client_id
+                        post['assignment_id'] = assignment_id
+
+                    seen_post_ids.append(post_id)
+
+                preview_file_name = ''
+                if not file_name == "":
+                    root_file_name = os.path.splitext(file_name)[0]
+                    file_extention = os.path.splitext(file_name)[1]
+                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
+                media_object = {
+                    'media_id': media_id,
+                    'file_name': file_name,
+                    'preview_file_name': preview_file_name,
+                    'caption': caption,
+                    'media_text': media_text,
+                    'media_type_name': media_type_name,
+                    'media_type_description': media_type_description,
+                }
+
+                post['media_objects'].append(media_object)
+
+                if index == len(posts)-1:
+                    ret_posts.append(post)
+
+                index += 1
+
+    return ret_posts
+
+def _decode_collections(collections):
+
+    if True:
+
+        ret_collections = []
+
+        for collection_id, user_id, collection_datetime, name, description, \
+                tags, enabled, assignment_id, assignment_name, post_count \
+                in collections:
+            ret_collections.append({
+                'collection_id': collection_id,
+                'collection_datetime': str(collection_datetime),
+                'name': name,
+                'decription': description,
+                'tags': tags,
+                'enabled': enabled,
+                'assignment_id': assignment_id,
+                'assignment_name': assignment_name,
+                'post_count': post_count,
+            })
+
+    return ret_collections
+
+def _decode_organizations(organizations):
+
+    if True:
+
+        ret_organizations = []
+
+        for org_id, name, desc, contact_name, contact_email, created \
+                in organizations:
+
+            ret_organizations.append({
+                'id': org_id,
+                'name': name,
+                'description': desc,
+                'contact_name': contact_name,
+                'contact_email': contact_email,
+                'created': str(created),
+            })
+
+    return ret_organizations
+
+>>>>>>> Stashed changes

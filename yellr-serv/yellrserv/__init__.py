@@ -71,7 +71,7 @@ def main(global_config, **settings):
     config.add_route('admin/remove_post_from_collection.json', 'admin/remove_post_from_collection.json')
     config.add_route('admin/disable_collection.json', 'admin/disable_collection.json')
     config.add_route('admin/get_collection_posts.json', 'admin/get_collection_posts.json')
-    config.add_route('admin/get_user_posts.json','admin/get_user_posts.json')
+    config.add_route('admin/get_client_posts.json','admin/get_client_posts.json')
     config.add_route('admin/get_subscriber_list.json','admin/get_subscriber_list.json')
     config.add_route('admin/create_user.json','admin/create_user.json')
     config.add_route('admin/get_post.json', 'admin/get_post.json')

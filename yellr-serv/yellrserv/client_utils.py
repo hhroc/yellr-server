@@ -155,4 +155,19 @@ def get_messages(client_id, language_code, lat, lng):
 
     return ret_messages
 
+<<<<<<< Updated upstream
     
+=======
+def get_approved_posts(client_id, language_code, lat, lng, start, count):
+
+    posts = Posts.get_all_approved_from_location(
+        session = DBSession,
+        language_code = language_code,
+        lat = lat,
+        lng = lng,
+        start = start,
+        count = count,
+    )
+
+    return utils._decode_posts(posts, clean=True)
+>>>>>>> Stashed changes

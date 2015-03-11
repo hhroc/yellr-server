@@ -53,7 +53,7 @@ if __name__ == '__main__':
         first_name = "Tim",
         last_name = "Duffy",
         email = "tim@timduffy.me",
-        organization = "Hacks/Hackers Rochester",
+        organization = "Hacks/Hackers Rochester, NY",
     )
 
     create_user(
