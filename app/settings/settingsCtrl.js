@@ -22,11 +22,12 @@ angular
          * @return void
          */
         $scope.newAccount = function (account) {
-            userApiService.createUser('moderator', account.userName,
+            console.log('new account', account);
+            userApiService.createUser('moderator', account.username,
                                       account.password, account.first,
                                       account.last, account.email, 'WXXI')
             .success(function (data) {
-                console.log('user created');
+                console.log('user created', data);
             });
         };
 
@@ -38,5 +39,6 @@ angular
          */
         $scope.changePassword = function (password) {
             // TODO:
+            console.log('change password');
         };
     }]);
