@@ -11,8 +11,6 @@ def admin_create_message(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")

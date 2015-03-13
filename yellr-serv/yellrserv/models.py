@@ -33,6 +33,8 @@ from sqlalchemy import (
     text,
     distinct,
     cast,
+    or_,
+    and_,
 )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -1003,11 +1005,14 @@ class Posts(Base):
                 MediaTypes.name,
                 MediaTypes.description,
                 Clients.verified,
+                Clients.first_name,
+                Clients.last_name,
                 Clients.cuid,
                 Languages.language_code,
                 Languages.name,
                 Assignments.assignment_id,
                 Assignments.name,
+                Questions.question_text,
             ).join(
                 PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
             ).join(
@@ -1021,6 +1026,12 @@ class Posts(Base):
             ).outerjoin(
                 Assignments, Assignments.assignment_id == \
                     Posts.assignment_id,
+            ).outerjoin(
+                QuestionAssignments, QuestionAssignments.assignment_id == \
+                    Assignments.assignment_id,
+            ).outerjoin(
+                Questions, Questions.question_id == \
+                    QuestionAssignments.question_id,
             ).outerjoin(
                 CollectionPosts, CollectionPosts.post_id == \
                     Posts.post_id,
@@ -1128,12 +1139,18 @@ class Posts(Base):
         with transaction.manager:
             posts = Posts._build_posts_query(session).filter(
                 Posts.approved == True,
-                Assignments.top_left_lat + 90 > lat + 90,
-                Assignments.top_left_lng + 180 < lng + 180,
-                Assignments.bottom_right_lat + 90 < lat + 90,
-                Assignments.bottom_right_lng + 180 > lng + 180,
+            ).filter(                
+                ((Assignments.top_left_lat + 90 > lat + 90) &
+                    (Assignments.top_left_lng + 180 < lng + 180) &
+                    (Assignments.bottom_right_lat + 90 < lat + 90) &
+                    (Assignments.bottom_right_lng + 180 > lng + 180)) |
+                (((lat + 1) + 90 > Posts.lat + 90) & 
+                    ((lng + 1) + 180 > Posts.lng + 180) &
+                    ((lat - 1) + 90 < Posts.lat + 90) &
+                    ((lng - 1) + 180 < Posts.lng + 180))
+            ).filter(
                 Languages.language_code == language_code,
-                cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
+                #cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
             ).slice(start, start+count).all()
         return posts
  

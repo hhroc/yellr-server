@@ -11,8 +11,6 @@ def admin_get_languages(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -33,8 +31,6 @@ def admin_get_question_types(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -54,9 +50,7 @@ def admin_create_question(request):
 
     result = {'success': False}
 
-    #if True:
     try:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -98,9 +92,7 @@ def admin_update_question(request):
 
     result = {'success': False}
 
-    #if True:
     try:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -119,6 +111,7 @@ def admin_update_question(request):
             answers = json.loads(request.POST['answers'])
         except:
             pass
+
         # back fill with empty strings
         for i in range(len(answers),10):
             answers.append('')
@@ -147,8 +140,6 @@ def admin_publish_assignment(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -196,8 +187,6 @@ def admin_update_assignment(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -211,6 +200,7 @@ def admin_update_assignment(request):
                 life_time = int(float(request.POST['life_time']))
             except:
                 life_time = 24*7
+
             #questions = json.loads(request.POST['questions'])
             top_left_lat = float(request.POST['top_left_lat'])
             top_left_lng = float(request.POST['top_left_lng'])
@@ -246,8 +236,6 @@ def admin_get_my_assignments(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -279,11 +267,7 @@ def admin_get_assignment_responses(request):
 
     result = {'success': False}
 
-    #if True:
     try:
-
-        token = None
-        valid_token = False
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")

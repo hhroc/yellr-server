@@ -10,8 +10,6 @@ def admin_get_access_token(request):
     status_code = 200
 
     try:
-    #if True:
-
         user_name = ''
         password = ''
         try:
@@ -56,8 +54,6 @@ def admin_check_loged_in(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
 
         result['logged_in'] = False
@@ -78,8 +74,6 @@ def admin_logout(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         token = None
         try:
             token = request.GET['token']
@@ -88,7 +82,6 @@ def admin_logout(request):
                 token = request.session['token']
             except:
                 pass
-            pass
 
         if token != None:
             Users.invalidate_token(

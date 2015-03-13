@@ -9,8 +9,6 @@ def admin_get_posts(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -49,8 +47,6 @@ def admin_get_post(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -76,9 +72,7 @@ def admin_get_client_posts(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
-
+    try:
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -105,8 +99,8 @@ def admin_get_client_posts(request):
         result['posts'] = ret_posts
         result['success'] = True
 
-    #except Exception, e:
-    #    result['error_text'] = str(e)
+    except Exception, e:
+        result['error_text'] = str(e)
 
     return utils.make_response(result)
 
@@ -116,8 +110,6 @@ def admin_delete_post(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -145,8 +137,6 @@ def admin_approve_post(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")

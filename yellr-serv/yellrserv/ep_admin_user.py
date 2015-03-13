@@ -9,8 +9,6 @@ def admin_create_collection(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -45,8 +43,6 @@ def admin_get_organizations(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -67,14 +63,11 @@ def admin_create_user(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
 
         try:
-        #if True:
             user_type_name = request.POST['user_type']
             username = request.POST['username']
             password = request.POST['password']
@@ -117,9 +110,7 @@ def admin_change_password(request):
 
     result = {'success': False}
 
-    #try:
-    if True:
-
+    try:
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -138,8 +129,8 @@ def admin_change_password(request):
         result['user_id'] = user.user_id
         result['success'] = True
 
-    #except Exception, e:
-    #    result['error_text'] = str(e)
+    except Exception, e:
+        result['error_text'] = str(e)
 
     return utils.make_response(result)
 

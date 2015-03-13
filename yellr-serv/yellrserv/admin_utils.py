@@ -56,23 +56,18 @@ def check_token(request):
 
 def authenticate(username, password):
 
-    if True:
+    user = None
+    token = None
+    fence = None
 
-        user = None
-        token = None
-        fence = None
+    user, org, token = Users.authenticate(DBSession, username, password)
 
-        user, org, token = Users.authenticate(DBSession, username, password)
-
-        if token == None:
-            result['error_text'] = 'Invalid credentials'
-            #raise Exception('invalid credentials')
-        else:
-            
-            fence = UserGeoFences.get_fence_from_user_id(
-                session = DBSession,
-                user_id = user.user_id,
-            )
+    # make sure the user is valid, and is so, get their geofence
+    if token != None:
+        fence = UserGeoFences.get_fence_from_user_id(
+            session = DBSession,
+            user_id = user.user_id,
+        )
 
     return user, org, token, fence
 

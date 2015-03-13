@@ -126,8 +126,8 @@ def run_tests():
     log("Testing Assignments ...")
 
     _language_code = 'en'
-    _lat = 43.2
-    _lng = -77.5
+    _lat = 43.1
+    _lng = -77.6
 
     success, payload = _execute_test(
         'admin/get_access_token.json',
@@ -440,7 +440,7 @@ def run_tests():
         _lng,
         {
             #'language_code': 'en',
-            #'lat': 43.2,
+            #'lat': 43.1,
             #'lng': -77.5,
         },
         'GET',
@@ -962,7 +962,7 @@ def run_tests():
         _lng,
         {
             #'cuid': cuid_a,
-            'assignment_id': '0',
+            'assignment_id': assignment_id,
             #'title': '',
             #'language_code': 'en',
             #'lat': 43.1,
@@ -1337,7 +1337,31 @@ def run_tests():
     )
     log('----')
 
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': image_1_post_id,
+        },
+        'POST',
+    )
+    log('----')
 
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': text_post_id,
+        },
+        'POST',
+    )
+    log('----')
 
     log("Done with Tests")
     log("")

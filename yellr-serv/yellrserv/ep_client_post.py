@@ -22,8 +22,6 @@ def get_local_posts(request):
     status_code = 200
 
     try:
-    #if True:
-
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
@@ -74,7 +72,6 @@ def upload_media(request):
     status_code = 200
 
     try:
-    #if True:
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
@@ -193,7 +190,6 @@ def publish_post(request):
     status_code = 200
 
     try:
-    #if True:
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:

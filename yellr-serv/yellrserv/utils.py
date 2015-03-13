@@ -48,110 +48,104 @@ def make_response(resp_dict, status_code=200):
 
 def _decode_languages(languages):
 
-    if True:
-
-        ret_languages = []
-        
-        for language_code, name in languages:
-            ret_languages.append({
-                'name': name,
-                'code': language_code,
-            })
+    ret_languages = []
+    
+    for language_code, name in languages:
+        ret_languages.append({
+            'name': name,
+            'code': language_code,
+        })
 
     return ret_languages
 
 
 def _decode_question_types(question_types):
 
-    if True:
-
-        ret_question_types = []
+    ret_question_types = []
     
-        for question_type_id, question_type_text, question_type_description \
-                in question_types:
-            ret_question_types.append({
-                'question_type_id': question_type_id,
-                'question_type_text': question_type_text,
-                'question_type_description': question_type_description,
-            })
+    for question_type_id, question_type_text, question_type_description \
+            in question_types:
+        ret_question_types.append({
+            'question_type_id': question_type_id,
+            'question_type_text': question_type_text,
+            'question_type_description': question_type_description,
+        })
 
     return ret_question_types
 
 def _decode_assignments(assignments):
 
-    if True:
+    ret_assignments = []
 
-        ret_assignments = []
+    if len(assignments) > 0 and assignments[0][0] != None:
 
-        if len(assignments) > 0 and assignments[0][0] != None:
+        seen_assignment_ids = []
+        assignment = {}
 
-            seen_assignment_ids = []
-            assignment = {}
+        # itterate throught he list, and build our resposne
+        index = 0
+        for assignment_id, publish_datetime, expire_datetime, name, \
+                top_left_lat, top_left_lng, bottom_right_lat, \
+                bottom_right_lng, use_fence, collection_id, org_id, \
+                org_name, org_description, question_text, \
+                question_type_id, question_description, \
+                answer0, answer1, answer2, answer3, answer4, answer5, \
+                answer6, answer7, answer8, answer9, language_id, \
+                language_code, post_count in assignments:
 
-            # itterate throught he list, and build our resposne
-            index = 0
-            for assignment_id, publish_datetime, expire_datetime, name, \
-                    top_left_lat, top_left_lng, bottom_right_lat, \
-                    bottom_right_lng, use_fence, collection_id, org_id, \
-                    org_name, org_description, question_text, \
-                    question_type_id, question_description, \
-                    answer0, answer1, answer2, answer3, answer4, answer5, \
-                    answer6, answer7, answer8, answer9, language_id, \
-                    language_code, post_count in assignments:
+            if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
 
-                if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
-
-                    # add our existing assignment to the list of assignments
-                    # to return
-                    if assignment:
-                        ret_assignments.append(assignment)
-
-                    # build our assignment with no question(s)
-                    assignment = {
-                        'assignment_id': assignment_id,
-                        'publish_datetime': str(publish_datetime),
-                        'expire_datetime': str(expire_datetime),
-                        'name': name,
-                        'top_left_lat': top_left_lat,
-                        'top_left_lng': top_left_lng,
-                        'bottom_right_lat': bottom_right_lat,
-                        'bottom_right_lng': bottom_right_lng,
-                        #'use_fence': use_fence,
-                        'organization_id': org_id,
-                        'organization': org_name,
-                        'organization_description': org_description,
-                        'questions': [],
-                        'post_count': post_count,
-                        'language_code': language_code,
-                    }
-
-                    # record that we have seen the assignment_id
-                    seen_assignment_ids.append(assignment_id)
-
-                # build our question
-                question = {
-                    'question_text': question_text,
-                    'question_type_id': question_type_id,
-                    'description': question_description,
-                    'answer0': answer0,
-                    'answer1': answer1,
-                    'answer2': answer2,
-                    'answer3': answer3,
-                    'answer4': answer4,
-                    'answer5': answer5,
-                    'answer6': answer6,
-                    'answer7': answer7,
-                    'answer8': answer8,
-                    'answer9': answer9,
-                }
-
-                # add the question to the current assignment
-                assignment['questions'].append(question)
-
-                if index == len(assignments)-1:
+                # add our existing assignment to the list of assignments
+                # to return
+                if assignment:
                     ret_assignments.append(assignment)
 
-                index += 1
+                # build our assignment with no question(s)
+                assignment = {
+                    'assignment_id': assignment_id,
+                    'publish_datetime': str(publish_datetime),
+                    'expire_datetime': str(expire_datetime),
+                    'name': name,
+                    'top_left_lat': top_left_lat,
+                    'top_left_lng': top_left_lng,
+                    'bottom_right_lat': bottom_right_lat,
+                    'bottom_right_lng': bottom_right_lng,
+                    #'use_fence': use_fence,
+                    'organization_id': org_id,
+                    'organization': org_name,
+                    'organization_description': org_description,
+                    'questions': [],
+                    'post_count': post_count,
+                    'language_code': language_code,
+                }
+
+                # record that we have seen the assignment_id
+                seen_assignment_ids.append(assignment_id)
+
+            # build our question
+            question = {
+                'question_text': question_text,
+                'question_type_id': question_type_id,
+                'description': question_description,
+                'answer0': answer0,
+                'answer1': answer1,
+                'answer2': answer2,
+                'answer3': answer3,
+                'answer4': answer4,
+                'answer5': answer5,
+                'answer6': answer6,
+                'answer7': answer7,
+                'answer8': answer8,
+                'answer9': answer9,
+            }
+
+            # add the question to the current assignment
+            assignment['questions'].append(question)
+
+            if index == len(assignments)-1:
+                ret_assignments.append(assignment)
+
+            index += 1
 
     return ret_assignments
 
@@ -171,9 +165,9 @@ def _decode_posts(posts, clean=False):
             for post_id, client_id, post_datetime, deleted, \
                     lat, lng, approved, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
-                    media_type_description, verified, cuid, \
-                    language_code, language_name, assignment_id, \
-                    assignment_name in posts:
+                    media_type_description, verified, first_name, last_name, \
+                    cuid, language_code, language_name, assignment_id, \
+                    assignment_name, question_text in posts:
 
                 if (post_id not in seen_post_ids) or (index == len(posts)-1):
 
@@ -189,12 +183,15 @@ def _decode_posts(posts, clean=False):
                         #'lat': lat,
                         #'lng': lng,
                         #'approved': approved,
-                        #'verified_user': bool(verified),
+                        'verified_user': bool(verified),
+                        'first_name': first_name,
+                        'last_name': last_name,
                         #'client_id': client_id,
                         'language_code': language_code,
                         'language_name': language_name,
                         #'assignment_id': assignment_id,
-                        'assignment_name': assignment_name,
+                        #'assignment_name': assignment_name,
+                        'question_text': question_text,
                         'media_objects': []
                     }
 
@@ -207,6 +204,7 @@ def _decode_posts(posts, clean=False):
                         post['verified_user'] = bool(verified)
                         post['client_id'] = client_id
                         post['assignment_id'] = assignment_id
+                        post['assignment_name'] = assignment_name
 
                     seen_post_ids.append(post_id)
 
