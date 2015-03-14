@@ -85,10 +85,13 @@ def admin_logout(request):
                 raise Exception("Missing token.")
 
         if token != None:
-            Users.invalidate_token(
-                session = DBSession,
-                token = token,
+            admin_utils.logout(
+                token,
             )
+            #Users.invalidate_token(
+            #    session = DBSession,
+            #    token = token,
+            #)
 
             request.session['token'] = ""
 
