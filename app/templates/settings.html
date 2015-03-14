@@ -39,7 +39,12 @@
 
 <div class="row">
     <h3>Change Password</h3>
-    <form ng-submit="newPassword(password)">
+    <form ng-submit="changePassword(password)">
+        <div class="large-12 columns">
+            <label>Username
+                <input type="text" placeholder="username" ng-model="password.username" required>
+            </label>
+        </div>
         <div class="large-12 columns">
             <label>Old Password
                 <input type="password" placeholder="old password" ng-model="password.old" required>
@@ -56,7 +61,7 @@
                     pw-check="pw1">
             </label>
         </div>
-        <input type="submit" value="Create Account"/>
+        <input type="submit" value="Change Password"/>
     </form>
 
 </div>

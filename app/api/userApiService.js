@@ -74,6 +74,21 @@ angular
             });
         };
 
+        userApi.changePassword = function (username, password) {
+            var url = '/admin/change_password.json';
+
+            password = CryptoJS.SHA256(password).toString();
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param({
+                    username: username,
+                    password: password
+                })
+            });
+        };
+
         /**
          * Gets all available languages
          *
@@ -107,8 +122,6 @@ angular
                 params: { token: accessToken }
             });
         };
-
-
 
         return userApi;
     }]);
