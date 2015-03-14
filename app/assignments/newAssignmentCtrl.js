@@ -1,7 +1,7 @@
 'use strict';
 
-var moment = moment || {};
-var async = async || {};
+var moment = moment || {},
+    async = async || {};
 
 angular
     .module('Yellr')
@@ -9,7 +9,7 @@ angular
                 '$timeout', 'assignmentApiService',
     function ($scope, $rootScope, $location, $timeout, assignmentApiService) {
 
-        if ($rootScope.user === undefined) {
+        if (!window.loggedIn) {
             $location.path('/login');
             return;
         }
@@ -24,7 +24,7 @@ angular
         $scope.canPublish = false;
 
         $scope.assignment = {};
-        $scope.assignment.questions = [ { question_text: '' } ];
+        $scope.assignment.questions = [{ question_text: '' }];
 
         /**
          * Utility function which toggles the notification bar.
@@ -95,23 +95,22 @@ angular
          * @return void
          */
         $scope.publish = function () {
-            var exp = moment($scope.assignment.expireDate);
-            var timeDiff = moment.duration(exp.diff(moment())).asHours();
+            var exp = moment($scope.assignment.expireDate),
+                timeDiff = moment.duration(exp.diff(moment())).asHours();
 
             async.map($scope.assignment.questions,
             function (question, callback) {
                 console.log('calling: ', question);
-                assignmentApiService.createQuestion($rootScope.user.token,
-                    question.language_code, question.question_text,
-                    question.description, question.question_type,
-                    question.answers)
+                assignmentApiService.createQuestion(question.language_code,
+                    question.question_text, question.description,
+                    question.question_type, question.answers)
                 .success(function (data) {
                     callback(null, data.question_id);
                 });
             },
             function (error, questionIds) {
-                assignmentApiService.publishAssignment($rootScope.user.token,
-                    $scope.assignment.name, timeDiff, questionIds,
+                assignmentApiService.publishAssignment($scope.assignment.name,
+                    timeDiff, questionIds,
                     $scope.assignment.geofence.topLeft.lat,
                     $scope.assignment.geofence.topLeft.lng,
                     $scope.assignment.geofence.bottomRight.lat,

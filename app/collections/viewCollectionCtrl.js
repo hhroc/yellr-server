@@ -8,7 +8,7 @@ angular
     function ($scope, $rootScope, $location, $stateParams, $modal,
               collectionApiService, formatPosts) {
 
-        if ($rootScope.user === undefined) {
+        if (!window.loggedIn) {
             $location.path('/login');
             return;
         }
@@ -39,7 +39,7 @@ angular
          *
          * @return void
          */
-        collectionApiService.getAllCollections($scope.user.token)
+        collectionApiService.getAllCollections()
         .success(function (data) {
             data.collections.forEach(function (collection) {
                 if (collection.collection_id == $stateParams.collectionId) {
@@ -54,8 +54,7 @@ angular
          *
          * @return void
          */
-        collectionApiService.getPosts($rootScope.user.token,
-                                      $stateParams.collectionId)
+        collectionApiService.getPosts($stateParams.collectionId)
         .success(function (data) {
             $scope.posts = formatPosts(data.posts);
         });

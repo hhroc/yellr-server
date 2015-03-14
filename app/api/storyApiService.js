@@ -8,7 +8,6 @@ angular
         /**
          * publishes given story.
          *
-         * @param accessToken : token needed for all admin functions
          * @param title : title of story
          * @param tags : tags associated with story
          * @param topText : place for credit, updates, corrections
@@ -22,13 +21,12 @@ angular
          *
          * @return response : either error code or success with story id
          */
-        storyApi.publishStory = function (accessToken, title, tags,
-                                              topText, bannerId, contents,
-                                              languageCode, topLeftLat,
-                                              topLeftLng, bottomRightLat,
-                                              bottomRightLng) {
+        storyApi.publishStory = function (title, tags, topText, bannerId,
+                                          contents, languageCode, topLeftLat,
+                                          topLeftLng, bottomRightLat,
+                                          bottomRightLng) {
 
-            var url = '/admin/publish_story.json?token=' + accessToken;
+            var url = '/admin/publish_story.json';
 
             return $http({
                 method: 'POST',
@@ -51,25 +49,23 @@ angular
         /**
          * Register that someone has viewed a specific post/story
          *
-         * @param accessToken : token needed for all admin functions
          * @param id : id of story/post being viewed
          *
          * @return response : either error code or success with post id
          */
-        storyApi.registerView = function (accessToken, id) {
-            var url = '/admin/register_post_view.json?token=' + accessToken;
+        storyApi.registerView = function (id) {
+            var url = '/admin/register_post_view.json';
 
             return $http({
                 method: 'POST',
                 url: url,
-                params: { post_id: id }
+                data: $.param({ post_id: id })
             });
         };
 
-        storyApi.getUserPosts = function (accessToken, id, start, count) {
+        storyApi.getUserPosts = function (id, start, count) {
             var url = '/admin/get_user_posts.json',
                 params = {
-                    token: accessToken,
                     client_id: id
                 };
 
@@ -82,7 +78,6 @@ angular
                 params: params
             });
         };
-
 
         return storyApi;
     }]);

@@ -49,11 +49,7 @@ describe('Calling Access Token API', function () {
 });
 
 describe('Calling Post API', function () {
-    var token = 'ABC123ImCorrectToken',
-        badToken = 'XYZ098ImWrong',
-        url = 'admin/get_posts.json?token=',
-        badTokenMsg = 'Invalid auth token.',
-        missingTokenMsg = 'Missing "token" field in request.',
+    var url = 'admin/get_posts.json',
         assignmentApiService, httpBackend;
 
     beforeEach(module('Yellr'));
@@ -62,49 +58,22 @@ describe('Calling Post API', function () {
         httpBackend = $httpBackend;
 
         // Correct request
-        httpBackend.whenGET(url + token)
+        httpBackend.whenGET(url)
             .respond({
                 post_count: 1,
-                posts: {
-                    '1': {}
-                },
+                posts: [
+                    {}
+                ],
                 success: true
             });
 
-        // Incorrect Token
-        httpBackend.whenGET(url + badToken)
-            .respond({
-                error_text: badTokenMsg,
-                success: false
-            });
-
-        httpBackend.whenGET(url)
-            .respond({
-                error_text: missingTokenMsg,
-                success: false
-            });
     }));
 
     it('should return success on normal api call', function () {
-        assignmentApiService.getFeed(token)
+        assignmentApiService.getFeed()
         .then(function (response) {
             expect(response.success).toEqual(true);
         });
     });
 
-    it('should error due to wrong token', function () {
-        assignmentApiService.getFeed(badToken)
-        .then(function (response) {
-            expect(response.success).toEqual(false);
-            expect(response.error_text).toEqual(badTokenMsg);
-        });
-    });
-
-    it('should error due to no token', function () {
-        assignmentApiService.getFeed()
-        .then(function (response) {
-            expect(response.success).toEqual(false);
-            expect(response.error_text).toEqual(missingTokenMsg);
-        });
-    });
 });

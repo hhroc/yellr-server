@@ -16,8 +16,7 @@ angular
          * @param username : plaintext username of current user
          * @param password : plaintext password of current user (is hashed in
          *                   this function)
-         * @return accessToken : http promise of containing token and
-         *                       some metadata
+         * @return DEPRECATED
          */
         userApi.getAccessToken = function (username, password) {
             var hashedPass = CryptoJS.SHA256(password).toString(),
@@ -34,9 +33,34 @@ angular
         };
 
         /**
+         * Logs the user out
+         */
+        userApi.logout = function () {
+            var url = '/admin/logout.json';
+
+            return $http({
+                method: 'POST',
+                url: url
+            });
+        };
+
+        /**
+         * checks if the user is logged in
+         *
+         * @return response - object with "logged_in" as answer
+         */
+        userApi.isLoggedIn = function () {
+            var url = '/admin/check_logged_in.json';
+
+            return $http({
+                method: 'GET',
+                url: url
+            });
+        };
+
+        /**
          * Creates new user
          *
-         * @param accessToken : token needed for all admin functions
          * @param userType : type of user [admin, moderator, etc]
          * @param userName : login id of user
          * @param password : password of user (hashed in this function)
@@ -45,10 +69,9 @@ angular
          * @param email : email of user
          * @param organization : organization user belongs to
          */
-        userApi.createUser = function (accessToken, userType, userName,
-                                      password, firstName, lastName, email,
-                                      organization) {
-            var url = '/admin/create_user.json?token=' + accessToken,
+        userApi.createUser = function (userType, userName, password, firstName,
+                                       lastName, email, organization) {
+            var url = '/admin/create_user.json',
                 params = {
                     user_type: userType,
                     user_name: userName,
@@ -63,45 +86,37 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                params: params
+                data: $(params)
             });
         };
 
         /**
          * Gets all available languages
          *
-         * @param accessToken : token needed for all admin functions
-         *
          * @return languages : list of all languages
          */
-        userApi.getLanguages = function (accessToken) {
+        userApi.getLanguages = function () {
             var url = '/admin/get_languages.json';
 
             return $http({
                 method: 'GET',
-                url: url,
-                params: { token: accessToken }
+                url: url
             });
         };
 
         /**
          * Gets all available question types
          *
-         * @param accessToken : token needed for all admin functions
-         *
          * @return questionTypes : list of all question types
          */
-        userApi.getQuestionTypes = function (accessToken) {
+        userApi.getQuestionTypes = function () {
             var url = '/admin/get_question_types';
 
             return $http({
                 method: 'GET',
-                url: url,
-                params: { token: accessToken }
+                url: url
             });
         };
-
-
 
         return userApi;
     }]);

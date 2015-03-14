@@ -12,7 +12,7 @@ angular
         var postIndex = 0,
             postCount = 50;
 
-        if ($rootScope.user === undefined) {
+        if (!window.loggedIn) {
             $location.path('/login');
             return;
         }
@@ -43,7 +43,7 @@ angular
         };
 
         $scope.loadMore = function () {
-            assignmentApiService.getFeed($scope.user.token, postIndex, postCount)
+            assignmentApiService.getFeed(postIndex, postCount)
             .success(function (data) {
                 $scope.posts = $scope.posts.concat(formatPosts(data.posts));
             });
@@ -56,7 +56,7 @@ angular
          * @return void
          */
         $scope.getCollections = function () {
-            collectionApiService.getAllCollections($scope.user.token)
+            collectionApiService.getAllCollections()
                 .success(function (data) {
 
                 $scope.collections = data.collections;
@@ -69,9 +69,7 @@ angular
          * @return void
          */
         $scope.addPostToCollection = function (post, collection) {
-            collectionApiService.addPost($scope.user.token,
-                                         collection.collection_id,
-                                         post.post_id)
+            collectionApiService.addPost(collection.collection_id, post.post_id)
             .success(function (data) {
                 collection.post_count++;
             });
