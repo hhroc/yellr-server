@@ -150,3 +150,16 @@ if __name__ == '__main__':
     log('Post ID (Text): {0}'.format(post_id_image))
     log('----')
 
+    success, payload = _execute_test(
+        'get_local_posts.json',
+        random_client_id,
+        _language_code,
+        _lat,
+        _lng,
+        {},
+        'GET',
+    )
+    approved_posts = payload['posts']
+    log('Approved Posts: {0}'.format(approved_posts))
+    log('----')
+

@@ -58,23 +58,18 @@ def check_token(request):
 
 def authenticate(username, password):
 
-    if True:
+    user = None
+    token = None
+    fence = None
 
-        user = None
-        token = None
-        fence = None
+    user, org, token = Users.authenticate(DBSession, username, password)
 
-        user, org, token = Users.authenticate(DBSession, username, password)
-
-        if token == None:
-            result['error_text'] = 'Invalid credentials'
-            #raise Exception('invalid credentials')
-        else:
-
-            fence = UserGeoFences.get_fence_from_user_id(
-                session = DBSession,
-                user_id = user.user_id,
-            )
+    # make sure the user is valid, and is so, get their geofence
+    if token != None:
+        fence = UserGeoFences.get_fence_from_user_id(
+            session = DBSession,
+            user_id = user.user_id,
+        )
 
     return user, org, token, fence
 
@@ -136,6 +131,16 @@ def create_user(user_type_id, user_type_name, user_name, password, first_name,\
 
     return new_user
 
+def change_password(username, password):
+
+    user = Users.change_password(
+        session = DBSession,
+        username = username,
+        password = password,
+    )
+
+    return user
+
 def get_languages():
 
     languages = Languages.get_all(
@@ -188,6 +193,15 @@ def get_post(post_id):#, start, count):
 def delete_post(post_id):
 
     post = Posts.delete_post(
+        session = DBSession,
+        post_id = post_id,
+    )
+
+    return post
+
+def approve_post(post_id):
+
+    post = Posts.approve_post(
         session = DBSession,
         post_id = post_id,
     )

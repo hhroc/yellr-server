@@ -126,8 +126,8 @@ def run_tests():
     log("Testing Assignments ...")
 
     _language_code = 'en'
-    _lat = 43.2
-    _lng = -77.5
+    _lat = 43.1
+    _lng = -77.6
 
     success, payload = _execute_test(
         'admin/get_access_token.json',
@@ -440,7 +440,7 @@ def run_tests():
         _lng,
         {
             #'language_code': 'en',
-            #'lat': 43.2,
+            #'lat': 43.1,
             #'lng': -77.5,
         },
         'GET',
@@ -601,7 +601,7 @@ def run_tests():
     log('')
 
     success, payload = _execute_test(
-        'admin/get_user_posts.json',
+        'admin/get_client_posts.json',
         token,
         _language_code,
         _lat,
@@ -943,6 +943,7 @@ def run_tests():
         {
             #'cuid': cuid_a,
             'media_type': 'image',
+            'media_caption': 'I like our little city :).',
         },
         'POST',
         files={'media_file': open('./test_media/roc.jpg','rb')},
@@ -961,7 +962,7 @@ def run_tests():
         _lng,
         {
             #'cuid': cuid_a,
-            'assignment_id': '0',
+            'assignment_id': assignment_id,
             #'title': '',
             #'language_code': 'en',
             #'lat': 43.1,
@@ -1257,6 +1258,110 @@ def run_tests():
     log('')
     log('')
 
+    new_password_2 = hashlib.sha256('password123').hexdigest()
+
+    success, payload = _execute_test(
+        'admin/change_password.json',
+        new_user_token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'username': new_username,
+            'password': new_password_2,
+        },
+        'POST',
+    )
+    #new_user_token_2 = payload['token']
+    #log('Got New User Token: {0}'.format(new_user_token))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/get_access_token.json',
+        None,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'username': new_username,
+            'password': new_password_2
+        },
+        'POST',
+    )
+    new_user_token_2 = payload['token']
+    log('Got New User Token: {0}'.format(new_user_token))
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/check_logged_in.json',
+        new_user_token_2,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # does not take any params
+        },
+        'GET',
+    )
+    log('----')
+    log('')
+    log('')
+
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': post_id_a,
+        },
+        'POST',
+    )
+    log('----')
+
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': post_id_b,
+        },
+        'POST',
+    )
+    log('----')
+
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': image_1_post_id,
+        },
+        'POST',
+    )
+    log('----')
+
+    success, payload = _execute_test(
+        'admin/approve_post.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': text_post_id,
+        },
+        'POST',
+    )
+    log('----')
 
     log("Done with Tests")
     log("")
