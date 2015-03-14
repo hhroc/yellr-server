@@ -184,5 +184,23 @@ angular
             });
         };
 
+        /**
+         * Approves the post of a given id
+         *
+         * @param id : the id of the post to approve
+         *
+         * @return void
+         */
+        assignmentApi.approvePost = function (id) {
+            var url = '/admin/approve_post.json',
+                data = { post_id: id };
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param(data)
+            });
+        };
+
         return assignmentApi;
     }]);
