@@ -30,6 +30,7 @@ from ..models import (
     QuestionAssignments,
     QuestionTypes,
     Subscribers,
+    Organizations,
     Zipcodes,
     )
 
@@ -169,6 +170,14 @@ def main(argv=sys.argv):
             bottom_right_lng = -180.0,
         )
 
+        yellr_organization = Organizations.add_organization(
+            session = DBSession,
+            name = "Yellr",
+            description = "",
+            contact_name = "",
+            contact_email = "",
+        )
+
         # create the system user
         system_user = Users.create_new_user(
             session = DBSession,
@@ -182,7 +191,8 @@ def main(argv=sys.argv):
             first_name = 'SYSTEM',
             last_name = 'USER',
             email = '',
-            organization = 'Yellr',
+            organization_id = yellr_organization.organization_id,
+            #organization = 'Yellr',
             #pass_salt = '',
             #pass_hash = 'hash', # NOTE: will never be the result of a md5 hash
         )
@@ -220,7 +230,7 @@ def main(argv=sys.argv):
             )
 
         #transaction.commit()
-
+    '''
     if Zipcodes.get_count(DBSession) == 0:
 
         with open("zipcodes/zipcode.csv", "r") as f:
@@ -242,6 +252,7 @@ def main(argv=sys.argv):
                     timezone = values[5],
                 )
             index += 1
+    '''
 
     #subscriber = Subscribers.add_subscriber(
     #    session = DBSession,

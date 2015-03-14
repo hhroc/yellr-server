@@ -71,11 +71,17 @@ def main(global_config, **settings):
     config.add_route('admin/remove_post_from_collection.json', 'admin/remove_post_from_collection.json')
     config.add_route('admin/disable_collection.json', 'admin/disable_collection.json')
     config.add_route('admin/get_collection_posts.json', 'admin/get_collection_posts.json')
-    config.add_route('admin/get_user_posts.json','admin/get_user_posts.json')
+    config.add_route('admin/get_client_posts.json','admin/get_client_posts.json')
     config.add_route('admin/get_subscriber_list.json','admin/get_subscriber_list.json')
     config.add_route('admin/create_user.json','admin/create_user.json')
     config.add_route('admin/get_post.json', 'admin/get_post.json')
     config.add_route('admin/delete_post.json', 'admin/delete_post.json')
+    config.add_route('admin/get_organizations.json', 'admin/get_organizations.json')
+    config.add_route('admin/add_organization.json', 'admin/add_organization.json')
+    config.add_route('admin/check_logged_in.json', 'admin/check_logged_in.json')
+    config.add_route('admin/logout.json', 'admin/logout.json')
+    config.add_route('admin/change_password.json', 'admin/change_password.json')
+    config.add_route('admin/approve_post.json','admin/approve_post.json')
 
     # client views
     #config.add_route('server_info.json','server_info.json')
@@ -95,7 +101,8 @@ def main(global_config, **settings):
     config.add_route('upload_test.json','upload_test.json')
     config.add_route('publish_post.json','publish_post.json')
     config.add_route('get_profile.json', 'get_profile.json')
-    config.add_route('verify_client.json', 'verify_client.json')
+    #config.add_route('verify_client.json', 'verify_client.json')
+    config.add_route('get_local_posts.json', 'get_local_posts.json')
 
     config.scan()
     return config.make_wsgi_app()

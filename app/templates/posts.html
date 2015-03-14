@@ -18,7 +18,7 @@
                     <p class="post-assignment-name" ng-if="!post.assignment_name">Free Post</p>
                     <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>
                     <button class="delete-post"><i class="fa fa-trash"></i></button>
-                    <button class="add-post" dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
+                    <button  ng-if="!collectionPage"class="add-post" dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
                     <ul id="drop-{{post.post_id}}" class="f-dropdown add-post-dropdown">
                         <li ng-repeat="collection in collections" ng-click="addPostToCollection(post, collection)">{{collection.name}}</li>
                     </ul>
