@@ -198,7 +198,8 @@ def publish_post(request):
 
         try:
             assignment_id = 0
-            if 'assignment_id' in request.POST:
+            if 'assignment_id' in request.POST and \
+                    request.POST['assignment_id'] != '':
                 assignment_id = int(float(str(request.POST['assignment_id'])))
         except:
             status_code = 403
