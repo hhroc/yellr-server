@@ -42,14 +42,27 @@ angular
             });
         };
 
+        /**
+         * Loads more posts
+         *
+         * @return void
+         */
         $scope.loadMore = function () {
             assignmentApiService.getFeed($scope.user.token, postIndex, postCount)
             .success(function (data) {
+                console.log(data);
                 $scope.posts = $scope.posts.concat(formatPosts(data.posts));
             });
             postIndex += postCount;
         };
 
+        $scope.approvePost = function (post) {
+            assignmentApiService.approvePost(post.post_id)
+            .success(function (data) {
+                post.approved = true;
+                console.log('post approved?', data);
+            });
+        };
         /**
          * Gets all current collections
          *

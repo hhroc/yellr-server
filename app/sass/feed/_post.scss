@@ -68,6 +68,27 @@
             margin: 0;
         }
 
+        .approve-post {
+            @extend .post-button;
+
+            float: right !important;
+            margin-top: 2px;
+
+            &:hover {
+                background-color: lighten($primary, 20);
+                border-color: $primary;
+                cursor: pointer;
+                color: $background;
+            }
+        }
+
+        .approve-post-active {
+            background-color: lighten($primary, 20);
+            border-color: $primary;
+            cursor: pointer;
+            color: $background;
+        }
+
         .add-post {
             @extend .post-button;
 
@@ -97,6 +118,7 @@
 
             float: right;
             margin-top: 2px;
+            margin-right: 5px;
 
             &:hover {
                 background-color: lighten($warn, 20);
