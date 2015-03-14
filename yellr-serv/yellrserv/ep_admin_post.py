@@ -21,9 +21,18 @@ def admin_get_posts(request):
 
         count = 50
         try:
-            count = int(request.GET['count'])
+            start = 0
+            if 'start' in request.GET:
+                start = int(request.GET['start'])
+            count = 50
+            if 'count' in request.GET:
+                count = int(request.GET['count'])
+            deleted = False
+            if 'deleted' in request.GET:
+                deleted = bool(int(request.GET['deleted']))
         except:
-            pass
+            status_code = 403
+            raise Exception('Invalid Input')
 
         deleted = False
         try:

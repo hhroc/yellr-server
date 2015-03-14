@@ -27,15 +27,16 @@ def get_local_posts(request):
         if success == False:
             raise Exception(error_text)
 
-        start = 0
-        count = 50
         try:
-            if 'start' in reqeusts.GET:
+            start = 0
+            if 'start' in request.GET:
                 start = int(float(request.GET['start']))
+            count = 50
             if 'count' in request.GET:
                 count = int(float(request.GET['count']))
         except:
-            pass
+            status_code = 403
+            raise Exception("Invalid input.")
 
         posts = client_utils.get_approved_posts(
             client_id = client.client_id,
@@ -195,12 +196,13 @@ def publish_post(request):
         if success == False:
             raise Exception(error_text)
 
-        assignment_id = 0
         try:
+            assignment_id = 0
             if 'assignment_id' in request.POST:
                 assignment_id = int(float(str(request.POST['assignment_id'])))
         except:
-            pass
+            status_code = 403
+            raise Exception("Invalid input.")
 
         media_obects = []
         try:

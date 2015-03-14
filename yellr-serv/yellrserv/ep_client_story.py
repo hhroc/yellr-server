@@ -15,11 +15,11 @@ def get_stories(request):
         if success == False:
             raise Exception(error_text)
 
-        start = 0
-        count = 25
         try:
-            if 'start' in reqeusts.GET:
+            start = 0
+            if 'start' in request.GET:
                 start = int(float(request.GET['start']))
+            count = 25
             if 'count' in request.GET:
                 count = int(float(request.GET['count']))
                 if count > 25:
@@ -27,7 +27,8 @@ def get_stories(request):
                     # reduce load on the server
                     count = 25
         except:
-            pass
+           status_code = 403
+           raise Exception("Invalid input.") 
 
         stories = client_utils.get_stories(
             language_code = language_code,

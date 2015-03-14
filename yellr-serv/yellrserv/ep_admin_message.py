@@ -22,11 +22,13 @@ def admin_create_message(request):
         except:
             raise Exception('Missing or invalid fields.')
 
-        parent_message_id = None
         try:
-            parent_message_id = request.POST['parent_message_id']
+            parent_message_id = None
+            if 'parent_message_id' in request.POST:
+                parent_message_id = request.POST['parent_message_id']
         except:
-            pass
+            status_code = 403
+            raise Exception("Invalid Input.") 
 
         message = Messages.create_message_from_http(
             session = DBSession,
@@ -45,5 +47,4 @@ def admin_create_message(request):
         result['error_text'] = str(e)
 
     return utils.make_response(result)
-
 

@@ -148,11 +148,13 @@ def admin_publish_assignment(request):
             name = request.POST['name']
             life_time = 0
             try:
-                life_time = int(float(request.POST['life_time']))
+                life_time = 0
+                if 'life_time' in request.POST:
+                    life_time = int(float(request.POST['life_time']))
+                    if life_time == 0:
+                        life_time = 168 # set to 1 week if blank or missing
             except:
-                pass
-            if life_time == 0:
-                life_time = 168 # set to 1 week if blank
+                raise Exception("Invalid input.")
             questions = json.loads(request.POST['questions'])
             top_left_lat = float(request.POST['top_left_lat'])
             top_left_lng = float(request.POST['top_left_lng'])
@@ -195,12 +197,14 @@ def admin_update_assignment(request):
             assignment_id = request.POST['assignment_id']
             #client_id = request.POST['client_id']
             name = request.POST['name']
-            life_time = 0
             try:
-                life_time = int(float(request.POST['life_time']))
+                life_time = 0
+                if 'life_time' in request.POST:
+                    life_time = int(float(request.POST['life_time']))
+                    if life_time == 0:
+                        life_time = 168 # set to 1 week if blank or missing
             except:
-                life_time = 24*7
-
+                raise Exception("Invalid input.")
             #questions = json.loads(request.POST['questions'])
             top_left_lat = float(request.POST['top_left_lat'])
             top_left_lng = float(request.POST['top_left_lng'])
@@ -234,23 +238,23 @@ def admin_update_assignment(request):
 def admin_get_my_assignments(request):
 
     result = {'success': False}
+    status_code = 200
 
     try:
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
 
-        start=0
         try:
-            start = int(request.GET['start'])
+            start = 0
+            if 'start' in request.GET:
+                stat = int(request.get['start'])
+            count = 50
+            if 'count' in request.GET:
+                count = int(request.GET['count'])
         except:
-            pass
-
-        count=50
-        try:
-            count = int(request.GET['count'])
-        except:
-            pass
+            status_code = 403
+            raise Exception("invalid input")
 
         ret_assignments = admin_utils.get_assignments(start, count)
 
@@ -258,9 +262,10 @@ def admin_get_my_assignments(request):
         result['success'] = True
 
     except Exception, e:
+        status_code = 400
         result['error_text'] = str(e)
 
-    return utils.make_response(result)
+    return utils.make_response(result, status_code)
 
 @view_config(route_name='admin/get_assignment_responses.json')
 def admin_get_assignment_responses(request):

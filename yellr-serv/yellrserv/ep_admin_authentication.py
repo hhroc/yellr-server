@@ -72,6 +72,7 @@ def admin_check_loged_in(request):
 def admin_logout(request):
 
     result = {'success': False}
+    status_code = 200
 
     try:
         token = None
@@ -81,7 +82,7 @@ def admin_logout(request):
             try:
                 token = request.session['token']
             except:
-                pass
+                raise Exception("Missing token.")
 
         if token != None:
             Users.invalidate_token(
@@ -94,7 +95,8 @@ def admin_logout(request):
         result['success'] = True
 
     except Exception, e:
+        status_code = 400
         result['error_text'] = str(e)
 
-    return utils.make_response(result)
+    return utils.make_response(result, status_code)
 
