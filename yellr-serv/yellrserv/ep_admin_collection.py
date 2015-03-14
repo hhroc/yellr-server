@@ -9,14 +9,11 @@ def admin_create_collection(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
 
         try:
-        #if True:
             name = request.POST['name']
             description = request.POST['description']
             tags = request.POST['tags']
@@ -44,8 +41,6 @@ def admin_disable_collection(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -75,8 +70,6 @@ def admin_add_post_to_collection(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -108,8 +101,6 @@ def admin_remove_post_from_collection(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -141,10 +132,9 @@ def admin_remove_post_from_collection(request):
 def admin_get_collection_posts(request):
 
     result = {'success': False}
+    status_code = 200
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -154,17 +144,16 @@ def admin_get_collection_posts(request):
         except:
             raise Exception('Missing of invalid field.')
 
-        start=0
         try:
-            start = int(request.GET['start'])
+            start = 0
+            if 'start' in request.GET:
+                start = int(request.GET['start'])
+            count = 50
+            if 'count' in request.GET:
+                count = int(request.GET['count'])
         except:
-            pass
-
-        count=50
-        try:
-            count = int(request.GET['count'])
-        except:
-            pass
+            status_code = 403
+            raise Exception('Invalid input.')
 
         ret_posts = admin_utils.get_collection_posts(
             collection_id = collection_id,
@@ -176,9 +165,10 @@ def admin_get_collection_posts(request):
         result['success'] = True
 
     except Exception, e:
+        status_code = 400
         result['error_text'] = str(e)
 
-    return utils.make_response(result)
+    return utils.make_response(result, status_code)
 
 @view_config(route_name='admin/get_my_collections.json')
 def admin_get_my_collection(request):
@@ -186,8 +176,6 @@ def admin_get_my_collection(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")

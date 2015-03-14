@@ -9,8 +9,6 @@ def admin_create_collection(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
@@ -45,12 +43,9 @@ def admin_get_organizations(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
-            result['error_text'] = "Missing or invalid 'token' field in request."
-            raise Exception('invalid/missing token')
+            raise Exception("Invalid authorization or bad credentials.")
 
         ret_organizations = admin_utils.get_organizations()
 
@@ -68,16 +63,13 @@ def admin_create_user(request):
     result = {'success': False}
 
     try:
-    #if True:
-
         valid, user = admin_utils.check_token(request)
         if valid == False:
             raise Exception("Invalid authorization or bad credentials.")
 
         try:
-        #if True:
             user_type_name = request.POST['user_type']
-            user_name = request.POST['username']
+            username = request.POST['username']
             password = request.POST['password']
             first_name = request.POST['first_name']
             last_name = request.POST['last_name']
@@ -93,7 +85,7 @@ def admin_create_user(request):
         new_user = admin_utils.create_user(
              user_type_id = user.user_type_id,
              user_type_name = user_type_name,
-             user_name = user_name,
+             user_name = username,
              password = password,
              first_name = first_name,
              last_name = last_name,
@@ -113,4 +105,32 @@ def admin_create_user(request):
 
     return utils.make_response(result)
 
+@view_config(route_name='admin/change_password.json')
+def admin_change_password(request):
+
+    result = {'success': False}
+
+    try:
+        valid, user = admin_utils.check_token(request)
+        if valid == False:
+            raise Exception("Invalid authorization or bad credentials.")
+
+        try:
+            username = request.POST['username']
+            password = request.POST['password']
+        except:
+            raise Exception("Missing or invalid field.")
+
+        user = admin_utils.change_password(
+            username = username,
+            password = password,
+        )
+
+        result['user_id'] = user.user_id
+        result['success'] = True
+
+    except Exception, e:
+        result['error_text'] = str(e)
+
+    return utils.make_response(result)
 

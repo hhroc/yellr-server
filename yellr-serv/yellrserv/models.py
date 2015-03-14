@@ -17,6 +17,7 @@ from sqlalchemy import (
     Integer,
     Text,
     DateTime,
+    Date,
     Boolean,
     Float,
     CHAR,
@@ -31,6 +32,9 @@ from sqlalchemy import (
     func,
     text,
     distinct,
+    cast,
+    or_,
+    and_,
 )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -269,6 +273,25 @@ class Users(Base):
                 user.token = ""
                 session.add(user)
                 transaction.commit()
+        return user
+
+    @classmethod
+    def change_password(cls, session, username, password):
+        with transaction.manager:
+            user = session.query(
+                Users,
+            ).filter(
+                Users.user_name == username,
+            ).first()
+            pass_salt=str(uuid.uuid4())
+            pass_hash = hashlib.sha256('{0}{1}'.format(
+                password,
+                pass_salt
+            )).hexdigest()
+            user.pass_salt = pass_salt
+            user.pass_hash = pass_hash
+            session.add(user)
+            transaction.commit()
         return user
 
 class UserGeoFences(Base):
@@ -631,7 +654,7 @@ class Assignments(Base):
                 Assignments.bottom_right_lat + 90 < lat + 90,
                 Assignments.bottom_right_lng + 180 > lng + 180,
                 Languages.language_code == language_code,
-                Assignments.expire_datetime >= datetime.datetime.now(),
+                cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
             ).all() #.slice(start, start+count).all()
         return assignments
 
@@ -915,12 +938,14 @@ class Posts(Base):
     deleted = Column(Boolean)
     lat = Column(Float)
     lng = Column(Float)
+    approved = Column(Boolean)
 
     @classmethod
     def create_from_http(cls, session, client_id, assignment_id, #title, 
             language_code, lat, lng, media_objects=[]):
         # create post
         with transaction.manager:
+            # todo: error check this
             language = Languages.get_from_code(
                 session = session,
                 language_code = language_code
@@ -938,6 +963,7 @@ class Posts(Base):
                 deleted = False,
                 lat = lat,
                 lng = lng,
+                approved = False,
             )
             session.add(post)
             transaction.commit()
@@ -970,6 +996,7 @@ class Posts(Base):
                 Posts.deleted,
                 Posts.lat,
                 Posts.lng,
+                Posts.approved,
                 MediaObjects.media_object_id,
                 MediaObjects.media_id,
                 MediaObjects.file_name,
@@ -978,11 +1005,14 @@ class Posts(Base):
                 MediaTypes.name,
                 MediaTypes.description,
                 Clients.verified,
+                Clients.first_name,
+                Clients.last_name,
                 Clients.cuid,
                 Languages.language_code,
                 Languages.name,
                 Assignments.assignment_id,
                 Assignments.name,
+                Questions.question_text,
             ).join(
                 PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
             ).join(
@@ -996,6 +1026,12 @@ class Posts(Base):
             ).outerjoin(
                 Assignments, Assignments.assignment_id == \
                     Posts.assignment_id,
+            ).outerjoin(
+                QuestionAssignments, QuestionAssignments.assignment_id == \
+                    Assignments.assignment_id,
+            ).outerjoin(
+                Questions, Questions.question_id == \
+                    QuestionAssignments.question_id,
             ).outerjoin(
                 CollectionPosts, CollectionPosts.post_id == \
                     Posts.post_id,
@@ -1082,6 +1118,42 @@ class Posts(Base):
             session.add(post)
             transaction.commit()
         return post
+
+    @classmethod
+    def approve_post(cls, session, post_id):
+        with transaction.manager:
+            post = session.query(
+                Posts,
+            ).filter(
+                Posts.post_id == post_id,
+            ).first()
+            post.approved = True
+            session.add(post)
+            transaction.commit()
+        return post
+
+
+    @classmethod
+    def get_all_approved_from_location(cls, session, language_code, lat, lng,
+            start=0, count=0):
+        with transaction.manager:
+            posts = Posts._build_posts_query(session).filter(
+                Posts.approved == True,
+            ).filter(                
+                ((Assignments.top_left_lat + 90 > lat + 90) &
+                    (Assignments.top_left_lng + 180 < lng + 180) &
+                    (Assignments.bottom_right_lat + 90 < lat + 90) &
+                    (Assignments.bottom_right_lng + 180 > lng + 180)) |
+                (((lat + 1) + 90 > Posts.lat + 90) & 
+                    ((lng + 1) + 180 > Posts.lng + 180) &
+                    ((lat - 1) + 90 < Posts.lat + 90) &
+                    ((lng - 1) + 180 < Posts.lng + 180))
+            ).filter(
+                Languages.language_code == language_code,
+                #cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
+            ).slice(start, start+count).all()
+        return posts
+ 
 
 # Posts indexes ... these will be important to implement soon
 
