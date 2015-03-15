@@ -88,11 +88,7 @@ def admin_logout(request):
             admin_utils.logout(
                 token,
             )
-            #Users.invalidate_token(
-            #    session = DBSession,
-            #    token = token,
-            #)
-
+        
             request.session['token'] = ""
 
         result['success'] = True
