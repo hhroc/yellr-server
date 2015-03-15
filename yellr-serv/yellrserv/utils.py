@@ -165,7 +165,8 @@ def _decode_posts(posts, clean=False):
                 file_name, caption, media_text, media_type_name, \
                 media_type_description, verified, first_name, last_name, \
                 cuid, language_code, language_name, assignment_id, \
-                assignment_name, question_text in posts:
+                assignment_name, question_text, up_vote_count, \
+                down_vote_count in posts:
 
             if (post_id not in seen_post_ids) or (index == len(posts)-1):
 
@@ -182,6 +183,8 @@ def _decode_posts(posts, clean=False):
                     'language_code': language_code,
                     'language_name': language_name,
                     'question_text': question_text,
+                    'up_vote_count': up_vote_count,
+                    'down_vote_count': down_vote_count,
                     'media_objects': []
                 }
 

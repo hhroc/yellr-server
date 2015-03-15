@@ -26,6 +26,7 @@ from .models import (
     #QuestionAssignments,
     #Languages,
     Posts,
+    Votes,
     #MediaTypes,
     MediaObjects,
     #PostMediaObjects,
@@ -262,6 +263,17 @@ def get_approved_posts(client_id, language_code, lat, lng, start, count):
 
     return utils._decode_posts(posts, clean=True)
 
+def register_vote(post_id, client_id, is_up_vote):
+
+    vote = Votes.register_vote(
+        session = DBSession,
+        post_id = post_id,
+        client_id = client_id,
+        is_up_vote = is_up_vote,
+    )
+
+    return vote
+
 def save_input_file(input_file):
 
     # generate a unique file name to store the file to
@@ -412,7 +424,14 @@ def add_post(client_id, assignment_id, language_code, lat, lng, media_objects):
         media_objects = media_objects, # array
     )
 
-    return post
+    # register initial upvote from client
+    vote = register_vote(
+        post_id = post.post_id,
+        client_id = client_id,
+        is_up_vote = True
+    )
+
+    return post, vote
 
 def get_profile(client_id):
 
