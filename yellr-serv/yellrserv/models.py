@@ -200,6 +200,8 @@ class Users(Base):
                 Users,
             ).filter(
                 Users.token == token,
+                Users.token != None,
+                Users.token != "",
             ).first()
         return user
 
@@ -245,7 +247,6 @@ class Users(Base):
             token = None
             if user != None:
                 pass_hash = hashlib.sha256('{0}{1}'.format(password, user.pass_salt)).hexdigest()
-                print "pass_hash: %s" % pass_hash
                 if ( user.pass_hash == pass_hash ):
                     token = str(uuid.uuid4())
                     user.token = token
@@ -270,7 +271,7 @@ class Users(Base):
         with transaction.manager:
             user = Users.get_from_token(session, token)
             if user != None:
-                user.token = ""
+                user.token = None
                 session.add(user)
                 transaction.commit()
         return user
@@ -917,6 +918,7 @@ class Languages(Base):
             session.add(language)
             transaction.commit()
         return language
+
 
 class Posts(Base):
 
