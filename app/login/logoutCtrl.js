@@ -8,6 +8,10 @@ angular
         // Make logout call
         userApiService.logout()
         .success(function (data) {
+            window.loggedIn = false;
             $location.path('/login');
+        })
+        .error(function (data) {
+            console.log(data);
         });
     }]);
