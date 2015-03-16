@@ -12,7 +12,7 @@ from .models import (
     DBSession,
     UserTypes,
     Users,
-    #Clients,
+    Clients,
     Assignments,
     Questions,
     QuestionAssignments,
@@ -214,6 +214,34 @@ def approve_post(post_id):
     )
 
     return post
+
+def register_post_view(organization_id, post_id):
+
+    post = Posts.get_from_post_id(
+        session = DBSession,
+        post_id = post_id,
+    )
+
+    client = Clients.increment_view_count(
+        session = DBSession,
+        client_id = post.client_id,
+    )
+
+    organization = Organizations.get_from_id(
+        session = DBSession,
+        organization_id = organization_id,
+    )
+
+    notification = Notifications.create_notification(
+        session = DBSession,
+        client_id = post.client_id,
+        notification_type = 'post_viewed',
+        payload = json.dumps({
+            'organization': organization.name,
+        })
+    )
+
+    return post, client, notification
 
 def get_response_posts(assignment_id, start, count, deleted):
 

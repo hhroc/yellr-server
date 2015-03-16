@@ -167,3 +167,35 @@ def admin_approve_post(request):
 
     return utils.make_response(result)
 
+@view_config(route_name='admin/register_post_view.json')
+def admin_register_post_view(request):
+
+    result = {'success': False}
+
+    try:
+    #if True:
+
+        valid, user = admin_utils.check_token(request)
+        if valid == False:
+            raise Exception("Invalid authorization or bad credentials.")
+
+        try:
+            post_id = request.POST['post_id']
+        except:
+            raise Exception('Missing or invalid field.')
+
+        post, client, notification = admin_utils.register_post_view(
+            organization_id = user.organization_id,
+            post_id = post_id,
+        )
+
+        result['post_id'] = post.post_id
+        result['client_id'] = client.client_id
+        result['notification_id'] = notification.notification_id
+        result['success'] = True
+
+    except Exception, e:
+        result['error_text'] = str(e)
+
+    return utils.make_response(result)
+
