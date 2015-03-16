@@ -66,6 +66,61 @@ def get_local_posts(request):
 
     return utils.make_response(result, status_code)
 
+@view_config(route_name='register_vote.json')
+def register_vote(request):
+
+    result = {'success': False}
+    status_code = 200
+
+    try:
+        success, error_text, language_code, lat, lng, \
+            client = client_utils.register_client(request)
+        if success == False:
+            raise Exception(error_text)
+
+        try:
+            post_id = int(request.POST['post_id'])
+            if post_id < 1:
+                raise Exception('Invalid input')
+            _is_up_vote = int(request.POST['is_up_vote'])
+            if _is_up_vote == 1:
+                is_up_vote = True
+            elif _is_up_vote == 0:
+                is_up_vote = False
+            else:
+                raise Exception('Invalid input.')
+        except:
+            status_code = 403
+            raise Exception("Missing or Invalid input.")
+
+        vote = client_utils.register_vote(
+            post_id = post_id,
+            client_id = client.client_id,
+            is_up_vote = is_up_vote,
+        )
+
+        result['vote_id'] = vote.vote_id
+        result['post_id'] = vote.post_id
+        result['is_up_vote'] = vote.is_up_vote
+        result['success'] = True
+
+    except Exception, e:
+        status_code = 400
+        result['error_text'] = str(e)
+
+    client_utils.log_client_action(
+        client = client,
+        url = 'register_vote.json',
+        lat = lat,
+        lng = lng,
+        request = request,
+        result = result,
+        success = success,
+    )
+
+    return utils.make_response(result, status_code)
+
+
 @view_config(route_name='upload_media.json')
 def upload_media(request):
 
@@ -213,7 +268,7 @@ def publish_post(request):
         except:
             raise Exception("Missing or invalid MediaObjects JSON list.")
 
-        post = client_utils.add_post(
+        post, vote = client_utils.add_post(
             client_id = client.client_id,
             assignment_id = assignment_id,
             language_code = language_code,
@@ -224,6 +279,7 @@ def publish_post(request):
 
         result['success'] = True
         result['post_id'] = post.post_id
+        result['vote_id'] = vote.vote_id
 
     except Exception, e:
        status_code = 400
@@ -240,4 +296,5 @@ def publish_post(request):
     )
 
     return utils.make_response(result, status_code)
+
 

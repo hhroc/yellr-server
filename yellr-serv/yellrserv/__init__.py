@@ -103,6 +103,7 @@ def main(global_config, **settings):
     config.add_route('get_profile.json', 'get_profile.json')
     #config.add_route('verify_client.json', 'verify_client.json')
     config.add_route('get_local_posts.json', 'get_local_posts.json')
+    config.add_route('register_vote.json', 'register_vote.json')
 
     config.scan()
     return config.make_wsgi_app()
