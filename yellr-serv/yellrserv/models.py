@@ -468,12 +468,12 @@ class Clients(Base):
         return client
 
     @classmethod
-    def increment_view_count(cls, session, cuid):
+    def increment_view_count(cls, session, client_id):
         with transaction.manager:
             client = session.query(
                 Clients,
             ).filter(
-                Clients.cuid == cuid,
+                Clients.client_id == client_id,
             ).first()
             client.post_view_count += 1
             session.add(client)
@@ -990,7 +990,7 @@ class Posts(Base):
     def _build_posts_query(cls, session):
         if True:
             posts_query = session.query(
-                Posts.post_id,
+                Posts.post_id.label('posts_post_id'),
                 #Posts.assignment_id,
                 Posts.client_id,
                 #Posts.title,
@@ -1015,6 +1015,18 @@ class Posts(Base):
                 Assignments.assignment_id,
                 Assignments.name,
                 Questions.question_text,
+                session.query(
+                    func.count(distinct(Votes.vote_id)).label('up_count'),
+                ).filter(
+                    Votes.post_id == Posts.post_id,
+                    Votes.is_up_vote == True,
+                ).label('up_vote_count'),
+                session.query(
+                    func.count(distinct(Votes.vote_id)).label('down_count'),
+                ).filter(
+                    Votes.post_id == Posts.post_id,
+                    Votes.is_up_vote == False,
+                ).label('down_vote_count'),
             ).join(
                 PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
             ).join(
@@ -1162,6 +1174,50 @@ class Posts(Base):
 #Index('index_posts_post_id', Posts.post_id, unique=True)
 #Index('index_posts_post_datetime', Posts.creation_datetime)
 #Index('index_posts_client_id', Posts.client_id)
+
+class Votes(Base):
+
+    __tablename__ = 'votes'
+    vote_id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.post_id'))
+    client_id = Column(Integer, ForeignKey('clients.client_id'))
+    is_up_vote = Column(Boolean)
+    vote_datetime = Column(DateTime)
+
+    @classmethod
+    def register_vote(cls, session, post_id, client_id, is_up_vote):
+        with transaction.manager:
+            _vote = session.query(
+                Votes,
+            ).filter(
+                Votes.post_id == post_id,
+                Votes.client_id == client_id,
+            ).first()
+            vote = None
+            # if the client has not voted, register vote.
+            if _vote == None:
+                vote = Votes(
+                    post_id = post_id,
+                    client_id = client_id,
+                    is_up_vote = is_up_vote,
+                    vote_datetime = datetime.datetime.now(),
+                )
+                session.add(vote)
+                transaction.commit()
+            # if the client has voted, but wants to remove it
+            # (sending the vote a second time), then delete it
+            elif _vote.is_up_vote == is_up_vote:
+                session.delete(_vote)
+                transaction.commit()
+                vote = _vote
+            # the client has already voted, but wants to change
+            # their vote.
+            elif _vote.is_up_vote != is_up_vote:
+                _vote.is_up_vote = is_up_vote
+                session.add(_vote)
+                transaction.commit()
+                vote = _vote
+        return vote
 
 class MediaTypes(Base):
 
@@ -1624,10 +1680,10 @@ class Notifications(Base):
         return notifications #, created
 
     @classmethod
-    def create_notification(cls, session, user_id, notification_type, payload):
+    def create_notification(cls, session, client_id, notification_type, payload):
         with transaction.manager:
             notification = cls(
-                user_id = user_id,
+                client_id = client_id,
                 notification_datetime = datetime.datetime.now(),
                 notification_type = notification_type,
                 payload = payload,
