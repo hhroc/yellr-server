@@ -8,16 +8,15 @@ angular
         /**
          * Gets all posts submitted to a feed
          *
-         * @param accessToken : token needed for all admin functions
          * @param start : (optional) Starting index for results
          * @param count : (optional) Number of results to return.
          * @param reported : (optional) boolean value for including reported
          *                   posts
          * @return posts : http promise containing all posts
          */
-        assignmentApi.getFeed = function (accessToken, start, count, reported) {
+        assignmentApi.getFeed = function (start, count, reported) {
             var url = '/admin/get_posts.json',
-                params = { token: accessToken };
+                params = {};
 
             if (start !== undefined) params.start = start;
             if (count !== undefined) params.count = count;
@@ -33,15 +32,13 @@ angular
         /**
          * Gets the contents of a specific post
          *
-         * @param accessToken : token needed for all admin functions
          * @param id : id of post to get
          *
          * @return post : js object with post data
          */
-        assignmentApi.getPost = function (accessToken, id) {
+        assignmentApi.getPost = function (id) {
             var url = '/admin/get_post.json',
                 params = {
-                    token: accessToken,
                     post_id: id
                 };
 
@@ -55,24 +52,20 @@ angular
         /**
          * Gets all assignments
          *
-         * @param accessToken : token needed for all admin functions
-         *
          * @return response : response with list of assignments and questions
          */
-        assignmentApi.getAssignments = function (accessToken) {
+        assignmentApi.getAssignments = function () {
             var url = '/admin/get_assignments.json';
 
             return $http({
                 method: 'GET',
-                url: url,
-                params: { token: accessToken }
+                url: url
             });
         };
 
         /**
          * Creates new question
          *
-         * @param accessToken : token needed for all admin functions
          * @param languageCode : 2 letter language code (en, es, etc)
          * @param questionText : Text of question users will see
          * @param description : Addition info on question
@@ -83,7 +76,7 @@ angular
         assignmentApi.createQuestion = function (accessToken, languageCode,
                                            questionText, description,
                                            questionType, answers) {
-            var url = '/admin/create_question.json?token=' + accessToken,
+            var url = '/admin/create_question.json',
                 data = {
                     language_code: languageCode,
                     question_text: questionText,
@@ -103,7 +96,6 @@ angular
         /**
          * Publishes assignment to all users within given GeoBox
          *
-         * @param accessToken : token need for all admin functions
          * @param lifeTime : time that assignment will last (hours)
          * @param questions : json array of question ids
          * @param topLeftLat : top left latitude of geobox
@@ -114,11 +106,11 @@ angular
          * @return response : either error or sucess response with assignment
          *                    id
          */
-        assignmentApi.publishAssignment = function (accessToken, name, lifeTime,
+        assignmentApi.publishAssignment = function (name, lifeTime,
                                                questions, topLeftLat, topLeftLng,
                                                bottomRightLat, bottomRightLng) {
 
-            var url = '/admin/publish_assignment.json?token=' + accessToken,
+            var url = '/admin/publish_assignment.json',
                 data = {
                     name: name,
                     life_time: lifeTime,
@@ -128,7 +120,6 @@ angular
                     bottom_right_lat: bottomRightLat,
                     bottom_right_lng: bottomRightLng
                 };
-
 
             return $http({
                 method: 'POST',
@@ -140,7 +131,6 @@ angular
         /**
          * Updates assignment to all users within given GeoBox
          *
-         * @param accessToken : token need for all admin functions
          * @param lifeTime : time that assignment will last (hours)
          * @param topLeftLat : top left latitude of geobox
          * @param topLeftLng : top left longitude of geobox
@@ -150,11 +140,11 @@ angular
          * @return response : either error or success response with assignment
          *                    id
          */
-        assignmentApi.updateAssignment = function (accessToken, lifeTime, topLeftLat,
+        assignmentApi.updateAssignment = function (lifeTime, topLeftLat,
                                               topLeftLng, bottomRightLat,
                                               bottomRightLng) {
 
-            var url = '/admin/update_assignment.json?token=' + accessToken,
+            var url = '/admin/update_assignment.json',
                 params = {
                     life_time: lifeTime,
                     top_left_lat: topLeftLat,
@@ -162,7 +152,6 @@ angular
                     bottom_right_lat: bottomRightLat,
                     bottom_right_lng: bottomRightLng
                 };
-
 
             return $http({
                 method: 'POST',
@@ -174,17 +163,15 @@ angular
         /**
          * Gets all responses for a specific assignment
          *
-         * @param accessToken : token needed for all admin functions
          * @param id : Id of assignment to get responses for.
          * @param start : (optional) Starting index for results.
          * @param count : (optional) Number of results to return.
          *                   posts
          * @return posts : http promise containing all responses
          */
-        assignmentApi.getAssignmentResponses = function (accessToken, id,
-                                                        start, count) {
+        assignmentApi.getAssignmentResponses = function (id, start, count) {
 
-            var url = '/admin/get_assignment_responses.json?token=' + accessToken,
+            var url = '/admin/get_assignment_responses.json',
                 params = { assignment_id: id };
 
             if (start !== undefined) params.start = start;
@@ -194,6 +181,24 @@ angular
                 method: 'POST',
                 url: url,
                 params: params
+            });
+        };
+
+        /**
+         * Approves the post of a given id
+         *
+         * @param id : the id of the post to approve
+         *
+         * @return void
+         */
+        assignmentApi.approvePost = function (id) {
+            var url = '/admin/approve_post.json',
+                data = { post_id: id };
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param(data)
             });
         };
 

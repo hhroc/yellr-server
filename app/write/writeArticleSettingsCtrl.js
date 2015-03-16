@@ -37,8 +37,7 @@ angular
         },
 
         _getPosts = function () {
-            collectionApiService.getPosts($rootScope.user.token,
-                                          $scope.$parent.collectionId)
+            collectionApiService.getPosts($scope.$parent.collectionId)
             .success(function (data) {
                 var postId,
                     posts = [];

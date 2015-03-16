@@ -12,7 +12,7 @@ angular
         var editor = new EpicEditor().load(),
 
         _getLanguages = function () {
-            userApiService.getLanguages($rootScope.user.token)
+            userApiService.getLanguages()
             .success(function (data) {
                 console.log(data);
                 $scope.languages = data.languages;
@@ -57,8 +57,8 @@ angular
         $scope.getImages = function () {
             $scope.images = [];
 
-            collectionApiService.getPosts($rootScope.user.token,
-                $scope.article.collection.collection_id)
+            collectionApiService
+            .getPosts($scope.article.collection.collection_id)
             .success(function (data) {
                 $scope.$parent.collectionId = $scope.article.collection
                     .collection_id;
@@ -83,7 +83,6 @@ angular
                     .join(',');
 
             storyApiService.publishStory(
-                $rootScope.user.token,
                 $scope.article.title,
                 tags,
                 '',
@@ -105,7 +104,7 @@ angular
          *
          * @return void
          */
-        collectionApiService.getAllCollections($rootScope.user.token)
+        collectionApiService.getAllCollections()
         .success(function (data) {
             $scope.collections = data.collections;
         });

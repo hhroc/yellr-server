@@ -73,6 +73,15 @@ def authenticate(username, password):
 
     return user, org, token, fence
 
+def logout(token):
+
+    user = Users.invalidate_token(
+        session = DBSession,
+        token = token,
+    )
+
+    return user
+
 def check_super_user(user_type_id):
 
     # we need to make sure that the user trying to create the

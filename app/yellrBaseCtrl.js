@@ -2,7 +2,10 @@
 
 angular
     .module('Yellr')
-    .controller('yellrBaseCtrl', ['$scope', '$http', function ($scope, $http) {
+    .controller('yellrBaseCtrl',
+    ['$scope', '$http', 'userApiService',
+    function ($scope, $http, userApiService) {
+        window.loggedIn = false;
         $scope.feedPage = false;
         $scope.contributorsPage = false;
         $scope.assignmentsPage = false;
@@ -20,4 +23,9 @@ angular
         };
 
         $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+
+        userApiService.isLoggedIn()
+        .success(function (data) {
+            window.loggedIn = data.logged_in;
+        });
     }]);
