@@ -80,6 +80,8 @@ def register_vote(request):
 
         try:
             post_id = int(request.POST['post_id'])
+            if post_id < 1:
+                raise Exception('Invalid input')
             _is_up_vote = int(request.POST['is_up_vote'])
             if _is_up_vote == 1:
                 is_up_vote = True
@@ -98,6 +100,8 @@ def register_vote(request):
         )
 
         result['vote_id'] = vote.vote_id
+        result['post_id'] = vote.post_id
+        result['is_up_vote'] = vote.is_up_vote
         result['success'] = True
 
     except Exception, e:

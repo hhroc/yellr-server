@@ -254,6 +254,7 @@ def get_approved_posts(client_id, language_code, lat, lng, start, count):
 
     posts = Posts.get_all_approved_from_location(
         session = DBSession,
+        client_id = client_id,
         language_code = language_code,
         lat = lat,
         lng = lng,
