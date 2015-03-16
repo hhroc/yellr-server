@@ -468,12 +468,12 @@ class Clients(Base):
         return client
 
     @classmethod
-    def increment_view_count(cls, session, cuid):
+    def increment_view_count(cls, session, client_id):
         with transaction.manager:
             client = session.query(
                 Clients,
             ).filter(
-                Clients.cuid == cuid,
+                Clients.client_id == client_id,
             ).first()
             client.post_view_count += 1
             session.add(client)
@@ -1680,10 +1680,10 @@ class Notifications(Base):
         return notifications #, created
 
     @classmethod
-    def create_notification(cls, session, user_id, notification_type, payload):
+    def create_notification(cls, session, client_id, notification_type, payload):
         with transaction.manager:
             notification = cls(
-                user_id = user_id,
+                client_id = client_id,
                 notification_datetime = datetime.datetime.now(),
                 notification_type = notification_type,
                 payload = payload,
