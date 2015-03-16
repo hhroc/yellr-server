@@ -8,12 +8,13 @@ angular
 
         var localUser = window.sessionStorage.getItem('YellrUser');
 
-        if (localUser) {
+        if (window.loggedIn) {
             $rootScope.user = JSON.parse(localUser);
             $location.path('/feed');
         }
 
         /**
+         * DEPRECATED
          * logs the user in and assigns token in global scope
          *
          * @param username
@@ -25,14 +26,16 @@ angular
             .success(function (data, status, headers, config) {
                 $rootScope.user = {
                     name: data.first_name + ' ' + data.last_name,
-                    organization: data.organization,
-                    token: data.token
+                    organization: data.organization
                 };
 
-                window.sessionStorage.setItem('YellrUser', JSON.stringify($rootScope.user));
-
-                if (data.success) $location.path('/feed');
-                else console.log('Login Failure');
+                if (data.success) {
+                    window.loggedIn = true;
+                    $location.path('/feed');
+                } else {
+                    //TODO
+                    console.log('Login Failure');
+                }
             })
 
             .error(function (data, status, headers, config) {

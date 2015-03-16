@@ -17,6 +17,7 @@
                     <p class="post-assignment-name" ng-if="post.assignment_name">Assignment: {{post.assignment_name}}</p>
                     <p class="post-assignment-name" ng-if="!post.assignment_name">Free Post</p>
                     <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>
+                    <button ng-class="{'approve-post-active': post.approved}" class="approve-post" ng-click="approvePost(post)"><i class="fa fa-star"></i></button>
                     <button class="delete-post"><i class="fa fa-trash"></i></button>
                     <button  ng-if="!collectionPage"class="add-post" dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
                     <ul id="drop-{{post.post_id}}" class="f-dropdown add-post-dropdown">

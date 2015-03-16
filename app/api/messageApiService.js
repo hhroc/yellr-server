@@ -15,10 +15,10 @@ angular
          *
          * @return response : either error or success response with message id
          */
-        messageApi.createMessage = function (accessToken, toClientId, subject,
-                                          text, parentMessageId) {
+        messageApi.createMessage = function (toClientId, subject, text,
+                                             parentMessageId) {
 
-            var url = '/admin/create_message.json?token=' + accessToken,
+            var url = '/admin/create_message.json',
                 params = {
                     to_client_id: toClientId,
                     subject: subject,
@@ -35,13 +35,12 @@ angular
             });
         };
 
-        messageApi.getMessages = function (accessToken) {
+        messageApi.getMessages = function () {
             var url = '/admin/get_my_messages.json';
 
             return $http({
                 method: 'GET',
-                url: url,
-                params: { token: accessToken }
+                url: url
             });
         };
 
