@@ -6,11 +6,13 @@ angular
     ['$scope', '$rootScope', '$modalInstance', 'assignmentApiService',
     function ($scope, $rootScope, $modalInstance, assignmentApiService) {
 
-        console.log($scope);
-        assignmentApiService
-        .getPost($rootScope.user.token, $scope.postId)
+        assignmentApiService.registerPostViewed($scope.postId)
         .success(function (data) {
-            console.log('success', data);
+            console.log(data);
+        });
+
+        assignmentApiService.getPost($scope.postId)
+        .success(function (data) {
             $scope.post = data.post;
         });
 

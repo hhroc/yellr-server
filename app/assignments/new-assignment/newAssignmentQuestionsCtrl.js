@@ -58,7 +58,7 @@ angular
          * @return void
          */
         $scope.getLanguages = function () {
-            userApiService.getLanguages($rootScope.user.token)
+            userApiService.getLanguages()
             .success(function (data) {
                 $scope.languages = data.languages;
             });

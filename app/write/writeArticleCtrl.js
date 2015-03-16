@@ -6,7 +6,7 @@ angular
     ['$scope', '$rootScope', '$location', 'collectionApiService',
     function ($scope, $rootScope, $location, collectionApiService) {
 
-        if ($rootScope.user === undefined) {
+        if (!window.loggedIn) {
             $location.path('/login');
             return;
         }

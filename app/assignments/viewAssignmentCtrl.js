@@ -8,7 +8,7 @@ angular
     function ($scope, $stateParams, $location, $rootScope,
               assignmentApiService, formatPosts, collectionApiService) {
 
-        if ($rootScope.user === undefined) {
+        if (!window.loggedIn) {
             $location.path('/login');
             return;
         }
@@ -28,9 +28,7 @@ angular
          * @return void
          */
         $scope.addPostToCollection = function (post, collection) {
-            collectionApiService.addPost($scope.user.token,
-                                         collection.collection_id,
-                                         post.post_id)
+            collectionApiService.addPost(collection.collection_id, post.post_id)
             .success(function (data) {
                 collection.post_count++;
             });
@@ -41,7 +39,7 @@ angular
          *
          * @return void
          */
-        assignmentApiService.getAssignments($scope.user.token)
+        assignmentApiService.getAssignments()
         .success(function (data) {
             data.assignments.forEach(function (assignment) {
                 if (assignment.assignment_id == $stateParams.assignmentId) {
@@ -50,15 +48,14 @@ angular
             });
         });
 
-        assignmentApiService.getAssignmentResponses($rootScope.user.token,
-                                      $stateParams.assignmentId)
+        assignmentApiService.getAssignmentResponses($stateParams.assignmentId)
         .success(function (data) {
             console.log(formatPosts(data.posts));
             $scope.posts = formatPosts(data.posts);
         });
 
-        collectionApiService.getAllCollections($scope.user.token)
-            .success(function (data) {
+        collectionApiService.getAllCollections()
+        .success(function (data) {
 
             $scope.collections = data.collections;
         });
