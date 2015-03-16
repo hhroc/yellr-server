@@ -202,5 +202,24 @@ angular
             });
         };
 
+        /**
+         * Registers a post viewed
+         *
+         * @param id : id of post viewed
+         *
+         * @return notification_id : id of notification
+         */
+        assignmentApi.registerPostViewed = function (id) {
+            var url = '/admin/register_post_view.json';
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param({
+                    post_id: id
+                })
+            });
+        };
+
         return assignmentApi;
     }]);
