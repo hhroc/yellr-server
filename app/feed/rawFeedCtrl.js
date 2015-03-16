@@ -94,7 +94,7 @@ angular
          * @return void
          */
         $scope.deletePost = function (post) {
-
+            //TODO: ^
         };
 
         $scope.loadMore();

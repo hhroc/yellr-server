@@ -987,7 +987,7 @@ class Posts(Base):
         return post
 
     @classmethod
-    def _build_posts_query(cls, session):
+    def _build_posts_query(cls, session, client_id=0):
         if True:
             posts_query = session.query(
                 Posts.post_id.label('posts_post_id'),
@@ -1027,6 +1027,19 @@ class Posts(Base):
                     Votes.post_id == Posts.post_id,
                     Votes.is_up_vote == False,
                 ).label('down_vote_count'),
+                session.query(
+                    func.count(distinct(Votes.vote_id)),
+                ).filter(
+                    Votes.client_id == client_id,
+                    Votes.post_id == Posts.post_id,
+                ).label('has_voted'),
+                session.query(
+                    func.count(distinct(Votes.vote_id))
+                ).filter(
+                    Votes.client_id == client_id,
+                    Votes.post_id == Posts.post_id,
+                    Votes.is_up_vote == True,
+                ).label('is_up_vote'),
             ).join(
                 PostMediaObjects, #PostMediaObjects.media_object_id == MediaObjects.media_object_id,
             ).join(
@@ -1148,10 +1161,10 @@ class Posts(Base):
 
 
     @classmethod
-    def get_all_approved_from_location(cls, session, language_code, lat, lng,
-            start=0, count=0):
+    def get_all_approved_from_location(cls, session, client_id, language_code, \
+            lat, lng, start=0, count=0):
         with transaction.manager:
-            posts = Posts._build_posts_query(session).filter(
+            posts = Posts._build_posts_query(session, client_id).filter(
                 Posts.approved == True,
             ).filter(                
                 ((Assignments.top_left_lat + 90 > lat + 90) &

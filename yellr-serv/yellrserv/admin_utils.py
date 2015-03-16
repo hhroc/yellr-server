@@ -37,10 +37,12 @@ def check_token(request):
     valid = False
     user = None
 
-    #print "\n\nREQUEST.GET:"
-    #print request.GET
-    #print "\n\nREQUEST.POST:"
-    #print request.POST
+    print "\n\nREQUEST.GET:"
+    print request.GET
+    print "\n\nREQUEST.POST:"
+    print request.POST
+    print "\n\nREQUEST.SESSION:"
+    print request.session
 
     try:
         token = request.GET['token']
@@ -183,7 +185,7 @@ def get_posts(start, count, deleted):
         start = start,
         count = count,
     )
-   
+
     return utils._decode_posts(posts)
 
 def get_post(post_id):#, start, count):

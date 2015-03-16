@@ -74,19 +74,41 @@ angular
             var url = '/admin/create_user.json',
                 params = {
                     user_type: userType,
-                    user_name: userName,
+                    username: userName,
+                    password: password,
                     first_name: firstName,
                     last_name: lastName,
                     email: email,
-                    organization: organization
+                    organization_id: 1,
+                    fence_top_left_lat: 43,
+                    fence_top_left_lng: -77.9,
+                    fence_bottom_right_lat: 43.4,
+                    fence_bottom_right_lng: -77.3
                 };
 
             params.password = CryptoJS.SHA256(password).toString();
 
+            console.log('params', params);
+
             return $http({
                 method: 'POST',
                 url: url,
-                data: $(params)
+                data: $.param(params)
+            });
+        };
+
+        userApi.changePassword = function (username, password) {
+            var url = '/admin/change_password.json';
+
+            password = CryptoJS.SHA256(password).toString();
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param({
+                    username: username,
+                    password: password
+                })
             });
         };
 
