@@ -2,11 +2,11 @@
 
 angular
     .module('Yellr')
-    .controller('viewAssignmentsCtrl', ['$scope', '$rootScope', '$location',
-                'assignmentApiService',
+    .controller('viewAssignmentsCtrl',
+    ['$scope', '$rootScope', '$location', 'assignmentApiService',
     function ($scope, $rootScope, $location, assignmentApiService) {
 
-        if ($rootScope.user === undefined) {
+        if (!window.loggedIn) {
             $location.path('/login');
             return;
         }
@@ -21,7 +21,7 @@ angular
          *
          * @return void
          */
-        assignmentApiService.getAssignments($scope.user.token)
+        assignmentApiService.getAssignments()
         .success(function (data) {
             $scope.assignments = data.assignments;
         });

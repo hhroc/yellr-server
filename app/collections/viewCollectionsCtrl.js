@@ -8,7 +8,7 @@ angular
     function ($scope, $rootScope, $location, $modal, $templateCache,
               collectionApiService) {
 
-        if ($rootScope.user === undefined) {
+        if (!window.loggedIn) {
             $location.path('/login');
             return;
         }
@@ -22,7 +22,7 @@ angular
          *
          * @return void
          */
-        collectionApiService.getAllCollections($scope.user.token)
+        collectionApiService.getAllCollections()
         .success(function (data) {
             $scope.collections = data.collections;
         });
@@ -43,8 +43,8 @@ angular
     ['$scope', '$rootScope', '$modalInstance', 'collectionApiService',
     function ($scope, $rootScope, $modalInstance, collectionApiService) {
         $scope.save = function (collection) {
-            collectionApiService.createCollection($rootScope.user.token,
-                collection.name, collection.description)
+            collectionApiService.createCollection(collection.name,
+                                                  collection.description)
             .success(function (data) {
                 collection.collection_id = data.collection_id;
                 $modalInstance.close(collection);
