@@ -39,7 +39,7 @@ angular
          */
         $scope.changePassword = function (password) {
             if (password.new == password.confirm) {
-                userApiService.changePassword(password.username, password.new)
+                userApiService.changePassword(password.username, password.old, password.new)
                 .success(function (data) {
                     console.log('password changed', data);
                 });

@@ -140,15 +140,16 @@ def create_user(user_type_id, user_type_name, user_name, password, first_name,\
 
     return new_user
 
-def change_password(username, password):
+def change_password(username, old_password, new_password):
 
-    user = Users.change_password(
+    user,success = Users.change_password(
         session = DBSession,
         username = username,
-        password = password,
+        old_password = old_password,
+        new_password = new_password,
     )
 
-    return user
+    return user,success
 
 def get_languages():
 
