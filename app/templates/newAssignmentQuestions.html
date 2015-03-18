@@ -24,10 +24,10 @@
         <select id="question-type" ng-model="question.question_type" required>
             <option value="">Choose Question Type</option>
             <option value="free_text">Free Text</option>
-            <option value="multiple_choice">Multiple Choice</option>
+            <option value="poll">Poll</option>
         </select>
 
-        <div ng-if="question.question_type == 'multiple_choice'">
+        <div ng-if="question.question_type == 'poll'">
             <h4>Multiple Choice Answers</h4>
             <div class="question-choice" ng-repeat="answer in question.answers track by $index">
                 <input ng-model="question.answers[$index]" type="text" placeholder="Question Answer" required/>
