@@ -81,6 +81,10 @@ def authenticate(username, password):
 
 def logout(token):
 
+    user = None
+
+    try:
+
         user = Users.invalidate_token(
             session = DBSession,
             token = token,
@@ -177,6 +181,9 @@ def change_password(username, old_password, new_password):
             new_password = new_password,
         )
 
+    except:
+        raise Exception("Database error.")
+
     return user,success
 
 def get_languages():
@@ -194,7 +201,7 @@ def get_languages():
     except:
         raise Exception("Database error.")
 
-    return ret_langauges
+    return ret_languages
 
 def get_question_types():
 

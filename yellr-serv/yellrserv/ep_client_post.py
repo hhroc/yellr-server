@@ -21,7 +21,8 @@ def get_local_posts(request):
     result = {'success': False}
     status_code = 200
 
-    try:
+    #try:
+    if True:
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
@@ -50,9 +51,9 @@ def get_local_posts(request):
         result['posts'] = posts
         result['success'] = True
 
-    except Exception, e:
-        status_code = 400
-        result['error_text'] = str(e)
+    #except Exception, e:
+    #    status_code = 400
+    #    result['error_text'] = str(e)
 
     client_utils.log_client_action(
         client = client,

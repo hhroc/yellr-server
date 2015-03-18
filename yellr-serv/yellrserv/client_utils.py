@@ -305,7 +305,7 @@ def get_approved_posts(client_id, language_code, lat, lng, start, count):
     except:
         raise Exception("Database error.")
 
-    return 
+    return ret_posts 
 
 def register_vote(post_id, client_id, is_up_vote):
 
@@ -327,21 +327,26 @@ def register_vote(post_id, client_id, is_up_vote):
 
 def save_input_file(input_file):
 
-        # generate a unique file name to store the file to
-        unique = str(uuid.uuid4())
-        filename = os.path.join(system_config['upload_dir'], unique)
+    # generate a unique file name to store the file to
+    unique = str(uuid.uuid4())
+    filename = os.path.join(system_config['upload_dir'], unique)
 
-        with open(filename, 'wb') as f:
-            input_file.seek(0)
-            while True:
-                data = input_file.read(2<<16)
-                if not data:
-                    break
-                f.write(data)
+    with open(filename, 'wb') as f:
+        input_file.seek(0)
+        while True:
+            data = input_file.read(2<<16)
+            if not data:
+                break
+            f.write(data)
 
     return filename
 
 def process_image(base_filename):
+
+    image_filename = ""
+    preview_filename = ""
+
+    try:
 
         image_filename = '{0}.jpg'.format(base_filename)
         preview_filename = '{0}p.jpg'.format(base_filename)
@@ -377,12 +382,17 @@ def process_image(base_filename):
         except Exception, ex:
             raise Exception("Error generating preview image: {0}".format(ex))
 
+    except Exception, e:
+        raise Exception(e)
+
     return image_filename, preview_filename
 
 def process_video(base_filename):
 
-        video_filename = ''
-        preview_filename = ''
+    video_filename = ""
+    preview_filename = ""
+
+    try:
 
         # type incoming file
         mime_type = magic.from_file(base_filename, mime=True)
@@ -411,11 +421,17 @@ def process_video(base_filename):
         # TODO: create preview image for video
         #
 
+    except Exception, e:
+        raise Exception(e)
+
     return video_filename, preview_filename
 
 def process_audio(base_filename):
 
-        preview_filename = ''
+    audio_filename = ""
+    preview_filename = ""
+
+    try:
 
         #mp3 file
         if mimetype == "audio/mpeg":
@@ -445,6 +461,9 @@ def process_audio(base_filename):
         #
         # TODO: generic audio picture for preview name??
         #
+
+    except Exception, e:
+        raise Exception(e)
 
     return audio_filename, preview_filename
 
