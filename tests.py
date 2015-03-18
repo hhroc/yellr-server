@@ -1258,7 +1258,7 @@ def run_tests():
     log('')
     log('')
 
-    new_password_2 = hashlib.sha256('password123').hexdigest()
+    new_password_2 = hashlib.sha256('password123%%%').hexdigest()
 
     success, payload = _execute_test(
         'admin/change_password.json',
@@ -1268,7 +1268,8 @@ def run_tests():
         _lng,
         {
             'username': new_username,
-            'password': new_password_2,
+            'old_password': new_password,
+            'new_password': new_password_2,
         },
         'POST',
     )

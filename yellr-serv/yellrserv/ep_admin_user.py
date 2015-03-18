@@ -109,6 +109,7 @@ def admin_create_user(request):
 def admin_change_password(request):
 
     result = {'success': False}
+    status_code = 200
 
     try:
         valid, user = admin_utils.check_token(request)
@@ -117,20 +118,26 @@ def admin_change_password(request):
 
         try:
             username = request.POST['username']
-            password = request.POST['password']
+            old_password = request.POST['old_password']
+            new_password = request.POST['new_password']
         except:
             raise Exception("Missing or invalid field.")
 
-        user = admin_utils.change_password(
+        user,success = admin_utils.change_password(
             username = username,
-            password = password,
+            old_password = old_password,
+            new_password = new_password,
         )
+
+        if success == False:
+            raise Exception("Wrong old password.")
 
         result['user_id'] = user.user_id
         result['success'] = True
 
     except Exception, e:
+        status_code = 400
         result['error_text'] = str(e)
 
-    return utils.make_response(result)
+    return utils.make_response(result, status_code)
 

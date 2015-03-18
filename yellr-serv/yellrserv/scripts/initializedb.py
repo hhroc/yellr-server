@@ -219,11 +219,11 @@ def main(argv=sys.argv):
                 question_type_description = 'Free form text response.',
             )
 
-        question_type_multiple_choice = QuestionTypes.get_from_type(DBSession, 'multiple_choice')
-        if question_type_multiple_choice == None:
-            question_type_multiple_choice = QuestionTypes.add_question_type(
+        question_type_poll = QuestionTypes.get_from_type(DBSession, 'poll')
+        if question_type_poll == None:
+            question_type_poll = QuestionTypes.add_question_type(
                 session = DBSession,
-                question_type = 'multiple_choice',
+                question_type = 'poll',
                 question_type_description = \
                     ('Allows for up to ten multiple'
                      'choice options')

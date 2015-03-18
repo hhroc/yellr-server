@@ -238,6 +238,7 @@ class Users(Base):
 
             org = None
             token = None
+            org = None
             if user is not None:
                 pass_hash = hashlib.sha256('{0}{1}'.format(password, user.pass_salt)).hexdigest()
                 if (user.pass_hash == pass_hash):
@@ -270,23 +271,30 @@ class Users(Base):
         return user
 
     @classmethod
-    def change_password(cls, session, username, password):
+    def change_password(cls, session, username, old_password, new_password):
         with transaction.manager:
             user = session.query(
                 Users,
             ).filter(
                 Users.user_name == username,
             ).first()
-            pass_salt=str(uuid.uuid4())
-            pass_hash = hashlib.sha256('{0}{1}'.format(
-                password,
-                pass_salt
+            old_pass_hash = hashlib.sha256('{0}{1}'.format(
+                old_password,
+                user.pass_salt
             )).hexdigest()
-            user.pass_salt = pass_salt
-            user.pass_hash = pass_hash
-            session.add(user)
-            transaction.commit()
-        return user
+            success = False
+            if old_pass_hash == user.pass_hash:
+                pass_salt = str(uuid.uuid4())
+                pass_hash = hashlib.sha256('{0}{1}'.format(
+                    new_password,
+                    pass_salt
+                )).hexdigest()
+                user.pass_salt = pass_salt
+                user.pass_hash = pass_hash
+                session.add(user)
+                transaction.commit()
+                success = True
+        return user, success
 
 class UserGeoFences(Base):
 

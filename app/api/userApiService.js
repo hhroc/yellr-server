@@ -97,17 +97,19 @@ angular
             });
         };
 
-        userApi.changePassword = function (username, password) {
+        userApi.changePassword = function (username, oldPassword, newPassword) {
             var url = '/admin/change_password.json';
 
-            password = CryptoJS.SHA256(password).toString();
+            oldPassword = CryptoJS.SHA256(oldPassword).toString();
+            newPassword = CryptoJS.SHA256(newPassword).toString();
 
             return $http({
                 method: 'POST',
                 url: url,
                 data: $.param({
                     username: username,
-                    password: password
+                    old_password: oldPassword,
+                    new_password: newPassword
                 })
             });
         };
