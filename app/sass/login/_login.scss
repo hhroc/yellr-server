@@ -88,3 +88,19 @@
         width: 100%;
     }
 }
+
+.login-error {
+    background: lighten($warn, 10%);
+    border: 1px solid $warn;
+    color: $background;
+    margin-bottom: 10px;
+
+    p {
+        margin: 5px 0;
+    }
+}
+
+.login-error-field {
+    background: lighten($warn, 20%) !important;
+    border: 1px solid $warn !important;
+}

@@ -56,16 +56,17 @@ def check_token(request):
 
     return valid, user
 
-def authenticate(username, password):
 
+def authenticate(username, password):
     user = None
     token = None
     fence = None
+    org = None
 
     user, org, token = Users.authenticate(DBSession, username, password)
 
     # make sure the user is valid, and is so, get their geofence
-    if token != None:
+    if token is not None:
         fence = UserGeoFences.get_fence_from_user_id(
             session = DBSession,
             user_id = user.user_id,
