@@ -13,6 +13,8 @@ angular
             $location.path('/feed');
         }
 
+        $scope.error = false;
+
         /**
          * DEPRECATED
          * logs the user in and assigns token in global scope
@@ -32,15 +34,11 @@ angular
                 if (data.success) {
                     window.loggedIn = true;
                     $location.path('/feed');
-                } else {
-                    //TODO
-                    console.log('Login Failure');
                 }
             })
 
             .error(function (data, status, headers, config) {
-                // TODO: Handle Error
-                console.log('ERROR', data);
+                $scope.error = true;
             });
         };
     }]);

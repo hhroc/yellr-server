@@ -7,11 +7,15 @@
                 <form id="mod-login" class="login-form">
                     <div class="input-group">
                         <label for="username">Username</label>
-                        <input type="text" id="username" ng-model="username" />
+                        <input type="text" id="username" ng-model="username" ng-class="{'login-error-field':error}"/>
                     </div>
                     <div class="input-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" ng-model="password" />
+                        <input type="password" id="password" ng-model="password" ng-class="{'login-error-field':error}" />
+                    </div>
+
+                    <div ng-if="error" class="login-error">
+                        <p>Login credentials incorrect</p>
                     </div>
 
                     <div class="input-group">
