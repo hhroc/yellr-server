@@ -3,9 +3,9 @@
 angular
     .module('Yellr')
     .controller('viewAssignmentCtrl',
-    ['$scope', '$stateParams', '$location', '$rootScope',
+    ['$scope', '$stateParams', '$location', '$rootScope', '$modal',
         'assignmentApiService', 'formatPosts', 'collectionApiService',
-    function ($scope, $stateParams, $location, $rootScope,
+    function ($scope, $stateParams, $location, $rootScope, $modal,
               assignmentApiService, formatPosts, collectionApiService) {
 
         if (!window.loggedIn) {
@@ -21,6 +21,16 @@ angular
             { name: 'Video Post', type: 'video' }
         ];
         $scope.selectedType = 'all';
+
+        $scope.openPost = function (postId) {
+            console.log('opening post', postId);
+            $scope.postId = postId;
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/templates/viewPost.html',
+                controller: 'viewPostModalCtrl',
+                scope: $scope
+            });
+        };
 
         /**
          * Adds the given post to a collection
