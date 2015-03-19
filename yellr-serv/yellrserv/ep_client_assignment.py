@@ -17,9 +17,10 @@ def get_assignments(request):
             raise Exception(error_text)
 
         assignments = client_utils.get_assignments(
+            client_id = client.client_id,
             language_code = language_code,
             lat = lat,
-            lng = lng
+            lng = lng,
         )
 
         result['assignments'] = assignments

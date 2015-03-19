@@ -558,7 +558,7 @@ class Assignments(Base):
         return counts
 
     @classmethod
-    def _build_assignments_query(cls, session):
+    def _build_assignments_query(cls, session, client_id=0):
         if True:
 
             #dialect = query.session.bind.dialect
@@ -570,6 +570,16 @@ class Assignments(Base):
             #count_sql = "(%s) as count_1" % str(q.statement.compile(dialect=q.session.bind.dialect))
 
             #count_sql = "(SELECT Count(*) FROM posts WHERE posts.assignment_id = assignments.assignment_id) AS count_1"
+
+            print "\n\nSQL:\n\n"
+            print str(session.query(
+                    func.count(distinct(Posts.post_id)),
+                ).filter(
+                    Posts.client_id == client_id,
+                    Posts.assignment_id == Assignments.assignment_id,
+                ).label('response_count'),
+            )
+            print "\n\n"
 
             assignments_query = session.query(
                 Assignments.assignment_id,
@@ -601,6 +611,15 @@ class Assignments(Base):
                 Languages.language_id,
                 Languages.language_code,
                 func.count(distinct(Posts.post_id)),
+                session.query(
+                    func.count(distinct(Posts.post_id)),
+                ).join(
+                    Assignments, Assignments.assignment_id ==
+                        Posts.assignment_id,
+                ).filter(
+                    Posts.client_id == client_id,
+                    Posts.assignment_id == Assignments.assignment_id,
+                ).label('response_count'), 
             ).join(
                 Users, Users.user_id == Assignments.user_id,
             ).join(
@@ -635,6 +654,11 @@ class Assignments(Base):
             ).order_by(
                 desc(Assignments.assignment_id),
             )
+
+            print "\n\nAssignments SQL:\n\n"
+            print str(assignments_query)
+            print "\n\n"
+
         return assignments_query
 
     @classmethod
@@ -647,9 +671,12 @@ class Assignments(Base):
         return assignments #, total_assignment_count
 
     @classmethod
-    def get_all_open_with_questions(cls, session, language_code, lat, lng):
+    def get_all_open_with_questions(cls, session, language_code, lat, lng, client_id=0):
         with transaction.manager:
-            assignments = Assignments._build_assignments_query(session).filter(
+            assignments = Assignments._build_assignments_query(
+                session = session,
+                client_id = client_id
+            ).filter(
                 # we add offsets so we can do simple comparisons
                 Assignments.top_left_lat + 90 > lat + 90,
                 Assignments.top_left_lng + 180 < lng + 180,
