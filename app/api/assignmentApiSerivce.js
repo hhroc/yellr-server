@@ -73,7 +73,7 @@ angular
          *
          * @return response : either error or sucess response with question id
          */
-        assignmentApi.createQuestion = function (accessToken, languageCode,
+        assignmentApi.createQuestion = function (languageCode,
                                            questionText, description,
                                            questionType, answers) {
             var url = '/admin/create_question.json',
