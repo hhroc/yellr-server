@@ -31,6 +31,18 @@ angular
             });
 
             return images;
+        },
+
+        _getQuotesFromPost = function (post) {
+            var quotes = [];
+
+            post.media_objects.forEach(function (mediaObject) {
+                if (mediaObject.media_type_name == 'text') {
+                    quotes.push(mediaObject);
+                }
+            });
+
+            return quotes;
         };
 
         $scope.article = $scope.$parent.article;
@@ -50,12 +62,12 @@ angular
         });
 
         /**
-         * Gets all images for the current collection
+         * Gets all quotes for the current collection
          *
          * @return void
          */
-        $scope.getImages = function () {
-            $scope.images = [];
+        $scope.getQuotes = function () {
+            $scope.quotes = [];
 
             collectionApiService
             .getPosts($scope.article.collection.collection_id)
@@ -64,8 +76,8 @@ angular
                     .collection_id;
 
                 data.posts.forEach(function (post) {
-                    var postImages = _getImagesFromPost(post);
-                    $scope.images = $scope.images.concat(postImages);
+                    var postQuotes = _getQuotesFromPost(post);
+                    $scope.quotes = $scope.quotes.concat(postQuotes);
                 });
             });
         };
