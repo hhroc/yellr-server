@@ -95,7 +95,9 @@ angular
                 -77
             )
             .success(function (data) {
-                console.log(data);
+                $scope.article.title = '';
+                editor.importFile(null, '');
+                $location.path('/feed');
             });
         };
 
