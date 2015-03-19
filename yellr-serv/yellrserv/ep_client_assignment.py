@@ -10,7 +10,6 @@ def get_assignments(request):
     status_code = 200
 
     try:
-    #if True:
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:

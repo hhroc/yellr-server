@@ -111,6 +111,7 @@ def get_assignments(client_id, language_code, lat, lng):
     ret_assignments = []
     
     try:
+
         assignments = Assignments.get_all_open_with_questions(
             session = DBSession,
             language_code = language_code,
@@ -126,7 +127,7 @@ def get_assignments(client_id, language_code, lat, lng):
                     question_type_id, description, answer0, \
                     answer1, answer2, answer3, answer4, answer5, answer6, \
                     answer7, answer8, answer9, language_id, language_code, \
-                    post_count, response_count in assignments:
+                    post_count, has_responded in assignments:
             ret_assignments.append({
                     'assignment_id': assignment_id,
                     #'organization_id': org_id,
@@ -154,7 +155,7 @@ def get_assignments(client_id, language_code, lat, lng):
                     'answer9': answer9,
                     'language_code': language_code,
                     'post_count': post_count,
-                    'response_count': response_count,
+                    'has_responded': has_responded,
                 })
 
     except:

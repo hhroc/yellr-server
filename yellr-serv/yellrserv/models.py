@@ -571,16 +571,6 @@ class Assignments(Base):
 
             #count_sql = "(SELECT Count(*) FROM posts WHERE posts.assignment_id = assignments.assignment_id) AS count_1"
 
-            print "\n\nSQL:\n\n"
-            print str(session.query(
-                    func.count(distinct(Posts.post_id)),
-                ).filter(
-                    Posts.client_id == client_id,
-                    Posts.assignment_id == Assignments.assignment_id,
-                ).label('response_count'),
-            )
-            print "\n\n"
-
             assignments_query = session.query(
                 Assignments.assignment_id,
                 Assignments.publish_datetime,
@@ -612,14 +602,13 @@ class Assignments(Base):
                 Languages.language_code,
                 func.count(distinct(Posts.post_id)),
                 session.query(
-                    func.count(distinct(Posts.post_id)),
-                ).join(
-                    Assignments, Assignments.assignment_id ==
-                        Posts.assignment_id,
+                    distinct(Posts),
                 ).filter(
+                    Assignments.assignment_id == Posts.assignment_id,
                     Posts.client_id == client_id,
-                    Posts.assignment_id == Assignments.assignment_id,
-                ).label('response_count'), 
+                ).correlate(
+                    Assignments,
+                ).exists().label('has_responded'), 
             ).join(
                 Users, Users.user_id == Assignments.user_id,
             ).join(
@@ -1093,7 +1082,7 @@ class Posts(Base):
             ).group_by(
                 Posts.post_id,
             ).order_by(
-                desc(Posts.post_datetime),
+                desc(Posts.post_id),
             )
         return posts_query
 
