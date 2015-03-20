@@ -23,6 +23,7 @@ angular
          */
         assignmentApiService.getAssignments()
         .success(function (data) {
+            console.log(data);
             $scope.assignments = data.assignments;
         });
 

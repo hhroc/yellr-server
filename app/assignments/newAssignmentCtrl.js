@@ -105,6 +105,7 @@ angular
                     question.question_text, question.description,
                     question.question_type, question.answers)
                 .success(function (data) {
+                    console.log(data);
                     callback(null, data.question_id);
                 });
             },
