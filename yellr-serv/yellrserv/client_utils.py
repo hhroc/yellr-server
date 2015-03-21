@@ -49,6 +49,9 @@ def log_client_action(client, url, lat, lng, request, result, success):
         if client != None:
             client_id = client.client_id
 
+        # no longer loging this, based on ... not a good idea.
+
+        '''
         client_log = ClientLogs.log(
             session = DBSession,
             client_id = client_id,
@@ -62,6 +65,7 @@ def log_client_action(client, url, lat, lng, request, result, success):
             result = json.dumps(result),
             success = success,
         )
+        '''
 
     except:
         raise Exception("Database error.")
