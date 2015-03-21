@@ -14,18 +14,20 @@ Setting up the moderator dev environment.
 
 To make our moderator site you must have [npm](https://www.npmjs.com/),
 [bower](http://bower.io/), [grunt](http://gruntjs.com/), and [ruby](https://www.ruby-lang.org/en/) (for SASS compilation),
-installed.
+installed. These instructions assume that you’re using bash.
 
 Ubuntu:
 
     sudo apt-get update
-    sudo apt-get install nodejs
-    sudo apt-get install npm
+    # This installs [nvm](https://github.com/creationix/nvm) which is a node version manager
     wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.23.2/install.sh | bash
+    # installs v0.10.24 of node
     nvm install v0.10.24
     nvm use v0.10.24
-    npm install bower
-    npm install grunt
+    # installs bower and grunt which is used for javascript make
+    npm install -g bower
+    npm install -g grunt-cli
+    # ruby is used for sass compilation
     sudo apt-get install ruby
 
 Once the you have all of those, simply run `make` to compile all of the
