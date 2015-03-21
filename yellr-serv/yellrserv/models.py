@@ -103,7 +103,7 @@ class Users(Base):
     __tablename__ = 'users'
     user_id = Column(Integer, primary_key=True)
     user_type_id = Column(Integer, ForeignKey('usertypes.user_type_id'))
-    
+
     #client_id = Column(Text)
 
     user_name = Column(Text)
@@ -131,7 +131,7 @@ class Users(Base):
             )).hexdigest()
             user = cls(
                 user_type_id = user_type_id,
-                user_geo_fence_id = user_geo_fence_id, 
+                user_geo_fence_id = user_geo_fence_id,
                 first_name = first_name,
                 last_name = last_name,
                 #organization = organization,
@@ -230,24 +230,18 @@ class Users(Base):
     @classmethod
     def authenticate(cls, session, user_name, password):
         with transaction.manager:
-            #user_user_type_id = \
-            #    UserTypes.get_from_name(session, 'user').user_type_id
-            admin_user_type_id = \
-                UserTypes.get_from_name(session, 'admin').user_type_id
-            mod_user_type_id = \
-                UserTypes.get_from_name(session, 'moderator').user_type_id
-            sub_user_type_id = \
-                UserTypes.get_from_name(session, 'subscriber').user_type_id
             user = session.query(
                 Users,
             ).filter(
                 Users.user_name == str(user_name),
             ).first()
 
+            org = None
             token = None
-            if user != None:
+            org = None
+            if user is not None:
                 pass_hash = hashlib.sha256('{0}{1}'.format(password, user.pass_salt)).hexdigest()
-                if ( user.pass_hash == pass_hash ):
+                if (user.pass_hash == pass_hash):
                     token = str(uuid.uuid4())
                     user.token = token
                     user.token_expire_datetime = datetime.datetime.now() + \
@@ -277,28 +271,35 @@ class Users(Base):
         return user
 
     @classmethod
-    def change_password(cls, session, username, password):
+    def change_password(cls, session, username, old_password, new_password):
         with transaction.manager:
             user = session.query(
                 Users,
             ).filter(
                 Users.user_name == username,
             ).first()
-            pass_salt=str(uuid.uuid4())
-            pass_hash = hashlib.sha256('{0}{1}'.format(
-                password,
-                pass_salt
+            old_pass_hash = hashlib.sha256('{0}{1}'.format(
+                old_password,
+                user.pass_salt
             )).hexdigest()
-            user.pass_salt = pass_salt
-            user.pass_hash = pass_hash
-            session.add(user)
-            transaction.commit()
-        return user
+            success = False
+            if old_pass_hash == user.pass_hash:
+                pass_salt = str(uuid.uuid4())
+                pass_hash = hashlib.sha256('{0}{1}'.format(
+                    new_password,
+                    pass_salt
+                )).hexdigest()
+                user.pass_salt = pass_salt
+                user.pass_hash = pass_hash
+                session.add(user)
+                transaction.commit()
+                success = True
+        return user, success
 
 class UserGeoFences(Base):
 
     """
-    Admins, Moderators, and Subscribers all have default geo fences that they 
+    Admins, Moderators, and Subscribers all have default geo fences that they
     are set to.  That is, that they can not post of view outside of this fence.
     """
 
@@ -346,7 +347,7 @@ class Clients(Base):
     __tablename__ = 'clients'
     client_id = Column(Integer, primary_key=True)
     cuid = Column(Text)
-    
+
     first_name = Column(Text, nullable=True)
     last_name = Column(Text, nullable=True)
     email = Column(Text, nullable=True)
@@ -415,15 +416,15 @@ class Clients(Base):
             ).filter(
                 Clients.cuid == cuid,
             ).first()
-            transaction.commit()            
+            transaction.commit()
 
         if not client and create == True:
-            
+
             #
             # This is max gross, and is terrible.  Was done because when a
-            # client first comes on line, the android app hammers the server 
+            # client first comes on line, the android app hammers the server
             # with lots of requests all in a row.  SQLAlchemy serves these up
-            # in some kind of queue, which causes SELECT INSERT SELECT INSERT 
+            # in some kind of queue, which causes SELECT INSERT SELECT INSERT
             # rather than SELECT INSERT SELECT <none>
             #
             sleep_time = float(float(randint(500,2000))/float(1000.0))
@@ -557,7 +558,7 @@ class Assignments(Base):
         return counts
 
     @classmethod
-    def _build_assignments_query(cls, session):
+    def _build_assignments_query(cls, session, client_id=0):
         if True:
 
             #dialect = query.session.bind.dialect
@@ -600,6 +601,14 @@ class Assignments(Base):
                 Languages.language_id,
                 Languages.language_code,
                 func.count(distinct(Posts.post_id)),
+                session.query(
+                    distinct(Posts),
+                ).filter(
+                    Assignments.assignment_id == Posts.assignment_id,
+                    Posts.client_id == client_id,
+                ).correlate(
+                    Assignments,
+                ).exists().label('has_responded'), 
             ).join(
                 Users, Users.user_id == Assignments.user_id,
             ).join(
@@ -634,6 +643,11 @@ class Assignments(Base):
             ).order_by(
                 desc(Assignments.assignment_id),
             )
+
+            print "\n\nAssignments SQL:\n\n"
+            print str(assignments_query)
+            print "\n\n"
+
         return assignments_query
 
     @classmethod
@@ -646,9 +660,12 @@ class Assignments(Base):
         return assignments #, total_assignment_count
 
     @classmethod
-    def get_all_open_with_questions(cls, session, language_code, lat, lng):
+    def get_all_open_with_questions(cls, session, language_code, lat, lng, client_id=0):
         with transaction.manager:
-            assignments = Assignments._build_assignments_query(session).filter(
+            assignments = Assignments._build_assignments_query(
+                session = session,
+                client_id = client_id
+            ).filter(
                 # we add offsets so we can do simple comparisons
                 Assignments.top_left_lat + 90 > lat + 90,
                 Assignments.top_left_lng + 180 < lng + 180,
@@ -943,7 +960,7 @@ class Posts(Base):
     approved = Column(Boolean)
 
     @classmethod
-    def create_from_http(cls, session, client_id, assignment_id, #title, 
+    def create_from_http(cls, session, client_id, assignment_id, #title,
             language_code, lat, lng, media_objects=[]):
         # create post
         with transaction.manager:
@@ -1065,7 +1082,7 @@ class Posts(Base):
             ).group_by(
                 Posts.post_id,
             ).order_by(
-                desc(Posts.post_datetime),
+                desc(Posts.post_id),
             )
         return posts_query
 
@@ -1087,7 +1104,7 @@ class Posts(Base):
             ).filter(
                 Posts.client_id == client_id,
             ).count()
-        return post_count 
+        return post_count
 
     @classmethod
     def get_with_media_objects_from_post_id(cls, session, post_id):
@@ -1166,21 +1183,21 @@ class Posts(Base):
         with transaction.manager:
             posts = Posts._build_posts_query(session, client_id).filter(
                 Posts.approved == True,
-            ).filter(                
+            ).filter(
                 ((Assignments.top_left_lat + 90 > lat + 90) &
                     (Assignments.top_left_lng + 180 < lng + 180) &
                     (Assignments.bottom_right_lat + 90 < lat + 90) &
                     (Assignments.bottom_right_lng + 180 > lng + 180)) |
-                (((lat + 1) + 90 > Posts.lat + 90) & 
-                    ((lng + 1) + 180 > Posts.lng + 180) &
-                    ((lat - 1) + 90 < Posts.lat + 90) &
-                    ((lng - 1) + 180 < Posts.lng + 180))
+                (((lat + 0.5) + 90 > Posts.lat + 90) &
+                    ((lng + 0.5) + 180 > Posts.lng + 180) &
+                    ((lat - 0.5) + 90 < Posts.lat + 90) &
+                    ((lng - 0.5) + 180 < Posts.lng + 180))
             ).filter(
                 Languages.language_code == language_code,
                 #cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
             ).slice(start, start+count).all()
         return posts
- 
+
 
 # Posts indexes ... these will be important to implement soon
 
@@ -1478,7 +1495,7 @@ class ClientLogs(Base):
     lng = Column(Float)
     request = Column(Text)
     result = Column(Text)
-    success = Column(Boolean) 
+    success = Column(Boolean)
     log_datetime = Column(DateTime)
 
     @classmethod
@@ -2046,7 +2063,7 @@ class Zipcodes(Base):
     #geom = Column(Geometry('POLYGON'), nullable=False)
 
     @classmethod
-    def add_zipcode(cls, session, _zipcode, city, state_code, lat, lng, 
+    def add_zipcode(cls, session, _zipcode, city, state_code, lat, lng,
             timezone, polygon_string):
         with transaction.manager:
             zipcode = Zipcodes(

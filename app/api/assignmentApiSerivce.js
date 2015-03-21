@@ -73,7 +73,7 @@ angular
          *
          * @return response : either error or sucess response with question id
          */
-        assignmentApi.createQuestion = function (accessToken, languageCode,
+        assignmentApi.createQuestion = function (languageCode,
                                            questionText, description,
                                            questionType, answers) {
             var url = '/admin/create_question.json',
@@ -199,6 +199,25 @@ angular
                 method: 'POST',
                 url: url,
                 data: $.param(data)
+            });
+        };
+
+        /**
+         * Registers a post viewed
+         *
+         * @param id : id of post viewed
+         *
+         * @return notification_id : id of notification
+         */
+        assignmentApi.registerPostViewed = function (id) {
+            var url = '/admin/register_post_view.json';
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param({
+                    post_id: id
+                })
             });
         };
 

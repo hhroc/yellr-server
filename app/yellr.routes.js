@@ -82,5 +82,11 @@ angular
                 url: '/collections/:collectionId',
                 templateUrl: 'assets/templates/viewCollection.html',
                 controller: 'viewCollectionCtrl'
+            })
+
+            .state('settings', {
+                url: '/settings',
+                templateUrl: 'assets/templates/settings.html',
+                controller: 'settingsCtrl'
             });
     }]);

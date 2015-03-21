@@ -10,11 +10,12 @@ def admin_get_access_token(request):
     status_code = 200
 
     try:
-        user_name = ''
+        username = ''
         password = ''
         try:
             username = request.POST['username']
             password = request.POST['password']
+            print username
         except:
             raise Exception("Missing of invalid fields.")
 
@@ -22,6 +23,7 @@ def admin_get_access_token(request):
         if user == None or token == None or fence == None:
             status_code = 403
             raise Exception("Invalid authorization or bad credentials.")
+
 
         result['token'] = token
         result['username'] = user.user_name
@@ -43,7 +45,8 @@ def admin_get_access_token(request):
         result['success'] = True
 
     except Exception, e:
-        status_code = 400
+        if status_code != 403:
+            status_code = 400
         result['error'] = str(e)
 
     return utils.make_response(result, status_code)
@@ -88,7 +91,7 @@ def admin_logout(request):
             admin_utils.logout(
                 token,
             )
-        
+
             request.session['token'] = ""
 
         result['success'] = True
