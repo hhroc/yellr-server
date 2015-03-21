@@ -10,16 +10,16 @@ def get_assignments(request):
     status_code = 200
 
     try:
-    #if True:
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
             raise Exception(error_text)
 
         assignments = client_utils.get_assignments(
+            client_id = client.client_id,
             language_code = language_code,
             lat = lat,
-            lng = lng
+            lng = lng,
         )
 
         result['assignments'] = assignments

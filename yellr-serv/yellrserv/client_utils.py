@@ -49,6 +49,9 @@ def log_client_action(client, url, lat, lng, request, result, success):
         if client != None:
             client_id = client.client_id
 
+        # no longer loging this, based on ... not a good idea.
+
+        '''
         client_log = ClientLogs.log(
             session = DBSession,
             client_id = client_id,
@@ -62,6 +65,7 @@ def log_client_action(client, url, lat, lng, request, result, success):
             result = json.dumps(result),
             success = success,
         )
+        '''
 
     except:
         raise Exception("Database error.")
@@ -77,7 +81,6 @@ def register_client(request):
     lng = 0
     client = None
     try:
-    #if True:
         cuid = request.GET['cuid']
         language_code = request.GET['language_code']
         lat = float(request.GET['lat'])
@@ -107,7 +110,7 @@ def register_client(request):
 
     return success, error_text, language_code, lat, lng, client
 
-def get_assignments(language_code, lat, lng):
+def get_assignments(client_id, language_code, lat, lng):
 
     ret_assignments = []
     
@@ -117,7 +120,8 @@ def get_assignments(language_code, lat, lng):
             session = DBSession,
             language_code = language_code,
             lat = lat,
-            lng = lng
+            lng = lng,
+            client_id = client_id,
         )
         
         for assignment_id, publish_datetime, expire_datetime, name, \
@@ -127,7 +131,7 @@ def get_assignments(language_code, lat, lng):
                     question_type_id, description, answer0, \
                     answer1, answer2, answer3, answer4, answer5, answer6, \
                     answer7, answer8, answer9, language_id, language_code, \
-                    post_count in assignments:
+                    post_count, has_responded in assignments:
             ret_assignments.append({
                     'assignment_id': assignment_id,
                     #'organization_id': org_id,
@@ -153,8 +157,9 @@ def get_assignments(language_code, lat, lng):
                     'answer7': answer7,
                     'answer8': answer8,
                     'answer9': answer9,
-                    'post_count': post_count,
                     'language_code': language_code,
+                    'post_count': post_count,
+                    'has_responded': has_responded,
                 })
 
     except:
