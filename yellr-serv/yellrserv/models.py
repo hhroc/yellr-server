@@ -1188,10 +1188,10 @@ class Posts(Base):
                     (Assignments.top_left_lng + 180 < lng + 180) &
                     (Assignments.bottom_right_lat + 90 < lat + 90) &
                     (Assignments.bottom_right_lng + 180 > lng + 180)) |
-                (((lat + 1) + 90 > Posts.lat + 90) &
-                    ((lng + 1) + 180 > Posts.lng + 180) &
-                    ((lat - 1) + 90 < Posts.lat + 90) &
-                    ((lng - 1) + 180 < Posts.lng + 180))
+                (((lat + 0.5) + 90 > Posts.lat + 90) &
+                    ((lng + 0.5) + 180 > Posts.lng + 180) &
+                    ((lat - 0.5) + 90 < Posts.lat + 90) &
+                    ((lng - 0.5) + 180 < Posts.lng + 180))
             ).filter(
                 Languages.language_code == language_code,
                 #cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),

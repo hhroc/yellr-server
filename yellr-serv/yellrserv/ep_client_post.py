@@ -32,7 +32,7 @@ def get_local_posts(request):
             start = 0
             if 'start' in request.GET:
                 start = int(float(request.GET['start']))
-            count = 50
+            count = 75
             if 'count' in request.GET:
                 count = int(float(request.GET['count']))
         except:
