@@ -558,7 +558,7 @@ class Assignments(Base):
         return counts
 
     @classmethod
-    def _build_assignments_query(cls, session):
+    def _build_assignments_query(cls, session, client_id=0):
         if True:
 
             #dialect = query.session.bind.dialect
@@ -601,6 +601,14 @@ class Assignments(Base):
                 Languages.language_id,
                 Languages.language_code,
                 func.count(distinct(Posts.post_id)),
+                session.query(
+                    distinct(Posts),
+                ).filter(
+                    Assignments.assignment_id == Posts.assignment_id,
+                    Posts.client_id == client_id,
+                ).correlate(
+                    Assignments,
+                ).exists().label('has_responded'), 
             ).join(
                 Users, Users.user_id == Assignments.user_id,
             ).join(
@@ -635,6 +643,11 @@ class Assignments(Base):
             ).order_by(
                 desc(Assignments.assignment_id),
             )
+
+            print "\n\nAssignments SQL:\n\n"
+            print str(assignments_query)
+            print "\n\n"
+
         return assignments_query
 
     @classmethod
@@ -647,9 +660,12 @@ class Assignments(Base):
         return assignments #, total_assignment_count
 
     @classmethod
-    def get_all_open_with_questions(cls, session, language_code, lat, lng):
+    def get_all_open_with_questions(cls, session, language_code, lat, lng, client_id=0):
         with transaction.manager:
-            assignments = Assignments._build_assignments_query(session).filter(
+            assignments = Assignments._build_assignments_query(
+                session = session,
+                client_id = client_id
+            ).filter(
                 # we add offsets so we can do simple comparisons
                 Assignments.top_left_lat + 90 > lat + 90,
                 Assignments.top_left_lng + 180 < lng + 180,
@@ -1066,7 +1082,7 @@ class Posts(Base):
             ).group_by(
                 Posts.post_id,
             ).order_by(
-                desc(Posts.post_datetime),
+                desc(Posts.post_id),
             )
         return posts_query
 
@@ -1172,10 +1188,10 @@ class Posts(Base):
                     (Assignments.top_left_lng + 180 < lng + 180) &
                     (Assignments.bottom_right_lat + 90 < lat + 90) &
                     (Assignments.bottom_right_lng + 180 > lng + 180)) |
-                (((lat + 1) + 90 > Posts.lat + 90) &
-                    ((lng + 1) + 180 > Posts.lng + 180) &
-                    ((lat - 1) + 90 < Posts.lat + 90) &
-                    ((lng - 1) + 180 < Posts.lng + 180))
+                (((lat + 0.5) + 90 > Posts.lat + 90) &
+                    ((lng + 0.5) + 180 > Posts.lng + 180) &
+                    ((lat - 0.5) + 90 < Posts.lat + 90) &
+                    ((lng - 0.5) + 180 < Posts.lng + 180))
             ).filter(
                 Languages.language_code == language_code,
                 #cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),

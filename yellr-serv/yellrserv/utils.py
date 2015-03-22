@@ -104,7 +104,7 @@ def _decode_assignments(assignments):
                     question_type_id, question_description, \
                     answer0, answer1, answer2, answer3, answer4, answer5, \
                     answer6, answer7, answer8, answer9, language_id, \
-                    language_code, post_count in assignments:
+                    language_code, post_count, response_count in assignments:
 
                 if (assignment_id not in seen_assignment_ids) or (index == len(assignments)-1):
 
@@ -128,8 +128,9 @@ def _decode_assignments(assignments):
                         'organization': org_name,
                         'organization_description': org_description,
                         'questions': [],
-                        'post_count': post_count,
                         'language_code': language_code,
+                        'post_count': post_count,
+                        'response_count': response_count,
                     }
 
                     # record that we have seen the assignment_id
