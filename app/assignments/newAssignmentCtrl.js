@@ -105,7 +105,6 @@ angular
                     question.question_text, question.description,
                     question.question_type, question.answers)
                 .success(function (data) {
-                    console.log(data);
                     callback(null, data.question_id);
                 });
             },
@@ -115,10 +114,7 @@ angular
                     $scope.assignment.geofence.topLeft.lat,
                     $scope.assignment.geofence.topLeft.lng,
                     $scope.assignment.geofence.bottomRight.lat,
-                    $scope.assignment.geofence.bottomRight.lng)
-                .success(function (data) {
-                    console.log(data);
-                });
+                    $scope.assignment.geofence.bottomRight.lng);
             });
 
             $location.path('/');
