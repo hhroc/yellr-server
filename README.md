@@ -18,6 +18,7 @@ installed. These instructions assume that you’re using bash.
 
 Ubuntu:
 
+```bash
     sudo apt-get update
     # This installs [nvm](https://github.com/creationix/nvm) which is a node version manager
     wget -qO- https://raw.githubusercontent.com/creationix/nvm/v0.23.2/install.sh | bash
@@ -29,6 +30,7 @@ Ubuntu:
     npm install -g grunt-cli
     # ruby is used for sass compilation
     sudo apt-get install ruby
+```
 
 Once the you have all of those, simply run `make` to compile all of the
 frontend dependencies and if you’re going to do development, run `make dev`
