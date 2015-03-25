@@ -114,10 +114,7 @@ angular
                     $scope.assignment.geofence.topLeft.lat,
                     $scope.assignment.geofence.topLeft.lng,
                     $scope.assignment.geofence.bottomRight.lat,
-                    $scope.assignment.geofence.bottomRight.lng)
-                .success(function (data) {
-                    console.log(data);
-                });
+                    $scope.assignment.geofence.bottomRight.lng);
             });
 
             $location.path('/');

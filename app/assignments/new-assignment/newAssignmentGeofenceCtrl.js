@@ -12,13 +12,13 @@ angular
 
         var mainTileLayer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
              attribution: 'Map data © OpenStreetMap contributors',
-             minZoom: 10,
+             minZoom: 4,
              maxZoom: 16
         });
 
         map = L.map('set-geofence-map', {
-            center: [43.2, -77.6],
-            zoom: 10,
+            center: [41, -77.6],
+            zoom: 6,
             layers: [
                 mainTileLayer
             ]
