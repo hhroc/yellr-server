@@ -61,13 +61,17 @@ angular
             }
         });
 
+        $scope.quotes = [];
+        $scope.images = [];
+
         /**
-         * Gets all quotes for the current collection
+         * Gets all quotes and images for the current collection
          *
          * @return void
          */
-        $scope.getQuotes = function () {
+        $scope.getPostContent = function () {
             $scope.quotes = [];
+            $scope.images = [];
 
             collectionApiService
             .getPosts($scope.article.collection.collection_id)
@@ -76,8 +80,11 @@ angular
                     .collection_id;
 
                 data.posts.forEach(function (post) {
-                    var postQuotes = _getQuotesFromPost(post);
+                    var postQuotes = _getQuotesFromPost(post),
+                        postImages = _getImagesFromPost(post);
+
                     $scope.quotes = $scope.quotes.concat(postQuotes);
+                    $scope.images = $scope.images.concat(postImages);
                 });
             });
         };
