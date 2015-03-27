@@ -57,13 +57,41 @@ def admin_check_loged_in(request):
     result = {'success': False}
 
     try:
-        valid, user = admin_utils.check_token(request)
+        #valid, user = admin_utils.check_token(request)
+
+        #result['logged_in'] = False
+        #if valid == True:
+        #    result['logged_in'] = True
+        #
+        #result['success'] = True
+
+        #user, org, token, fence = admin_utils.check_token(request) #admin_utils.authenticate(username, password)
+        #if user == None or token == None or fence == None:
+        #    result['logged_in'] = False
+        #    status_code = 400
+        #    raise Exception("User not logged in.")
+        #else:
+
+        valid, user, org, fence = admin_utils.check_logged_in(request)
 
         result['logged_in'] = False
-        if valid == True:
-            result['logged_in'] = True
+        if valid is True:
 
-        result['success'] = True
+            #result['token'] = token
+            result['username'] = user.user_name
+            result['first_name'] = user.first_name
+            result['last_name'] = user.last_name
+            result['organization_id'] = org.organization_id
+            result['organization'] = org.name
+
+            result['fence'] = {
+                'top_left_lat': fence.top_left_lat,
+                'top_left_lng': fence.top_left_lng,
+                'bottom_right_lat': fence.bottom_right_lat,
+                'bottom_right_lng': fence.bottom_right_lng,
+            }
+
+            result['logged_in'] = True
 
     except Exception, e:
         result['error_text'] = str(e)

@@ -56,6 +56,23 @@ def check_token(request):
 
     return valid, user
 
+def check_logged_in(request):
+
+    valid, user = check_token(request)
+
+    org = None
+    fence = None
+    if valid is True:
+       org = Organizations.get_from_id(
+           session = DBSession,
+           organization_id = user.organization_id,
+       )
+       fence = UserGeoFences.get_fence_from_user_id(
+           session = DBSession,
+           user_id = user.user_id,
+       )
+
+    return valid, user, org, fence
 
 def authenticate(username, password):
     user = None
