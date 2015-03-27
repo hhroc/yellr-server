@@ -254,9 +254,11 @@ def admin_get_my_assignments(request):
             start = 0
             if 'start' in request.GET:
                 start = int(request.GET['start'])
-            count = 50
+            count = 25
             if 'count' in request.GET:
                 count = int(request.GET['count'])
+                if count > 25:
+                    count = 25
         except:
             status_code = 403
             raise Exception("invalid input")
