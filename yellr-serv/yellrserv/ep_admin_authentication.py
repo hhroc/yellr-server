@@ -57,21 +57,7 @@ def admin_check_loged_in(request):
     result = {'success': False}
 
     try:
-        #valid, user = admin_utils.check_token(request)
-
-        #result['logged_in'] = False
-        #if valid == True:
-        #    result['logged_in'] = True
-        #
-        #result['success'] = True
-
-        #user, org, token, fence = admin_utils.check_token(request) #admin_utils.authenticate(username, password)
-        #if user == None or token == None or fence == None:
-        #    result['logged_in'] = False
-        #    status_code = 400
-        #    raise Exception("User not logged in.")
-        #else:
-
+        
         valid, user, org, fence = admin_utils.check_logged_in(request)
 
         result['logged_in'] = False
