@@ -62,7 +62,7 @@ def check_logged_in(request):
 
     org = None
     fence = None
-    if valid is True:
+    if valid:
        org = Organizations.get_from_id(
            session = DBSession,
            organization_id = user.organization_id,

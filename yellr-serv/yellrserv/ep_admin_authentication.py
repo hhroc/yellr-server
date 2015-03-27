@@ -61,7 +61,7 @@ def admin_check_loged_in(request):
         valid, user, org, fence = admin_utils.check_logged_in(request)
 
         result['logged_in'] = False
-        if valid is True:
+        if valid:
 
             #result['token'] = token
             result['username'] = user.user_name
