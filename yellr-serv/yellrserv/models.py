@@ -651,12 +651,26 @@ class Assignments(Base):
         return assignments_query
 
     @classmethod
-    def get_all_with_questions(cls, session, token, \
+    def get_all_with_questions(cls, session, expired=False, \
             start=0, count=0):
         with transaction.manager:
-            assignments = Assignments._build_assignments_query(session).filter(
-                #
-            ).slice(start, start+count).all()
+            assignments_query = Assignments._build_assignments_query(
+                session = session,
+            )
+            if expired:
+               assignments_query = assignments_query.filter(
+                    cast(Assignments.expire_datetime,Date) < \
+                        cast(datetime.datetime.now(),Date),
+                )
+            else:
+                assignments_query = assignments_query.filter(
+                    cast(Assignments.expire_datetime,Date) >= \
+                        cast(datetime.datetime.now(),Date),
+                )
+            assignments = assignments_query.slice(
+                start, 
+                start+count
+            ).all()
         return assignments #, total_assignment_count
 
     @classmethod
@@ -1171,7 +1185,11 @@ class Posts(Base):
             ).filter(
                 Posts.post_id == post_id,
             ).first()
-            post.approved = True
+            # change the approved state of the post (T -> F, F -> T)
+            if post.approved == False:
+                post.approved = True
+            else:
+                post.approved = False
             session.add(post)
             transaction.commit()
         return post
