@@ -79,6 +79,8 @@ def admin_check_loged_in(request):
 
             result['logged_in'] = True
 
+        result['success'] = True
+
     except Exception, e:
         result['error_text'] = str(e)
 
