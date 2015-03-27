@@ -1,6 +1,5 @@
 'use strict';
 var L = L || {},
-    map = map || {},
     mainTileLayer = {};
 
 angular
@@ -9,12 +8,11 @@ angular
     function ($scope) {
 
         // initialize map
-
         var mainTileLayer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
              attribution: 'Map data © OpenStreetMap contributors',
              minZoom: 4,
              maxZoom: 16
-        });
+        }),
 
         map = L.map('set-geofence-map', {
             center: [41, -77.6],

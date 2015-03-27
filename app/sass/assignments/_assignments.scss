@@ -1,6 +1,13 @@
 .assignments {
-    @extend .small-12;
+    @extend .small-6;
     @extend .columns;
+}
+
+.assignment-map {
+    @extend .small-6;
+    @extend .columns;
+
+    height: 100%;
 }
 
 .assignment-block {
