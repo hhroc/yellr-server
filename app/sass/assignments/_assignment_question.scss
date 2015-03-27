@@ -3,6 +3,28 @@
     margin-bottom: 20px;
 }
 
+.delete-question {
+    @include primary-btn();
+
+    margin: 10px 0;
+    padding: .55rem 1rem;
+    width: auto;
+
+    border: solid 1px darken($background-accent, 10);
+    color: $type;
+    background-color: $background;
+
+    &:focus {
+        color: $type;
+        background-color: $background;
+    }
+
+    &:hover {
+        color: $background;
+        background-color: $warn;
+    }
+}
+
 .add-question {
     @include primary-btn();
 
