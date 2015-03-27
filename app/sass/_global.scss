@@ -6,6 +6,10 @@ html, body {
     background-color: $primary;
 }
 
+body {
+    min-width: 1280px;
+}
+
 .page {
     height: 100%;
 }

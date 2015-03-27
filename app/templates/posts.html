@@ -17,9 +17,9 @@
                     <p class="post-assignment-name" ng-if="post.assignment_name">Assignment: {{post.assignment_name}}</p>
                     <p class="post-assignment-name" ng-if="!post.assignment_name">Free Post</p>
                     <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>
-                    <button ng-class="{'approve-post-active': post.approved}" class="approve-post" ng-click="approvePost(post)"><i class="fa fa-star"></i></button>
-                    <button class="delete-post"><i class="fa fa-trash"></i></button>
-                    <button  ng-if="!collectionPage"class="add-post" dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
+                    <button ng-class="{'approve-post-active': post.approved}" class="approve-post" title="Approve Post for Local Feed."ng-click="approvePost(post)"><i class="fa fa-star"></i></button>
+                    <button class="delete-post" title="Delete Post."><i class="fa fa-trash"></i></button>
+                    <button  ng-if="!collectionPage"class="add-post" title="Add to Collection for use with a Story." dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
                     <ul id="drop-{{post.post_id}}" class="f-dropdown add-post-dropdown">
                         <li ng-repeat="collection in collections" ng-click="addPostToCollection(post, collection)">{{collection.name}}</li>
                     </ul>

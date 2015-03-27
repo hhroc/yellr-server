@@ -8,9 +8,8 @@
         <div class="assignment-block" ng-repeat="assignment in assignments" ng-click="showGeofence(assignment)">
             <div class="assignment-question" ng-repeat="question in assignment.questions">
                 <h1><a href="#/assignments/{{assignment.assignment_id}}">{{question.question_text}}</a></h1>
-                <p ng-if="question.question_type_id==1"><b>Full Text Response</b></p>
-                <p ng-if="question.question_type_id==2"><b>Multiple Choice Response</b></p>
-                <p>Assignment Count: {{assignment.post_count}}</p>
+                <p ng-if="question.question_type_id==2"><b>Poll</b></p>
+                <p>Response Count: {{assignment.post_count}}</p>
             </div>
        </div>
     </div>
