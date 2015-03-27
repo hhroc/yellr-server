@@ -57,10 +57,26 @@ def admin_check_loged_in(request):
     result = {'success': False}
 
     try:
-        valid, user = admin_utils.check_token(request)
+        
+        valid, user, org, fence = admin_utils.check_logged_in(request)
 
         result['logged_in'] = False
-        if valid == True:
+        if valid:
+
+            #result['token'] = token
+            result['username'] = user.user_name
+            result['first_name'] = user.first_name
+            result['last_name'] = user.last_name
+            result['organization_id'] = org.organization_id
+            result['organization'] = org.name
+
+            result['fence'] = {
+                'top_left_lat': fence.top_left_lat,
+                'top_left_lng': fence.top_left_lng,
+                'bottom_right_lat': fence.bottom_right_lat,
+                'bottom_right_lng': fence.bottom_right_lng,
+            }
+
             result['logged_in'] = True
 
         result['success'] = True
