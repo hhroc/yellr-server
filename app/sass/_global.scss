@@ -10,6 +10,10 @@ html, body {
     height: 100%;
 }
 
+h1.page-title {
+    padding-left: 20px;
+}
+
 @mixin primary-btn() {
     padding: .55rem 0;
     border-radius: 5px;
