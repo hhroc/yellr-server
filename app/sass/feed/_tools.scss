@@ -2,6 +2,8 @@
     @extend .small-2;
     @extend .columns;
 
+    padding-left: 10px;
+
     h4 {
         margin: 5px 0;
         font-size: 1.8rem;
@@ -51,3 +53,21 @@
         }
     }
 }
+
+.collection-side-feed-item {
+
+    background-color: $background;
+    border-color: $primary;
+    //color: $background;
+    padding: 10px;
+
+    &:hover {
+        background-color: lighten($primary, 20);
+        border-color: $primary;
+        cursor: pointer;
+        //color: $background;
+    }
+
+
+}
+
