@@ -23,6 +23,9 @@
         <h4 class="collections">Collections</h4>
     </div>
     <ul class="collections-list">
-        <li class="collection-side-feed-item" ng-repeat="collection in collections">{{collection.name}} <span class="num-posts">{{collection.post_count}}</span></li>
+        <li class="collection-side-feed-item" ng-repeat="collection in collections">
+            <a href="#/collections/{{collection.collection_id}}">{{collection.name}}</a>
+            <span class="num-posts">{{collection.post_count}}</span>
+        </li>
     </ul>
 </div>
