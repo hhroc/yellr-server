@@ -9,14 +9,12 @@ angular
         var localUser = window.sessionStorage.getItem('YellrUser');
 
         if (window.loggedIn) {
-            $rootScope.user = JSON.parse(localUser);
             $location.path('/feed');
         }
 
         $scope.error = false;
 
         /**
-         * DEPRECATED
          * logs the user in and assigns token in global scope
          *
          * @param username
@@ -26,7 +24,7 @@ angular
 
             userApiService.getAccessToken(username, password)
             .success(function (data, status, headers, config) {
-                $rootScope.user = {
+                window.user = {
                     name: data.first_name + ' ' + data.last_name,
                     organization: data.organization
                 };
