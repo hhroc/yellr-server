@@ -1,17 +1,17 @@
-<h1>View Assignments</h1>
+<h1 class="page-title">View Assignments</h1>
 <div class="assignments">
     <div ng-if="!assignments.length === 0">
         <h4>No assignments yet.</h4>
         <a href="">Create an Assignment</a>
     </div>
     <div ng-if="assignments.length">
-        <div class="assignment-block" ng-repeat="assignment in assignments">
+        <div class="assignment-block" ng-repeat="assignment in assignments" ng-click="showGeofence(assignment)">
             <div class="assignment-question" ng-repeat="question in assignment.questions">
-                <h1><a href="#/assignments/{{assignment.assignment_id}}">{{question.question_text}}</a></h1>
-                <p ng-if="question.question_type_id==1"><b>Full Text Response</b></p>
-                <p ng-if="question.question_type_id==2"><b>Multiple Choice Response</b></p>
-                <p>Assignment Count: {{assignment.post_count}}</p>
+                <h3><a href="#/assignments/{{assignment.assignment_id}}">{{question.question_text}}</a></h3>
+                <p ng-if="question.question_type_id==2"><b>Poll</b></p>
+                <p>Response Count: {{assignment.post_count}}</p>
             </div>
        </div>
     </div>
 </div>
+<div class="assignment-map" id="assignment-map"></div>

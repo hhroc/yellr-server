@@ -52,6 +52,12 @@ angular
             $location.path('/new-assignment/geofence');
         };
 
+        $scope.deleteQuestion = function (index) {
+            console.log(index);
+            $scope.questions.splice(index, 1);
+            console.log($scope.questions);
+        };
+
         /**
          * Gets all available languages and populates options with them
          *

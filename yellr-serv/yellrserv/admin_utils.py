@@ -56,6 +56,23 @@ def check_token(request):
 
     return valid, user
 
+def check_logged_in(request):
+
+    valid, user = check_token(request)
+
+    org = None
+    fence = None
+    if valid:
+       org = Organizations.get_from_id(
+           session = DBSession,
+           organization_id = user.organization_id,
+       )
+       fence = UserGeoFences.get_fence_from_user_id(
+           session = DBSession,
+           user_id = user.user_id,
+       )
+
+    return valid, user, org, fence
 
 def authenticate(username, password):
     user = None
@@ -220,7 +237,7 @@ def get_question_types():
 
     return ret_question_types
 
-def get_assignments(start, count):
+def get_assignments(expired, start, count):
 
     ret_assignments = []
     
@@ -228,7 +245,7 @@ def get_assignments(start, count):
 
         assignments = Assignments.get_all_with_questions(
             session = DBSession,
-            token = None,
+            expired = expired,
             start = start,
             count = count,
         )

@@ -1,5 +1,5 @@
 <button class="btn btn-default" ng-click="openModal()">New Collection</button>
-<h1>View Collections</h1>
+<h1 class="page-title">View Collections</h1>
 <div class="collections">
     <div ng-if="!collections.length === 0">
         <h4>No collections yet.</h4>
@@ -7,7 +7,7 @@
     </div>
     <div ng-if="collections.length">
         <div class="collection-block" ng-repeat="collection in collections">
-            <h1><a href="#/collections/{{collection.collection_id}}">{{collection.name}}</a></h1>
+            <h3><a href="#/collections/{{collection.collection_id}}">{{collection.name}}</a></h3>
             <p ng-if="collection.assignment_id">Collection for assignment: {{collection.assignment_name}}</p>
         </div>
     </div>

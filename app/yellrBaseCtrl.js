@@ -3,8 +3,8 @@
 angular
     .module('Yellr')
     .controller('yellrBaseCtrl',
-    ['$scope', '$http', 'userApiService',
-    function ($scope, $http, userApiService) {
+    ['$scope', '$http', '$rootScope', 'userApiService',
+    function ($scope, $http, $rootScope, userApiService) {
         window.loggedIn = false;
         $scope.feedPage = false;
         $scope.contributorsPage = false;
@@ -27,5 +27,6 @@ angular
         userApiService.isLoggedIn()
         .success(function (data) {
             window.loggedIn = data.logged_in;
+            $rootScope.user = data;
         });
     }]);

@@ -246,17 +246,24 @@ def admin_get_my_assignments(request):
             raise Exception("Invalid authorization or bad credentials.")
 
         try:
+            expired = False
+            if 'expired' in request.GET:
+                expired = False
+                if int(request.GET['expired']) == 1:
+                    expired = True 
             start = 0
             if 'start' in request.GET:
-                stat = int(request.get['start'])
-            count = 50
+                start = int(request.GET['start'])
+            count = 25
             if 'count' in request.GET:
                 count = int(request.GET['count'])
+                if count > 25:
+                    count = 25
         except:
             status_code = 403
             raise Exception("invalid input")
 
-        ret_assignments = admin_utils.get_assignments(start, count)
+        ret_assignments = admin_utils.get_assignments(expired, start, count)
 
         result['assignments'] = ret_assignments
         result['success'] = True
