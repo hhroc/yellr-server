@@ -218,7 +218,7 @@ angular
                 url: url,
                 data: $.param(data)
             });
-        }
+        };
 
         /**
          * Registers a post viewed
