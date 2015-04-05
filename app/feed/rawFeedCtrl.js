@@ -94,7 +94,15 @@ angular
          * @return void
          */
         $scope.deletePost = function (post) {
-            //TODO: ^
+            assignmentApiService.deletePost(post.post_id)
+            .success(function (data) {
+                for(var i=0; i<$scope.posts.length; i++) {
+                    if ( $scope.posts[i].post_id == post.post_id ) {
+                        $scope.posts.splice(i,1);
+                        break;
+                    }
+                }
+            });
         };
 
         $scope.loadMore();
