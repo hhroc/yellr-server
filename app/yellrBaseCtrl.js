@@ -12,7 +12,7 @@ angular
         $scope.collectionsPage = false;
         $scope.messagesPage = false;
         $scope.settingsPage = false;
-        $rootScope.loading = true;
+        $scope.loading = true;
 
         $scope.clear = function () {
             $scope.feedPage = false;
@@ -29,8 +29,9 @@ angular
         .success(function (data) {
             window.loggedIn = data.logged_in;
             $rootScope.user = data;
+            $scope.loading = false;
             if (data.logged_in) {
-                $rootScope.loading = false;
+                $('#side-nav').show();
             }
         });
     }]);
