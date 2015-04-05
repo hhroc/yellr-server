@@ -203,6 +203,24 @@ angular
         };
 
         /**
+         * Delete a post from the feed
+         *
+         * @param id : id of the post to delete
+         *
+         * @return post_id : id of the deleted post
+         */
+        assignmentApi.deletePost = function (id) {
+            var url = '/admin/delete_post.json',
+                data = { post_id: id };
+
+            return $http({
+                method: 'POST',
+                url: url,
+                data: $.param(data)
+            });
+        }
+
+        /**
          * Registers a post viewed
          *
          * @param id : id of post viewed
