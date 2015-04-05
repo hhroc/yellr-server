@@ -28,8 +28,8 @@ angular
         userApiService.isLoggedIn()
         .success(function (data) {
             window.loggedIn = data.logged_in;
+            $rootScope.user = data;
             if (data.logged_in) {
-                $rootScope.user = data;
                 $rootScope.loading = false;
             }
         });
