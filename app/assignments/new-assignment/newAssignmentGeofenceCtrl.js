@@ -15,8 +15,8 @@ angular
         }),
 
         map = L.map('set-geofence-map', {
-            center: [41, -77.6],
-            zoom: 6,
+            center: [43.15, -77.6],
+            zoom: 11,
             layers: [
                 mainTileLayer
             ]
@@ -27,9 +27,16 @@ angular
 
         $('#geo-fence-button').on('click', function (e) {
             map.enableDrawing = true;
+            $('.leaflet-container').css('cursor','crosshair','!important');
+            if ( map.geoBox != false ) {
+                map.removeLayer(map.geoBox);
+            }
         });
 
         map.on('mousedown', function (e) {
+            L.DomUtil.disableImageDrag();
+            L.DomUtil.disableTextSelection();
+            //$('#set-geofence-map').css('cursor','crosshair', '!important');
             if (map.enableDrawing) {
                 map.removeLayer(map.geoBox);
                 map.dragging.disable();
@@ -39,6 +46,7 @@ angular
         });
 
         map.on('mousemove', function (e) {
+            //$('#set-geofence-map').css('cursor','crosshair', '!important');
             if (map.enableDrawing && map.drawingBox) {
                 map.removeLayer(map.geoBox);
                 map.geoBox = L.rectangle([map.topLeftCord, e.latlng], {color:'#ff7800', weight:1});
@@ -47,10 +55,13 @@ angular
         });
 
         map.on('mouseup', function (e) {
+            L.DomUtil.enableImageDrag();
+            L.DomUtil.enableTextSelection();
+            $('.leaflet-container').css('cursor','pointer','!important'); 
             if (map.enableDrawing && map.drawingBox) {
                 map.removeLayer(map.geoBox);
                 var bounds = [map.topLeftCord, e.latlng];
-                map.geoBox = L.rectangle(bounds, {color:'#00FF78', weight:1});
+                map.geoBox = L.rectangle(bounds, {color:'#00FF78', weight:2});
                 map.addLayer(map.geoBox);
 
                 $scope.$parent.assignment.geofence = {
