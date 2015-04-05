@@ -237,7 +237,7 @@ def get_question_types():
 
     return ret_question_types
 
-def get_assignments(start, count):
+def get_assignments(expired, start, count):
 
     ret_assignments = []
     
@@ -245,7 +245,7 @@ def get_assignments(start, count):
 
         assignments = Assignments.get_all_with_questions(
             session = DBSession,
-            token = None,
+            expired = expired,
             start = start,
             count = count,
         )

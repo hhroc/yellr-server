@@ -59,7 +59,7 @@ angular
         $scope.approvePost = function (post) {
             assignmentApiService.approvePost(post.post_id)
             .success(function (data) {
-                post.approved = true;
+                post.approved = !post.approved;
                 console.log('post approved?', data);
             });
         };

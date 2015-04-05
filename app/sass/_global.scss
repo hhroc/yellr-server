@@ -6,8 +6,16 @@ html, body {
     background-color: $primary;
 }
 
+body {
+    min-width: 1280px;
+}
+
 .page {
     height: 100%;
+}
+
+h1.page-title {
+    padding-left: 20px;
 }
 
 @mixin primary-btn() {
