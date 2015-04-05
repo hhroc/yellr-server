@@ -96,23 +96,12 @@ angular
         $scope.deletePost = function (post) {
             assignmentApiService.deletePost(post.post_id)
             .success(function (data) {
-                console.log($scope.posts);
                 for(var i=0; i<$scope.posts.length; i++) {
-                    console.log('$scope.posts[i].post_id: ' + $scope.posts[i].post_id + ', post.post_id: ' + post.post_id);
                     if ( $scope.posts[i].post_id == post.post_id ) {
                         $scope.posts.splice(i,1);
                         break;
                     }
                 }
-                console.log($scope.posts);
-                /*
-                $scope.notificationMessage = message;
-                $scope.activeNotification = true;
-
-                $timeout(function () {
-                    $scope.activeNotification = false;
-                }, 1200);
-                */
             });
         };
 
