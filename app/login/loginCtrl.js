@@ -32,6 +32,7 @@ angular
                 if (data.success) {
                     window.loggedIn = true;
                     $location.path('/feed');
+                    $('#side-nav').show();
                 }
             })
 
