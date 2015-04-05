@@ -36,7 +36,6 @@ angular
         map.on('mousedown', function (e) {
             L.DomUtil.disableImageDrag();
             L.DomUtil.disableTextSelection();
-            //$('#set-geofence-map').css('cursor','crosshair', '!important');
             if (map.enableDrawing) {
                 map.removeLayer(map.geoBox);
                 map.dragging.disable();
@@ -46,7 +45,6 @@ angular
         });
 
         map.on('mousemove', function (e) {
-            //$('#set-geofence-map').css('cursor','crosshair', '!important');
             if (map.enableDrawing && map.drawingBox) {
                 map.removeLayer(map.geoBox);
                 map.geoBox = L.rectangle([map.topLeftCord, e.latlng], {color:'#ff7800', weight:1});
