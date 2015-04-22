@@ -498,7 +498,6 @@ def add_post(client_id, assignment_id, language_code, lat, lng, media_objects):
     vote = None
     
     try:
-
         post = Posts.create_from_http(
             session = DBSession,
             client_id = client_id,
