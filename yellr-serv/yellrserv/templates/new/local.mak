@@ -39,7 +39,7 @@
         </div>
         <div class="small-10 columns">
           <div>
-            <span class="right"><i class="fa fa-pencil"></i> 20h</span>
+            <span class="right"><i class="fa fa-pencil"></i> ${post['post_datetime_ago']}</span>
             <i class="fa fa-user anonymous-user-label"></i> Anonymous User
           </div>
           % if post['question_text'] != None:

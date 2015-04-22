@@ -136,6 +136,19 @@ button.disabled {
   padding: 10px; 
 }
 
+#post-add-image {
+  overflow: hidden;
+}
+
+#post-add-image input {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  font-size: 100px;
+}
+
 .anonymous-label {
   font-size: 80%;
   font-weight: bold;

@@ -189,6 +189,7 @@ def get_stories(language_code, lat, lng, start, count):
             ret_stories.append({
                 'story_unique_id': story_unique_id,
                 'publish_datetime': str(publish_datetime),
+                'publish_datetime_ago': utils.ago_decode(publish_datetime),
                 'edited_datetime': str(edited_datetime),
                 'title': title,
                 'tags': tags,

@@ -27,6 +27,25 @@ from .models import (
     Notifications,
     )
 
+def ago_decode(dt):
+
+    SECOND = 1
+    MINUTE = SECOND * 60
+    HOUR = MINUTE * 60
+    DAY = HOUR * 24
+
+    ago = 0
+    diff = (datetime.datetime.now() - dt).total_seconds();
+    if diff > DAY:
+       ago = "%id" % int(float(diff / DAY))
+    elif diff > HOUR:
+       ago = "%ih" % int(float(diff / HOUR))
+    elif diff > MINUTE:
+       ago = "%im" % int(float(diff / MINUTE))
+    else:
+       ago = "1m"
+
+    return ago
 
 def make_response(resp_dict, status_code=200):
 
@@ -199,6 +218,7 @@ def _decode_posts(posts, clean=False):
                         # todo: obfuscate this some how ...
                         'post_id': post_id,
                         'post_datetime': str(post_datetime),
+                        'post_datetime_ago': ago_decode(post_datetime),
                         'verified_user': bool(verified),
                         'first_name': first_name,
                         'last_name': last_name,

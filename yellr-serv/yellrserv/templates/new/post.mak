@@ -1,25 +1,5 @@
 <%inherit file="base.mak"/>
 
-  <style>
-
-    #media-file {
-    }
-
-    #post-add-image {
-      overflow: hidden;
-    }
-
-    #post-add-image input {
-      opacity: 0;
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      font-size: 100px;
-    }
-
-  </style>
-
 <div class="row">
   <div class="large-12 columns">
     <div class="tab-links">
@@ -76,17 +56,6 @@
     imageUpload = true;
   });
 
-  /*
-  function selectMedia() {
-    // taken from:
-    //   http://stackoverflow.com/a/6888810
-    $('#media-file').show();
-    $('#media-file').focus();
-    $('#media-file').trigger('click');
-    //$('#media-file').hide();
-  }
-  */
-
   var url = '/upload_media.json?cuid=${cuid}&lat=${lat}&lng=${lng}&language_code=${language_code}';
 
   $(function () {
@@ -96,11 +65,6 @@
       autoUpload : false,
       url: url,
       dataType: 'json',
-      formData: {
-        media_type: 'image',
-        media_text: '', // not used for images
-        media_caption: $('#post-contents').val(),
-      },
       add: function(e, data) {
         $('#submit-image').off('click').on('click', function() {
           data.submit();
@@ -130,6 +94,13 @@
       imageUpload = false;
       console.log("uploadMedia(): Submitting Image + Text to upload_media.json ...");
       // this will cause the image to be uploaded, and once done(), will call publishPost()
+      $('#media-file').fileupload({
+        formData: {
+          media_type: 'image',
+          media_text: '',
+          media_caption: $('#post-contents').val()
+        }
+      });
       $('#submit-image').trigger('click');
     } else {
         console.log("uploadMedia(): Submitting Text to upload_media.json ...");

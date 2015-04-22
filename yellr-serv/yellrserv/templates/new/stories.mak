@@ -17,7 +17,7 @@
     % for story in stories:
     <div class="container-box">
       <div>
-        <span class="right"><i class="fa fa-pencil"></i> 24h</span>
+        <span class="right"><i class="fa fa-pencil"></i> ${story['publish_datetime_ago']}</span>
         <span><i class="fa fa-user organization-label"></i> ${story['author_first_name']} ${story['author_last_name']}</span>
       </div>
       <div class="story-contents">
