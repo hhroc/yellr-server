@@ -17,15 +17,15 @@ from .models import (
 
 def get_client_info(request):
 
-    lat = 43.1
-    lng = -77.5
+    lat = 43.1656
+    lng = -77.6114
     try:
         if 'lat' in request.COOKIES and 'lng' in request.COOKIES:
             lat = float(request.POST['lat'])
             lng = float(request.POST['lng'])
             if lat > 90 or lat < -90 or lng > 180 or lng < -180:
-                lat = 43.1
-                lng = -77.5
+                lat = 43.1656
+                lng = -77.6114
     except:
         pass
 
@@ -59,6 +59,16 @@ def get_client_info(request):
         pass
 
     return lat, lng, start, count, language_code, cuid, new_client   
+
+@view_config(route_name='index', renderer='templates/one-pager-index.mak')
+def index(request):
+
+    return {}
+
+@view_config(route_name='robots')
+def robots(request):
+
+    return Response('User-agent: *\nAllow: /\n', content_type='text/plain')
 
 @view_config(route_name='/local', renderer='templates/new/local.mak')
 def local(request):
