@@ -47,6 +47,10 @@ def main(global_config, **settings):
     #config.add_route('submit-tip.html','submit-tip.html')
 
     #config.add_route('/', '/')
+
+    config.add_route('index', '/')
+    config.add_route('robots', 'robots.txt')
+
     config.add_route('/local','/local')
     config.add_route('/assignments', '/assignments')
     config.add_route('/stories', '/stories')
