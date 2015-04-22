@@ -26,8 +26,8 @@
               <i id="post-up-vote-${post['post_id']}" class="fa fa-caret-up vote-icon no-vote"></i></br>
             </a>
             % endif
-            <span id="post-up-vote-count-${post['post_id']}">${post['up_vote_count']}</span></br>
-            <span id="post-down-vote-count-${post['post_id']}">${post['down_vote_count']}</span></br>
+            <span id="post-up-vote-count-${post['post_id']}" class="up-vote-count">${post['up_vote_count']}</span></br>
+            <span id="post-down-vote-count-${post['post_id']}" class="down-vote-count">${post['down_vote_count']*(-1)}</span></br>
             <a onclick="doDownVote(${post['post_id']});">
               % if post['has_voted'] == True and post['is_up_vote'] == False:
               <i id="post-down-vote-${post['post_id']}" class="fa fa-caret-down vote-icon down-vote"></i></br>
@@ -43,7 +43,7 @@
             <i class="fa fa-user anonymous-user-label"></i> Anonymous User
           </div>
           % if post['question_text'] != None:
-              <i class="fa fa-question-circle question-text"> ${post['question_text']}</i>
+          <span><i class="fa fa-question-circle question-text"></i> ${post['question_text']}</span>
           % endif
           <div class="post-contents">
             % if post['media_objects'][0]['media_type_name'] == "image":
@@ -83,7 +83,11 @@
 
     if ( $('#post-'+nd+'-vote-' + postId).hasClass(nd + '-vote') ) {
       var count = parseInt($('#post-'+nd+'-vote-count-' + postId).html());
-      count--;
+      if ( nd == 'down' ) {
+        count++;
+      } else {
+        count--;
+      }
       $('#post-'+nd+'-vote-count-' + postId).html(count);
     }
 
@@ -105,12 +109,20 @@
           if ( $('#post-'+d+'-vote-' + postId).hasClass(d+'-vote')) {
             $('#post-'+d+'-vote-' + postId).removeClass(d+'-vote');
             $('#post-'+d+'-vote-' + postId).addClass('no-vote');
-            count--;
+            if( nd == 'down' ) {
+              count--;
+            } else {
+              count++;
+            }
           } else {
             // client has not yet voted
             $('#post-'+d+'-vote-' + postId).removeClass(d+'-vote');
             $('#post-'+d+'-vote-' + postId).addClass(d+'-vote');
-            count++;
+            if( nd == 'down' ) {
+              count++;
+            } else {
+              count--;
+            }
           }
           $('#post-'+d+'-vote-count-' + postId).html(count)
         },

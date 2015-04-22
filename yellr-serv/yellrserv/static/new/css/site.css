@@ -104,6 +104,14 @@ button.disabled {
   font-size: 250%;
 }
 
+.up-vote-count {
+  color: #1ABC9C;
+}
+
+.down-vote-count {
+  color: #FF6347;
+}
+
 .no-vote {
   color: #BBBBBB;
 }

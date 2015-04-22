@@ -17,8 +17,8 @@
     % for story in stories:
     <div class="container-box">
       <div>
-        <i class="fa fa-pencil right"> 24h</i>
-        <i class="fa fa-user organization-label"> ${story['author_first_name']} ${story['author_last_name']}</i>
+        <span class="right"><i class="fa fa-pencil"></i> 24h</span>
+        <span><i class="fa fa-user organization-label"></i> ${story['author_first_name']} ${story['author_last_name']}</span>
       </div>
       <div class="story-contents">
         <h3><!--<a href="#">-->${story['title']}<!--</a>--></h3>
