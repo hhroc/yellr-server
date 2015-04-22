@@ -17,8 +17,8 @@
     % for assignment in assignments:
     <div class="container-box">
       <div>
-        <i class="fa fa-comments right"> ${assignment['post_count']}</i>
-        <i class="fa fa-user organization-label"> ${assignment['organization']}</i> 
+        <span class="right"><i class="fa fa-comments"></i> ${assignment['post_count']}</span>
+        <span><i class="fa fa-user organization-label"></i> ${assignment['organization']}</span>
       </div>
       <div class="assignment-contents">
         <h3><a href="/post?assignment_id=${assignment['assignment_id']}">${assignment['question_text']}</a></h3>

@@ -1,25 +1,5 @@
 <%inherit file="base.mak"/>
 
-  <style>
-
-    #media-file {
-    }
-
-    #post-add-image {
-      overflow: hidden;
-    }
-
-    #post-add-image input {
-      opacity: 0;
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      font-size: 100px;
-    }
-
-  </style>
-
 <div class="row">
   <div class="large-12 columns">
     <div class="tab-links">
@@ -49,7 +29,8 @@
             <i class="fa fa-camera"></i>
             <input id="media-file" type="file" name="media_file">
           </a>
-      </form>
+        </form>
+        <button id="submit-image" style="display: none;">Send Image</button>
       </div>
     </div>
   </div>
@@ -67,24 +48,13 @@
 
   var assignment_id = ${assignment_id};
   var fileName = '';
-  var mediaId = '';
   var imageUpload = false;
 
   $('#media-file').change(function() {
     fileName = $(this).val();
     console.log('File selected: ' + fileName);
+    imageUpload = true;
   });
-
-  /*
-  function selectMedia() {
-    // taken from:
-    //   http://stackoverflow.com/a/6888810
-    $('#media-file').show();
-    $('#media-file').focus();
-    $('#media-file').trigger('click');
-    //$('#media-file').hide();
-  }
-  */
 
   var url = '/upload_media.json?cuid=${cuid}&lat=${lat}&lng=${lng}&language_code=${language_code}';
 
@@ -95,24 +65,17 @@
       autoUpload : false,
       url: url,
       dataType: 'json',
-      formData: {
-        media_type: 'image',
-        media_text: '', // not used for images
-        media_caption: $('#post-contents').val(),
-      },
       add: function(e, data) {
-        data.submit();
+        $('#submit-image').off('click').on('click', function() {
+          data.submit();
+        });
       },
       done: function(e, data) {
         console.log('Image Media Uploaded Successfully.');
-        mediaId = data.result.media_id;
-        imageUpload = true;
-        //publishPost(data.media_id);
+        publishPost(data.result.media_id);
       },
       fail: function(e, data) {
         console.log('FAILURE');
-        console.log(data);
-        console.log(e);
       },
       always: function(e, data) {
         console.log('always()');
@@ -130,10 +93,15 @@
     if ( imageUpload == true ) {
       imageUpload = false;
       console.log("uploadMedia(): Submitting Image + Text to upload_media.json ...");
-      while( mediaId == '' ) {
-        // yea, this is bad if you have really slow interwebs.
-      }
-      publishPost( mediaId );
+      // this will cause the image to be uploaded, and once done(), will call publishPost()
+      $('#media-file').fileupload({
+        formData: {
+          media_type: 'image',
+          media_text: '',
+          media_caption: $('#post-contents').val()
+        }
+      });
+      $('#submit-image').trigger('click');
     } else {
         console.log("uploadMedia(): Submitting Text to upload_media.json ...");
         console.log('submitting: ' + $('#post-contents').val());
@@ -161,7 +129,7 @@
   }
 
   function publishPost( textMediaId ) {
-    console.log('publishPost(): mediaId = ' + textMediaId);
+    console.log('publishPost(): textMediaId = ' + textMediaId);
     var url = 'publish_post.json?cuid=${cuid}&lat=${lat}&lng=${lng}&language_code=${language_code}';
     $.ajax({
         type: 'POST',
@@ -173,8 +141,7 @@
         },
         success: function() {
           console.log('Post Published Successfully.');
-          alert("Post Successful!\r\nOnce approved, your post will show up in the local feed.");
-          mediaId = '';
+          alert("Post Successful!\r\n\n\nOnce approved, your post will show up in the local feed.");
           window.location = '/local';
         }
     });
