@@ -43,8 +43,14 @@ def main(global_config, **settings):
 
 
     # template views
-    config.add_route('index', '/')
-    config.add_route('submit-tip.html','submit-tip.html')
+    #config.add_route('index', '/')
+    #config.add_route('submit-tip.html','submit-tip.html')
+
+    #config.add_route('/', '/')
+    config.add_route('/local','/local')
+    config.add_route('/assignments', '/assignments')
+    config.add_route('/stories', '/stories')
+    config.add_route('/post', '/post')
 
     # admin views
     config.add_route('admin/get_access_token.json', 'admin/get_access_token.json')

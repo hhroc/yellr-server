@@ -12,7 +12,8 @@
     <link rel="stylesheet" type="text/css" href="assets/css/deps/_foundation-datepicker.css"/>
 </head>
 <body>
-    <div class="side-nav">
+    <div class="loading-cover" ng-if="loading"></div>
+    <div class="side-nav" id="side-nav">
         <div class="user">
             <div class="user-image"></div>
             <h3 class="name">{{user.first_name}} {{user.last_name}}</h3>
@@ -54,7 +55,7 @@
             </li>
         </ul>
     </div>
-    <div class='main' ui-view></div>
+    <div class="main" ui-view></div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
     <script src="assets/js/scripts.min.js"></script>

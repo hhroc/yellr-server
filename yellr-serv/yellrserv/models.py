@@ -531,9 +531,10 @@ class Assignments(Base):
         question = session.query(
             Questions
         ).join(
-            Questions,QuestionAssignments.question_id
+            QuestionAssignments,QuestionAssignments.question_id == \
+                Questions.question_id,
         ).filter(
-            QuestionAssignments.assignemnt_id == assignemnt_id,
+            QuestionAssignments.assignment_id == assignment_id,
             Questions.language_id == language_id
         ).filter().first()
         return (assignment,question)
