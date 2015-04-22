@@ -39,16 +39,18 @@
         </div>
         <div class="small-10 columns">
           <div>
-            <i class="fa fa-pencil right"> 20h</i>
-            <i class="fa fa-user anonymous-user-label"> Anonymous User</i>
+            <span class="right"><i class="fa fa-pencil"></i> 20h</span>
+            <i class="fa fa-user anonymous-user-label"></i> Anonymous User
           </div>
-          <i class="fa fa-question-circle question-text"> ${post['question_text']}</i>
+          % if post['question_text'] != None:
+              <i class="fa fa-question-circle question-text"> ${post['question_text']}</i>
+          % endif
           <div class="post-contents">
             % if post['media_objects'][0]['media_type_name'] == "image":
-            <p>${post['media_objects'][0]['caption']}</p>
+            <p class="post-text">${post['media_objects'][0]['caption']}</p>
             <img src="/media/${post['media_objects'][0]['file_name']}"></img>
             % else:
-            <span>${post['media_objects'][0]['media_text']}</span>
+            <p class="post-text">${post['media_objects'][0]['media_text']}</p>
             % endif
           </div>
         </div>

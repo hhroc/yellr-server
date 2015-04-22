@@ -1,6 +1,6 @@
 
 body {
-
+  font-family: Arial, Helvetica, sans-serif
 }
 
 footer {
@@ -94,6 +94,10 @@ button.disabled {
 
 .post-contents {
   padding: 10px;
+}
+
+.post-text {
+  font-size: 120%;
 }
 
 .vote-icon {

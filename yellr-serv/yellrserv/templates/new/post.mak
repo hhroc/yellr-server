@@ -3,22 +3,19 @@
   <style>
 
     #media-file {
-      display: none;
-      /*position: absolute;
-      color: white;
-      background-color: 
-      top: 0;
-      right: 0;
-      margin: 0;
+    }
+
+    #post-add-image {
+      overflow: hidden;
+    }
+
+    #post-add-image input {
       opacity: 0;
-      -ms-filter: 'alpha(opacity=0)';
-      font-size: 200px;
-      direction: ltr;
-      cursor: pointer;
-      padding-top: 1rem;
-      padding-right: 2rem;
-      padding-bottom: 1.0625rem;
-      padding-left: 2rem;*/
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      font-size: 100px;
     }
 
   </style>
@@ -47,67 +44,96 @@
         <form>
           <span class="anonymous-label">All posts are anonymous</span>
           <textarea id="post-contents" rows="6" placeholder="Tell us about your community"></textarea>
-          <div>
-            <a class="button right" onclick="uploadMedia();">Submit</a>
-            <div class="post-add-media">
-              <button id="post-add-image" onclick="selectMedia();"><i class="fa fa-camera"></i></button>
-              <input id="media-file" type="file" name="meida_file"></input>
-              <!--
-              <button class="disabled" ><i class="fa fa-video-camera"></i></a>
-              <button class="disabled" ><i class="fa fa-microphone"></i></a>
-              -->
-            </div>
-          </div>
+          <a class="button right" onclick="uploadMedia();">Submit</a>
+          <a class="button" id="post-add-image">
+            <i class="fa fa-camera"></i>
+            <input id="media-file" type="file" name="media_file">
+          </a>
       </form>
       </div>
     </div>
   </div>
 </div>
 
+<script>
+  $ = undefined;
+</script>
+
+<script src="static/new/js/jquery.min.js"></script>
 <script src="static/new/js/jquery.ui.widget.js"></script>
+<script src="static/new/js/jquery.iframe-transport.js"></script>
 <script src="static/new/js/jquery.fileupload.js"></script>
 <script>
 
   var assignment_id = ${assignment_id};
   var fileName = '';
+  var mediaId = undefined;
+  var imageUpload = false;
 
   $('#media-file').change(function() {
     fileName = $(this).val();
     console.log('File selected: ' + fileName);
   });
 
+  /*
   function selectMedia() {
     // taken from:
     //   http://stackoverflow.com/a/6888810
     $('#media-file').show();
     $('#media-file').focus();
-    $('#media-file').click();
-    $('#media-file').hide();
+    $('#media-file').trigger('click');
+    //$('#media-file').hide();
   }
+  */
+
+  var url = '/upload_media.json?cuid=${cuid}&lat=${lat}&lng=${lng}&language_code=${language_code}';
+
+  $(function () {
+    console.log('inside ...');
+    $('#media-file').fileupload({
+      singleFileUploads : true,
+      autoUpload : false,
+      url: url,
+      dataType: 'json',
+      formData: {
+        media_type: 'image',
+        media_text: '', // not used for images
+        media_caption: $('#post-contents').val(),
+      },
+      add: function(e, data) {
+        data.submit();
+      },
+      done: function(e, data) {
+        console.log('Image Media Uploaded Successfully.');
+        mediaId = data.result.media_id;
+        imageUpload = true;
+        //publishPost(data.media_id);
+      },
+      fail: function(e, data) {
+        console.log('FAILURE');
+        console.log(data);
+        console.log(e);
+      },
+      always: function(e, data) {
+        console.log('always()');
+      }
+    });
+  });
 
   function uploadMedia() {
     console.log('uploadMedia()');
-    var url = 'upload_media.json?cuid=${cuid}&lat=${lat}&lng=${lng}&language_code=${language_code}';
     if ( typeof $('#post-contents').val() == 'undefined' || $('#post-contents').val().trim() == '' ) {
       alert('Please tell us a bit about your community before submitting.');
       return;
     }
 
-    if ( fileName != '' ) {
+    if ( imageUpload == true ) {
+      imageUpload = false;
       console.log("uploadMedia(): Submitting Image + Text to upload_media.json ...");
-      $('#media-file').fileupload({
-        url: url,
-        dataType: 'json',
-        formData: {
-          media_type: 'image',
-          media_text: '', // not used for images
-          media_caption: $('#post-contents').val(), 
-        },
-        done: function(e, data) {
-          console.log('Image Media Uploaded Successfully.');
-          publishPost(data.media_id);
-        }
-      });
+      while( mediaId == '' ) {
+        // yea, this is bad if you have really slow interwebs.
+      }
+      publishPost( mediaId );
     } else {
         console.log("uploadMedia(): Submitting Text to upload_media.json ...");
         console.log('submitting: ' + $('#post-contents').val());
@@ -125,7 +151,7 @@
             if ( data.success == true ) {
               console.log('data:');
               console.log(data.media_id);
-              publishPost(data.media_id);
+              publishPost( data.media_id );
             } else {
               alert('Yikes!  Looks like something went wrong.  Please try again later.');
             }
@@ -134,8 +160,8 @@
     }
   }
 
-  function publishPost( mediaId ) {
-    console.log('publishPost(): mediaId = ' + mediaId);
+  function publishPost( textMediaId ) {
+    console.log('publishPost(): mediaId = ' + textMediaId);
     var url = 'publish_post.json?cuid=${cuid}&lat=${lat}&lng=${lng}&language_code=${language_code}';
     $.ajax({
         type: 'POST',
@@ -143,7 +169,7 @@
         dataType: 'json',
         data: {
           'assignment_id': assignment_id,
-          'media_objects': '["' + mediaId + '"]'
+          'media_objects': '["' + textMediaId + '"]'
         },
         success: function() {
           console.log('Post Published Successfully.');

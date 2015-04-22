@@ -21,7 +21,7 @@
         <i class="fa fa-user organization-label"> ${story['author_first_name']} ${story['author_last_name']}</i>
       </div>
       <div class="story-contents">
-        <h3><a href="#">${story['title']}</a></h3>
+        <h3><!--<a href="#">-->${story['title']}<!--</a>--></h3>
         <span>${story['contents_rendered'] | n}</span>
       </div>
     </div>

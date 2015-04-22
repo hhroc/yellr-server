@@ -21,7 +21,7 @@
         <i class="fa fa-user organization-label"> ${assignment['organization']}</i> 
       </div>
       <div class="assignment-contents">
-        <h3><a href="#">${assignment['question_text']}</a></h3>
+        <h3><a href="/post?assignment_id=${assignment['assignment_id']}">${assignment['question_text']}</a></h3>
         <span>${assignment['description']}</span>
       </div>
     </div>
