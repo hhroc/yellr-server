@@ -67,7 +67,7 @@
 
   var assignment_id = ${assignment_id};
   var fileName = '';
-  var mediaId = undefined;
+  var mediaId = '';
   var imageUpload = false;
 
   $('#media-file').change(function() {
@@ -174,6 +174,7 @@
         success: function() {
           console.log('Post Published Successfully.');
           alert("Post Successful!\r\nOnce approved, your post will show up in the local feed.");
+          mediaId = '';
           window.location = '/local';
         }
     });
