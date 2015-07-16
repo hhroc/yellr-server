@@ -973,6 +973,7 @@ class Posts(Base):
     lat = Column(Float)
     lng = Column(Float)
     approved = Column(Boolean)
+    flagged = Column(Boolean)
 
     @classmethod
     def create_from_http(cls, session, client_id, assignment_id, #title,
@@ -998,6 +999,7 @@ class Posts(Base):
                 lat = lat,
                 lng = lng,
                 approved = False,
+                flagged = False,
             )
             session.add(post)
             transaction.commit()
@@ -1031,6 +1033,7 @@ class Posts(Base):
                 Posts.lat,
                 Posts.lng,
                 Posts.approved,
+                Posts.flagged,
                 MediaObjects.media_object_id,
                 MediaObjects.media_id,
                 MediaObjects.file_name,
@@ -1195,6 +1198,21 @@ class Posts(Base):
             transaction.commit()
         return post
 
+    @classmethod
+    def flag_post(cls, session, post_id):
+        with transaction.manager:
+            post = session.query(
+                Posts,
+            ).filter(
+                Posts.post_id == post_id,
+            ).first()
+            if post.flagged == False:
+                post.flagged = True
+            else:
+                post.flagged = False
+            session.add(post)
+            transaction.commit()
+        return post
 
     @classmethod
     def get_all_approved_from_location(cls, session, client_id, language_code, \
@@ -1212,6 +1230,7 @@ class Posts(Base):
                     ((lat - 0.5) + 90 < Posts.lat + 90) &
                     ((lng - 0.5) + 180 < Posts.lng + 180))
             ).filter(
+                Posts.flagged == False,
                 Languages.language_code == language_code,
                 #cast(Assignments.expire_datetime,Date) >= cast(datetime.datetime.now(),Date),
             ).slice(start, start+count).all()

@@ -313,6 +313,29 @@ def get_approved_posts(client_id, language_code, lat, lng, start, count):
 
     return ret_posts 
 
+def flag_post(post_id):
+
+    post = None
+
+    #try:
+    if True:
+
+        post = Posts.get_from_post_id(
+            session = DBSession,
+            post_id = post_id,
+        )
+
+        if post.flagged == False:
+            post = Posts.flag_post(
+                session = DBSession,
+                post_id = post_id,
+            )
+
+    #except:
+    #    raise Exception('Database error.')
+
+    return post
+
 def register_vote(post_id, client_id, is_up_vote):
 
     vote = None

@@ -67,6 +67,39 @@ def get_local_posts(request):
 
     return utils.make_response(result, status_code)
 
+@view_config(route_name='flag_post.json')
+def flag_post(request):
+    result = {'success': False}
+    status_code = 200
+
+    #try:
+    if True:
+
+        success, error_text, language_code, lat, lng, \
+            client = client_utils.register_client(request)
+        if success == False:
+            raise Exception(error_text)
+
+        #try:
+        if True:
+
+            post_id = int(request.POST['post_id'])
+            if post_id < 1:
+                raise Exception('Invalid input')
+            
+            post = client_utils.flag_post(
+                post_id = post_id,
+            )
+
+            result['post_id'] = post.post_id
+            result['success'] = True
+
+    #except Exception, e:
+    #    status_code = 400
+    #    result['error_text'] = str(e)
+
+    return utils.make_response(result, status_code)
+
 @view_config(route_name='register_vote.json')
 def register_vote(request):
 

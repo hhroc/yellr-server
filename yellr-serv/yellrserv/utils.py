@@ -199,7 +199,7 @@ def _decode_posts(posts, clean=False):
             # itterate throught the list, and build our resposne
             index = 0
             for post_id, client_id, post_datetime, deleted, \
-                    lat, lng, approved, media_object_id, media_id, \
+                    lat, lng, approved, flagged, media_object_id, media_id, \
                     file_name, caption, media_text, media_type_name, \
                     media_type_description, verified, first_name, last_name, \
                     cuid, language_code, language_name, assignment_id, \
@@ -209,7 +209,6 @@ def _decode_posts(posts, clean=False):
                 if (post_id not in seen_post_ids) or (index == len(posts)-1):
 
                     if post:
-
                         ret_posts.append(post)
 
                     # build the response that is clean (can be sent to the client)
@@ -239,6 +238,7 @@ def _decode_posts(posts, clean=False):
                         post['lat'] = lat
                         post['lng'] = lng
                         post['approved'] = approved
+                        post['flagged'] = flagged
                         post['verified_user'] = bool(verified)
                         post['client_id'] = client_id
                         post['assignment_id'] = assignment_id
