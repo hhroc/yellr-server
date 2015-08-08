@@ -30,6 +30,7 @@ Ubuntu:
     npm install -g grunt-cli
     # ruby is used for sass compilation
     sudo apt-get install ruby
+    sudo gem install sass
 ```
 
 Once the you have all of those, simply run `make` to compile all of the
