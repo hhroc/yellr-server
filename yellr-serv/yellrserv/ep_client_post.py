@@ -23,6 +23,7 @@ def get_local_posts(request):
 
     #try:
     if True:
+
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
@@ -55,15 +56,17 @@ def get_local_posts(request):
     #    status_code = 400
     #    result['error_text'] = str(e)
 
+    '''
     client_utils.log_client_action(
         client = client,
-        url = 'get_approved_posts.json',
+        url = 'get_local_posts.json',
         lat = lat,
         lng = lng,
         request = request,
         result = result,
         success = success,
     )
+    '''
 
     return utils.make_response(result, status_code)
 
@@ -72,8 +75,8 @@ def flag_post(request):
     result = {'success': False}
     status_code = 200
 
-    #try:
-    if True:
+    try:
+    #if True:
 
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
@@ -94,9 +97,9 @@ def flag_post(request):
             result['post_id'] = post.post_id
             result['success'] = True
 
-    #except Exception, e:
-    #    status_code = 400
-    #    result['error_text'] = str(e)
+    except Exception, e:
+        status_code = 400
+        result['error_text'] = str(e)
 
     return utils.make_response(result, status_code)
 
@@ -161,7 +164,9 @@ def upload_media(request):
     result = {'success': False}
     status_code = 200
 
-    try:
+    #try:
+    if True:
+
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
@@ -172,8 +177,13 @@ def upload_media(request):
         except:
             raise Exception("Missing media_type field.")
 
-        media_caption = ''
-        media_text = ''
+        try:
+            post_id = request.POST['post_id']
+        except:
+            raise Exception("Missing post_id field.")
+
+        #media_caption = ''
+        #media_text = ''
         media_object_filename = ''
         media_object_preview_filename = ''
 
@@ -234,15 +244,16 @@ def upload_media(request):
             # cleanup our temp file
             os.remove(base_filename)
 
-        elif media_type == 'text':
+        #elif media_type == 'text':
+        #
+        #    # text isn't an uploaded file, it is within the media_text POST
+        #    # param.
+        #        
+        #    try:
+        #        media_text = request.POST['media_text']
+        #    except:
+        #         raise Exception('Invalid/missing field')
 
-            # text isn't an uploaded file, it is within the media_text POST
-            # param.
-                
-            try:
-                media_text = request.POST['media_text']
-            except:
-                 raise Exception('Invalid/missing field')
         else:
             raise Exception('Invalid media type: {0}'.format(media_type))
 
@@ -250,26 +261,29 @@ def upload_media(request):
             client_id = client.client_id,
             media_type_text = media_type,
             file_name = os.path.basename(media_object_filename),
-            caption = media_caption,
-            media_text = media_text,
+            #caption = media_caption,
+            #media_text = media_text,
+            post_id = post_id,
         )
 
         result['media_id'] = media_object.media_id
+        result['filename'] = os.path.basename(media_object_filename)
+        result['preview'] = os.path.basename(media_object_preview_filename)
         result['success'] = True
 
-    except Exception, e:
-        status_code = 400
-        result['error_text'] = str(e)
+    #except Exception, e:
+    #    status_code = 400
+    #    result['error_text'] = str(e)
 
-    client_utils.log_client_action(
-        client = client,
-        url = 'upload_media.json',
-        lat = lat,
-        lng = lng,
-        request = request,
-        result = result,
-        success = success,
-    )
+    #client_utils.log_client_action(
+    #    client = client,
+    #    url = 'upload_media.json',
+    #    lat = lat,
+    #    lng = lng,
+    #    request = request,
+    #    result = result,
+    #    success = success,
+    #)
 
     return utils.make_response(result, status_code)
 
@@ -279,7 +293,8 @@ def publish_post(request):
     result = {'success': False}
     status_code = 200
 
-    try:
+    if True:
+    #try:
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
@@ -294,13 +309,18 @@ def publish_post(request):
             status_code = 403
             raise Exception("Invalid input.")
 
-        media_obects = []
+        #media_obects = []
+        #try:
+        #     media_objects = json.loads(urllib.unquote(
+        #        request.POST['media_objects']).decode('utf8')
+        #    )
+        #except:
+        #    raise Exception("Missing or invalid MediaObjects JSON list.")
+
         try:
-             media_objects = json.loads(urllib.unquote(
-                request.POST['media_objects']).decode('utf8')
-            )
+            contents = request.POST['contents']
         except:
-            raise Exception("Missing or invalid MediaObjects JSON list.")
+            raise Exception("Missing post contents")
 
         post, vote = client_utils.add_post(
             client_id = client.client_id,
@@ -308,16 +328,17 @@ def publish_post(request):
             language_code = language_code,
             lat = lat,
             lng = lng,
-            media_objects = media_objects,
+            #media_objects = media_objects,
+            contents = contents,
         )
 
         result['success'] = True
         result['post_id'] = post.post_id
         result['vote_id'] = vote.vote_id
 
-    except Exception, e:
-       status_code = 400
-       result['error_text'] = str(e)
+    #except Exception, e:
+    #   status_code = 400
+    #   result['error_text'] = str(e)
 
     client_utils.log_client_action(
         client = client,

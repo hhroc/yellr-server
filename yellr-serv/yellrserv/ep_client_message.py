@@ -3,6 +3,7 @@ from pyramid.view import view_config
 import client_utils
 import utils
 
+'''
 @view_config(route_name='get_messages.json')
 def get_messages(request):
 
@@ -83,3 +84,4 @@ def create_response_message(request):
 
     return utils.make_response(result, status_code)
 
+'''

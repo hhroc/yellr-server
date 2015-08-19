@@ -96,19 +96,20 @@ def main(global_config, **settings):
     # client views
     #config.add_route('server_info.json','server_info.json')
 
-    config.add_route('zipcode_lookup.json','zipcode_lookup.json')
+    #config.add_route('zipcode_lookup.json','zipcode_lookup.json')
 
-    config.add_route('get_data.json', 'get_data.json')
+    #config.add_route('get_data.json', 'get_data.json')
 
-    config.add_route('create_response_message.json', \
-        'create_response_message.json')
+    #config.add_route('create_response_message.json', \
+    #    'create_response_message.json')
     config.add_route('get_assignments.json','get_assignments.json')
-    config.add_route('get_messages.json','get_messages.json')
-    config.add_route('get_notifications.json','get_notifications.json')
+    #config.add_route('get_poll_results.json', 'get_poll_results.json')
+    #config.add_route('get_messages.json','get_messages.json')
+    #config.add_route('get_notifications.json','get_notifications.json')
     #config.add_route('get_posts.json','get_posts.json')
     config.add_route('get_stories.json', 'get_stories.json')
     config.add_route('upload_media.json','upload_media.json')
-    config.add_route('upload_test.json','upload_test.json')
+    #config.add_route('upload_test.json','upload_test.json')
     config.add_route('publish_post.json','publish_post.json')
     config.add_route('get_profile.json', 'get_profile.json')
     #config.add_route('verify_client.json', 'verify_client.json')

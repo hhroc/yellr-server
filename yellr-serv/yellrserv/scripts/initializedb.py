@@ -27,9 +27,9 @@ from ..models import (
     Users,
     Assignments,
     Questions,
-    QuestionAssignments,
+    #QuestionAssignments,
     QuestionTypes,
-    Subscribers,
+    #Subscribers,
     Organizations,
     Zipcodes,
     )

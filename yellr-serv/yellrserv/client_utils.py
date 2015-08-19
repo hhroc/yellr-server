@@ -3,6 +3,8 @@ import datetime
 import os
 import uuid
 
+import time
+
 import markdown
 
 import subprocess
@@ -31,7 +33,7 @@ from .models import (
     MediaObjects,
     #PostMediaObjects,
     Stories,
-    ClientLogs,
+    #ClientLogs,
     #Collections,
     #CollectionPosts,
     Messages,
@@ -80,14 +82,22 @@ def register_client(request):
     lat = 0
     lng = 0
     client = None
-    try:
+
+    #try:
+    if True:
+
+        req = ('cuid', 'language_code', 'lat', 'lng', 'platform')
+        if not all( x in request.GET for x in req ):
+            raise Exception('Required Fields: {0}'.format(', '.join(req)))
+
         cuid = request.GET['cuid']
         language_code = request.GET['language_code']
         lat = float(request.GET['lat'])
         lng = float(request.GET['lng'])
+        platform = request.GET['platform']
 
-        print request.GET
-        print request.POST
+        #print request.GET
+        #print request.POST
 
         # creates client if not yet seen
         client = Clients.get_client_by_cuid(
@@ -97,16 +107,25 @@ def register_client(request):
             lng = lng,
         )
 
+        #raise Exception('debug')
+
         Clients.check_in(
             session = DBSession,
+            client = client,
             cuid = cuid,
             lat = lat,
             lng = lng,
+            platform = platform,
         )
 
+        #time.sleep(5);
+        #raise Exception('debug')
+
         success = True
-    except:
-        error_text = "Required Fields: cuid, language_code, lat, lng"
+
+    #except Exception as ex:
+    #    success = False
+    #    error_text = str(ex)
 
     return success, error_text, language_code, lat, lng, client
 
@@ -114,8 +133,22 @@ def get_assignments(client_id, language_code, lat, lng):
 
     ret_assignments = []
     
-    try:
+    #try:
+    if True:
 
+        assignments = Assignments.get_all_open(
+            session = DBSession,
+            #language_code = language_code,
+            lat = lat,
+            lng = lng,
+            #client_id = client_id,
+        )
+
+        print assignments
+
+        ret_assignments = [a.to_dict(client_id) for a in assignments]
+
+        '''
         assignments = Assignments.get_all_open_with_questions(
             session = DBSession,
             language_code = language_code,
@@ -162,10 +195,29 @@ def get_assignments(client_id, language_code, lat, lng):
                     'has_responded': has_responded,
                 })
 
-    except:
-        raise Exception("Database error.")
+        '''
+
+    #except:
+    #    raise Exception("Database error.")
 
     return ret_assignments
+
+def get_poll_results(assignment_id):
+
+    ret_results = []
+    #try:
+    if True:
+        results = Assignments.get_poll_results(
+            session = DBSession,
+            assignment_id = assignment_id,
+        )
+
+        ret_results = results
+
+    #except:
+    #    raise Exception("Database error.")
+
+    return ret_results
 
 def get_stories(language_code, lat, lng, start, count):
 
@@ -294,8 +346,23 @@ def get_approved_posts(client_id, language_code, lat, lng, start, count):
     
     ret_posts = []
     
-    try:
+    #try:
+    if True:
 
+        posts = Posts.get_approved_posts(
+            session = DBSession,
+            #language_code = language_code,
+            lat = lat,
+            lng = lng,
+        )
+
+        print "\n\nBild result dict()\n\n"
+
+        #print [p.to_dict() for p in posts]
+
+        ret_posts = [p.to_dict(client_id) for p in posts]
+
+        '''
         posts = Posts.get_all_approved_from_location(
             session = DBSession,
             client_id = client_id,
@@ -307,9 +374,11 @@ def get_approved_posts(client_id, language_code, lat, lng, start, count):
         )
         
         ret_posts = utils._decode_posts(posts, clean=True)
-        
-    except:
-        raise Exception("Database error.")
+        '''        
+
+
+    #except:
+    #    raise Exception("Database error.")
 
     return ret_posts 
 
@@ -317,8 +386,7 @@ def flag_post(post_id):
 
     post = None
 
-    #try:
-    if True:
+    try:
 
         post = Posts.get_from_post_id(
             session = DBSession,
@@ -331,8 +399,8 @@ def flag_post(post_id):
                 post_id = post_id,
             )
 
-    #except:
-    #    raise Exception('Database error.')
+    except:
+        raise Exception('Database error.')
 
     return post
 
@@ -428,24 +496,32 @@ def process_video(base_filename):
         allowed_image_types = [
             'video/mpeg',
             'video/mp4',
+            'video/quicktime',
+            'video/3gpp',
         ]
 
         if not mime_type.lower() in allowed_image_types:
             raise Exception("Unsupported Image Type: %s" % mime_type)
 
-        #I can't seem to find any evidence of PII in mpg metadata
-        if mime_type.lower() == 'video/mpeg':
-            video_filename = '{0}.mpeg'.format(base_filename)
-        elif mime_type.lower() == 'video/mp4':
-            video_filename = '{0}.mp4'.format(base_filename)
-            try:
-                mp4 = mutagen.mp4.MP4(temp_file_path)
-                mp4.delete()
-                mp4.save()
-            except:
-                raise Exception("Something went wrong while stripping"
-                                " metadata from mp4")
+        video_filename = '{0}.mp4'.format(base_filename)
 
+        cmd = [
+            'ffmpeg',
+            '-i',
+            base_filename,
+            '-map_metadata',
+            '-1',
+            '-c:v',
+            'copy',
+            '-c:a',
+            'copy',
+            video_filename,
+        ]
+        resp = subprocess.call(cmd)
+       
+        print "\n\nCMD: {0}\n\n".format(' '.join(cmd)) 
+	print "\n\nRESP: {0}\n\n".format(resp)
+ 
         #
         # TODO: create preview image for video
         #
@@ -462,31 +538,49 @@ def process_audio(base_filename):
 
     try:
 
-        #mp3 file
-        if mimetype == "audio/mpeg":
-            audio_filename = '{0}.mp3'.format(base_filename)
-            try:
-                mp3 = mutagen.mp3.MP3(temp_file_path)
-                mp3.delete()
-                mp3.save()
-            except:
-                raise Exception("Something went wrong while stripping"
-                                " metadata from mp3")
-        #ogg vorbis file
-        elif mimetype == "audio/ogg" or mimetype == "application/ogg":
-            audio_filename = '{0}.ogg'.format(base_filename)
-            try:
-                ogg = mutagen.oggvorbis.Open(temp_file_path)
-                ogg.delete()
-                ogg.save()
-            except:
-                raise Exception("Something went wrong while stripping"
-                                " metadata from ogg vorbis")
+        mime_type = magic.from_file(base_filename, mime=True)
+        allowed_audio_types = [
+            'audio/mpeg',
+            'audio/ogg',
+            'audio/x-wav',
+            'audio/mp4',
+            'video/3gpp',
+        ]
 
-        #not mp3 or ogg vorbis
-        else:
-            raise Exception("invalid audio file")
+        '''
+        exts = [
+            'mp3',
+            'ogg',
+            'wav',
+            'mp4',
+        ]
+        '''
 
+        if not mime_type.lower() in allowed_audio_types:
+            raise Exception("Unsupported Audio Type: %s" % mime_type)
+
+        audio_filename = '{0}.mp3'.format(base_filename)
+
+        cmd = [
+            'ffmpeg',
+            '-i',
+            base_filename,
+            '-f',
+            'mp3',
+            '-map_metadata',
+            '-1',
+            #'-c:v',
+            #'copy',
+            #'-c:a',
+            #'copy',
+            audio_filename,
+        ]
+        resp = subprocess.call(cmd)
+
+        print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
+
+        print "\n\nbase_filename: {0}\n\nRESP: {1}\n\n".format(base_filename, resp)
+      
         #
         # TODO: generic audio picture for preview name??
         #
@@ -496,32 +590,35 @@ def process_audio(base_filename):
 
     return audio_filename, preview_filename
 
-def add_media_object(client_id, media_type_text, file_name, caption, \
-        media_text):
+def add_media_object(client_id, media_type_text, file_name, post_id): #caption, \
+#        media_text):
 
     media_object = None
-    try:
+    #try:
+    if True:
 
         media_object = MediaObjects.create_new_media_object(
             session = DBSession,
             client_id = client_id,
             media_type_text = media_type_text,
             file_name = os.path.basename(file_name), #os.path.basename(file_path),
-            caption = caption,
-            media_text = media_text,
+            #caption = caption,
+            #media_text = media_text,
+            post_id = post_id,
         )
 
-    except:
-        raise Exception("Database error.")
+    #except:
+    #    raise Exception("Database error.")
 
     return media_object
 
-def add_post(client_id, assignment_id, language_code, lat, lng, media_objects):
+def add_post(client_id, assignment_id, language_code, lat, lng, contents): #, media_objects):
 
     post = None
     vote = None
     
-    try:
+    #try:
+    if True:
         post = Posts.create_from_http(
             session = DBSession,
             client_id = client_id,
@@ -530,7 +627,8 @@ def add_post(client_id, assignment_id, language_code, lat, lng, media_objects):
             language_code = language_code,
             lat = lat,
             lng = lng,
-            media_objects = media_objects, # array
+            #media_objects = media_objects, # array
+            contents = contents,
         )
 
         # register initial upvote from client
@@ -540,8 +638,8 @@ def add_post(client_id, assignment_id, language_code, lat, lng, media_objects):
             is_up_vote = True
         )
 
-    except:
-        raise Exception("Database error.")
+    #except:
+    #    raise Exception("Database error.")
 
     return post, vote
 

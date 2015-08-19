@@ -3,6 +3,7 @@ from pyramid.view import view_config
 import client_utils
 import utils
 
+'''
 @view_config(route_name='get_notifications.json')
 def get_notifications(request):
 
@@ -42,3 +43,4 @@ def get_notifications(request):
 
     return utils.make_response(result, status_code)
 
+'''

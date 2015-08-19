@@ -15,7 +15,7 @@ from .models import (
     Clients,
     Assignments,
     Questions,
-    QuestionAssignments,
+    #QuestionAssignments,
     QuestionTypes,
     Languages,
     Posts,

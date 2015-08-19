@@ -22,6 +22,7 @@ from sqlalchemy import (
     Float,
     CHAR,
     BLOB,
+    UnicodeText,
     )
 
 from sqlalchemy import ForeignKey
@@ -42,20 +43,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
+    relationship,
 )
 
 from zope.sqlalchemy import ZopeTransactionExtension
 
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension(),expire_on_commit=False))
+DBSession = scoped_session(sessionmaker(
+    extension=ZopeTransactionExtension(keep_session=True),
+    expire_on_commit=False))
 Base = declarative_base()
-
-#class MyModel(Base):
-#    __tablename__ = 'models'
-#    id = Column(Integer, primary_key=True)
-#    name = Column(Text)
-#    value = Column(Integer)
-
-#Index('my_index', MyModel.name, unique=True, mysql_length=255)
 
 class UserTypes(Base):
 
@@ -67,8 +63,8 @@ class UserTypes(Base):
 
     __tablename__ = 'usertypes'
     user_type_id = Column(Integer, primary_key=True)
-    name = Column(Text)
-    description = Column(Text)
+    name = Column(UnicodeText)
+    description = Column(UnicodeText)
 
     @classmethod
     def get_from_name(cls, session, name):
@@ -91,6 +87,14 @@ class UserTypes(Base):
             transaction.commit()
         return user_type
 
+    def to_dict(self):
+        resp = dict(
+            user_type_id = self.user_type_id,
+            name = self.name,
+            description = self.description,
+        )
+        return resp
+
 class Users(Base):
 
     """
@@ -104,20 +108,22 @@ class Users(Base):
     user_id = Column(Integer, primary_key=True)
     user_type_id = Column(Integer, ForeignKey('usertypes.user_type_id'))
 
-    #client_id = Column(Text)
+    #client_id = Column(UnicodeText)
 
-    user_name = Column(Text)
-    first_name = Column(Text)
-    last_name = Column(Text)
-    #organization = Column(Text)
+    user_name = Column(UnicodeText)
+    first_name = Column(UnicodeText)
+    last_name = Column(UnicodeText)
+    #organization = Column(UnicodeText)
     organization_id = Column(Integer, ForeignKey('organizations.organization_id'))
-    email = Column(Text)
-    pass_salt = Column(Text)
-    pass_hash = Column(Text)
+    email = Column(UnicodeText)
+    pass_salt = Column(UnicodeText)
+    pass_hash = Column(UnicodeText)
     user_geo_fence_id = Column(Integer,
         ForeignKey('user_geo_fences.user_geo_fence_id'), nullable=True)
-    token = Column(Text, nullable=True)
+    token = Column(UnicodeText, nullable=True)
     token_expire_datetime = Column(DateTime, nullable=True)
+
+    assignments = relationship('Assignments', backref='author', lazy='joined')
 
     @classmethod
     def create_new_user(cls, session, user_type_id, user_geo_fence_id, \
@@ -296,6 +302,22 @@ class Users(Base):
                 success = True
         return user, success
 
+    def to_dict(self):
+        resp = dict(
+            user_id = self.user_id,
+            user_name = self.user_name,
+            first_name = self.first_name,
+            last_name = self.last_name,
+            organization = self.organization.to_dict(),
+            email = self.email, 
+            #pass_salt = 
+            #pass_hash = 
+            user_geo_fence = self.geo_fence.to_dict(),
+            #token = 
+            #token_expire_datetime =
+        )
+        return resp
+
 class UserGeoFences(Base):
 
     """
@@ -309,6 +331,8 @@ class UserGeoFences(Base):
     top_left_lng = Column(Float)
     bottom_right_lat = Column(Float)
     bottom_right_lng = Column(Float)
+
+    users = relationship('Users', backref='geo_fence', lazy='joined')
 
     @classmethod
     def create_fence(cls, session, top_left_lat, top_left_lng, \
@@ -337,6 +361,15 @@ class UserGeoFences(Base):
             ).first()
         return fence
 
+    def to_dict(self):
+        resp = dict(
+            user_geo_fence_id = self.user_geo_fence_id,
+            top_left_lat = self.top_left_lat,
+            top_left_lng = self.top_left_lng,
+            bottom_right_lat = self.bottom_right_lat,
+            bottom_right_lng = self.bottom_right_lng,
+        )
+        return resp
 
 class Clients(Base):
 
@@ -346,13 +379,13 @@ class Clients(Base):
 
     __tablename__ = 'clients'
     client_id = Column(Integer, primary_key=True)
-    cuid = Column(Text)
+    cuid = Column(UnicodeText)
 
-    first_name = Column(Text, nullable=True)
-    last_name = Column(Text, nullable=True)
-    email = Column(Text, nullable=True)
-    passhash = Column(Text, nullable=True)
-    passsalt = Column(Text, nullable=True)
+    first_name = Column(UnicodeText, nullable=True)
+    last_name = Column(UnicodeText, nullable=True)
+    email = Column(UnicodeText, nullable=True)
+    passhash = Column(UnicodeText, nullable=True)
+    passsalt = Column(UnicodeText, nullable=True)
     verified = Column(Boolean)
     verified_datetime = Column(DateTime, nullable=True)
 
@@ -366,6 +399,8 @@ class Clients(Base):
 
     post_view_count = Column(Integer)
     post_used_count = Column(Integer)
+
+    platform = Column(UnicodeText)
 
     @classmethod
     def create_new_client(cls, session, cuid, lat, lng):
@@ -391,18 +426,19 @@ class Clients(Base):
         return client
 
     @classmethod
-    def check_in(cls, session, cuid, lat, lng):
+    def check_in(cls, session, client, cuid, lat, lng, platform):
         with transaction.manager:
             #print "check_in(): cuid: {0}".format(cuid)
-            client = session.query(
-                Clients,
-            ).filter(
-                Clients.cuid == cuid,
-            ).first()
+            #client = session.query(
+            #    Clients,
+            #).filter(
+            #    Clients.cuid == cuid,
+            #).first()
             #print "check_in(): client.cuid: {0}, client.client_id: {1}".format(client.cuid, client.client_id)
             client.last_lat = lat
             client.last_lng = lng
             client.last_check_in_datetime = datetime.datetime.now()
+            client.platform = platform
             session.add(client)
             transaction.commit()
         return client
@@ -494,6 +530,28 @@ class Clients(Base):
             transaction.commit()
         return client
 
+    def to_dict(self):
+        resp = dict(
+            client_id = self.client_id,
+            cuid = self.cuid,
+            first_name = self.first_name,
+            last_name = self.last_name,
+            email = self.email,
+            #passhash =
+            #passsalt =
+            verified = self.verified,
+            verified_datetime = str(self.verified_datetime),
+            creation_datetime = str(self.creation_datetime),
+            last_check_in_datetime = str(self.last_checking_datetime),
+            #home_zipcode_id = self.home_zipcode_id,
+            last_lat = self.last_lat,
+            last_lng = self.last_lng,
+            post_view_count = self.post_view_count,
+            post_used_count = self.post_used_count,
+            platform = self.platform,
+        )
+        return resp
+
 class Assignments(Base):
 
     """
@@ -507,14 +565,18 @@ class Assignments(Base):
     user_id = Column(Integer, ForeignKey('users.user_id'))
     publish_datetime = Column(DateTime)
     expire_datetime = Column(DateTime)
-    name = Column(Text)
-    #assignment_unique_id = Column(Text)
+    name = Column(UnicodeText)
+    #assignment_unique_id = Column(UnicodeText)
     top_left_lat = Column(Float)
     top_left_lng = Column(Float)
     bottom_right_lat = Column(Float)
     bottom_right_lng = Column(Float)
     use_fence = Column(Boolean)
     collection_id = Column(Integer, ForeignKey('collections.collection_id'), nullable=True)
+
+    questions = relationship('Questions', backref='assignment', lazy='joined')
+
+    #posts = relationship('Posts', backref='assignment', lazy='joined')
 
     @classmethod
     def get_by_assignment_id(cls, session, assignment_id):
@@ -538,6 +600,21 @@ class Assignments(Base):
             Questions.language_id == language_id
         ).filter().first()
         return (assignment,question)
+
+    @classmethod
+    def get_all_open(cls, session, lat, lng):
+        with transaction.manager:
+            assignments = session.query(
+                Assignments,
+            ).filter(
+                Assignments.top_left_lat + 90 > lat + 90,
+                Assignments.top_left_lng + 180 < lng + 180,
+                Assignments.bottom_right_lat + 90 < lat + 90,
+                Assignments.bottom_right_lng + 180 > lng + 180,
+                cast(Assignments.expire_datetime,Date) >= \
+                    cast(datetime.datetime.now(),Date),
+            ).all()
+        return assignments
 
     @classmethod
     def get_all_open_response_count(cls, session, lat, lng):
@@ -754,6 +831,55 @@ class Assignments(Base):
             transaction.commit()
         return assignment
 
+    '''
+    @classmethod
+    def get_poll_results(self, session, assignment_id):
+        results = session.query(
+            Assignments,
+            session.query(
+                Posts,
+                #distinct(Posts),
+            ).join(
+                PostMediaObjects, PostMediaObjects.post_id == \
+                    Posts.post_id,
+            ).join(
+                Questions, QuestionAssignments.question_id == \
+                    Questions.question_id,
+            ).filter(
+                Assignments.assignment_id == Posts.assignment_id,
+                #Posts.client_id == client_id,
+                MediaObjects.media_text == Questions.answer0,
+            #).correlate(
+            #    Assignments,
+            ).count().label('answer0_count'),
+        )
+        #print results
+        return results 
+    '''
+
+    def to_dict(self, client_id=None, simple=False):
+        resp = dict(
+            assignment_id = self.assignment_id,
+            #user_id = self.user_id,
+            author = self.author.to_dict() if not simple else {},
+            publish_datetime = str(self.publish_datetime),
+            expire_datetime = str(self.expire_datetime),
+            name = self.name,
+            top_left_lat = self.top_left_lat,
+            top_left_lng = self.top_left_lng,
+            bottom_right_lat = self.bottom_right_lat,
+            bottom_right_lng = self.bottom_right_lng,
+            #use_fence = self.use_fence,
+            collection_id = self.collection_id if not simple else 0,
+            questions = [q.to_dict() for q in self.questions],
+            response_count = len(self.posts),
+        )
+        if client_id != None:
+            resp.update(
+                has_responded = any(p.client_id == client_id for p in self.posts),
+            )
+        return resp 
+
 class QuestionTypes(Base):
 
     """
@@ -763,8 +889,10 @@ class QuestionTypes(Base):
 
     __tablename__ = 'questiontypes'
     question_type_id = Column(Integer, primary_key=True)
-    question_type = Column(Text)
-    question_type_description = Column(Text)
+    question_type = Column(UnicodeText)
+    question_type_description = Column(UnicodeText)
+
+    questions = relationship('Questions', backref='question_type', lazy='joined')
 
     @classmethod
     def get_from_type(cls, session, question_type):
@@ -797,6 +925,13 @@ class QuestionTypes(Base):
             transaction.commit()
         return question_type
 
+    def to_dict(self):
+        resp = dict(
+            question_type = self.question_type,
+            question_type_description = self.question_type_description,
+        )
+        return resp
+
 class Questions(Base):
 
     """
@@ -809,20 +944,23 @@ class Questions(Base):
     __tablename__ = 'questions'
     question_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
-    language_id = Column(Integer, ForeignKey('languages.language_id'))
-    question_text = Column(Text)
-    description = Column(Text)
+    #language_id = Column(Integer, ForeignKey('languages.language_id'))
+    language_code = Column(UnicodeText)
+    question_text = Column(UnicodeText)
+    description = Column(UnicodeText)
     question_type_id = Column(Integer, ForeignKey('questiontypes.question_type_id'))
-    answer0 = Column(Text)
-    answer1 = Column(Text)
-    answer2 = Column(Text)
-    answer3 = Column(Text)
-    answer4 = Column(Text)
-    answer5 = Column(Text)
-    answer6 = Column(Text)
-    answer7 = Column(Text)
-    answer8 = Column(Text)
-    answer9 = Column(Text)
+    answer0 = Column(UnicodeText)
+    answer1 = Column(UnicodeText)
+    answer2 = Column(UnicodeText)
+    answer3 = Column(UnicodeText)
+    answer4 = Column(UnicodeText)
+    answer5 = Column(UnicodeText)
+    answer6 = Column(UnicodeText)
+    answer7 = Column(UnicodeText)
+    answer8 = Column(UnicodeText)
+    answer9 = Column(UnicodeText)
+
+    assignment_id = Column(Integer, ForeignKey('assignments.assignment_id'))
 
     @classmethod
     def add_question(cls, session, user_id, language_code, question_text,
@@ -884,7 +1022,18 @@ class Questions(Base):
             transaction.commit()
         return question
 
+    def to_dict(self):
+        resp = dict(
+            question_id = self.question_id,
+            user_id = self.user_id,
+            language = self.language.to_dict(),
+            question_text = self.question_text,
+            description = self.description,
+            question_type = self.question_type.to_dict(),
+        )
+        return resp
 
+'''
 class QuestionAssignments(Base):
 
     """
@@ -908,6 +1057,7 @@ class QuestionAssignments(Base):
             session.add(question_assignment)
             transaction.commit()
         return question_assignment
+'''
 
 class Languages(Base):
 
@@ -918,8 +1068,11 @@ class Languages(Base):
 
     __tablename__ = 'languages'
     language_id = Column(Integer, primary_key=True)
-    language_code = Column(Text)
-    name = Column(Text)
+    language_code = Column(UnicodeText)
+    name = Column(UnicodeText)
+
+    #questions = relationship('Questions', backref='language', lazy='joined')
+    #posts = relationship('Posts', backref='language', lazy='joined')
 
     @classmethod
     def get_from_code(cls, session, language_code):
@@ -951,6 +1104,13 @@ class Languages(Base):
             transaction.commit()
         return language
 
+    def to_dict(self):
+        resp = dict(
+            language_id = self.language_id,
+            language_code = self.language_code,
+            name = self.name,
+        )
+        return resp
 
 class Posts(Base):
 
@@ -966,25 +1126,31 @@ class Posts(Base):
     #user_id = Column(Integer, ForeignKey('users.user_id'))
     client_id = Column(Integer, ForeignKey('clients.client_id'))
     assignment_id = Column(Integer, ForeignKey('assignments.assignment_id'))
-    #title = Column(Text)
+    #title = Column(UnicodeText)
     post_datetime = Column(DateTime)
-    language_id = Column(Integer, ForeignKey('languages.language_id'))
+    #language_id = Column(Integer, ForeignKey('languages.language_id'))
+    language_code = Column(UnicodeText)
     deleted = Column(Boolean)
     lat = Column(Float)
     lng = Column(Float)
     approved = Column(Boolean)
     flagged = Column(Boolean)
+    contents = Column(UnicodeText)
+
+    media_objects = relationship('MediaObjects', backref='post')
+    assignment = relationship('Assignments', backref='posts', lazy='joined')
+    votes = relationship('Votes', backref='post', lazy='joined')
 
     @classmethod
     def create_from_http(cls, session, client_id, assignment_id, #title,
-            language_code, lat, lng, media_objects=[]):
+            language_code, lat, lng, contents): #, media_objects=[]):
         # create post
         with transaction.manager:
             # todo: error check this
-            language = Languages.get_from_code(
-                session = session,
-                language_code = language_code
-            )
+            #language = Languages.get_from_code(
+            #    session = session,
+            #    language_code = language_code
+            #)
             if assignment_id == None \
                    or assignment_id == '' \
                    or assignment_id <= 0:
@@ -994,15 +1160,18 @@ class Posts(Base):
                 assignment_id = assignment_id,
                 #title = title,
                 post_datetime = datetime.datetime.now(),
-                language_id = language.language_id,
+                #language_id = language.language_id,
+                language_code = language_code,
                 deleted = False,
                 lat = lat,
                 lng = lng,
                 approved = False,
                 flagged = False,
+                contents = contents,
             )
             session.add(post)
             transaction.commit()
+        '''
         # assign media objects to the post
         with transaction.manager:
             for media_id in media_objects:
@@ -1018,7 +1187,31 @@ class Posts(Base):
                 )
                 session.add(post_media_object)
             transaction.commit()
+        '''
         return post
+
+    @classmethod
+    def get_approved_posts(cls, session, lat, lng):
+
+        print "\n\nApproved Posts Query:\n\n"
+
+        with transaction.manager:
+            posts = session.query(
+                Posts,
+            ).filter(
+                ((Assignments.top_left_lat + 90 > lat + 90) &
+                    (Assignments.top_left_lng + 180 < lng + 180) &
+                    (Assignments.bottom_right_lat + 90 < lat + 90) &
+                    (Assignments.bottom_right_lng + 180 > lng + 180)) |
+                (((lat + 0.5) + 90 > Posts.lat + 90) &
+                    ((lng + 0.5) + 180 > Posts.lng + 180) &
+                    ((lat - 0.5) + 90 < Posts.lat + 90) &
+                    ((lng - 0.5) + 180 < Posts.lng + 180))
+            ).filter(
+                Posts.deleted == False,
+                Posts.flagged == False,
+            ).all()
+        return posts
 
     @classmethod
     def _build_posts_query(cls, session, client_id=0):
@@ -1236,6 +1429,36 @@ class Posts(Base):
             ).slice(start, start+count).all()
         return posts
 
+    def to_dict(self, client_id):
+
+        #print "\n\nself.question\n\n"
+        #print self.question
+        #print "\n\n"
+
+        resp = dict(
+            post_id = self.post_id,
+            #client = self.client.to_dict(),
+            client_id = self.client_id,
+            assignment = self.assignment.to_dict() if self.assignment_id != None and self.assignment_id != 0 else None,
+            #assignment_id = self.assignment_id,
+            #question = self.question, #.to_dict() if self.assignment != None else None,
+            post_datetime = str(self.post_datetime),
+            #language = self.language.to_dict(),
+            language_code = self.language_code,
+            deleted = self.deleted,
+            lat = self.lat,
+            lng = self.lng,
+            approved = self.approved,
+            flagged = self.approved,
+            contents = self.contents,
+            media_objects = [m.to_dict() for m in self.media_objects],
+            #votes = [v.to_dict() for v in self.votes],
+            up_count = sum(1 for v in self.votes if v.is_up_vote),
+            down_count = sum(1 for v in self.votes if not v.is_up_vote),
+            has_voted = any(v.client_id == client_id for v in self.votes),
+            is_up_vote = any(v.client_id == client_id and v.is_up_vote for v in self.votes),
+        )
+        return resp
 
 # Posts indexes ... these will be important to implement soon
 
@@ -1287,6 +1510,16 @@ class Votes(Base):
                 vote = _vote
         return vote
 
+    def to_dict(self):
+        resp = dict(
+            vote_id = self.vote_id,
+            post_id = self.post_id, 
+            client_id = self.client_id,
+            is_up_vote = self.is_up_vote,
+            vote_datetime = str(self.vote_datetime),
+        )
+        return resp
+
 class MediaTypes(Base):
 
     """
@@ -1295,8 +1528,10 @@ class MediaTypes(Base):
 
     __tablename__ = 'mediatypes'
     media_type_id = Column(Integer, primary_key=True)
-    name = Column(Text)
-    description = Column(Text)
+    name = Column(UnicodeText)
+    description = Column(UnicodeText)
+
+    media_objects = relationship('MediaObjects', backref='media_type', lazy='joined')
 
     @classmethod
     def from_value(cls, session, name):
@@ -1319,6 +1554,15 @@ class MediaTypes(Base):
             transaction.commit()
         return media_type
 
+    def to_dict(self):
+        resp = dict(
+            media_type_id = self.media_type_id,
+            name = self.name,
+            description = self.description,
+        )
+        return resp
+ 
+
 class MediaObjects(Base):
 
     """
@@ -1327,13 +1571,16 @@ class MediaObjects(Base):
 
     __tablename__ = 'mediaobjects'
     media_object_id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.post_id'))
     #user_id = Column(Integer, ForeignKey('users.user_id'))
     client_id = Column(Integer, ForeignKey('clients.client_id'))
     media_type_id = Column(Integer, ForeignKey('mediatypes.media_type_id'))
-    media_id = Column(Text)
-    file_name = Column(Text)
-    caption = Column(Text)
-    media_text = Column(Text)
+    media_id = Column(UnicodeText)
+    file_name = Column(UnicodeText)
+    #caption = Column(UnicodeText)
+    #media_text = Column(UnicodeText)
+
+    #post = relationship('Posts', backref='media_objects', lazy='joined')
 
     @classmethod
     def get_from_media_id(cls, session, media_id):
@@ -1366,7 +1613,7 @@ class MediaObjects(Base):
 
     @classmethod
     def create_new_media_object(cls, session, client_id, media_type_text,
-            file_name, caption, media_text):
+            file_name, post_id): #caption, media_text):
         with transaction.manager:
             mediatype = MediaTypes.from_value(session,media_type_text)
             mediaobject = cls(
@@ -1374,13 +1621,27 @@ class MediaObjects(Base):
                 media_type_id = mediatype.media_type_id,
                 media_id = str(uuid.uuid4()),
                 file_name = file_name,
-                caption = caption,
-                media_text = media_text,
+                #caption = caption,
+                #media_text = media_text,
+                post_id = post_id, 
             )
             session.add(mediaobject)
             transaction.commit()
         return mediaobject
 
+    def to_dict(self):
+        resp = dict(
+            media_object_id = self.media_object_id,
+            post_id = self.post_id,
+            client_id = self.client_id,
+            media_type = self.media_type.to_dict(),
+            file_name = self.file_name,
+            #caption = self.caption,
+            #media_text = self.media_text,
+        )
+        return resp
+
+'''
 class PostMediaObjects(Base):
 
     """
@@ -1400,6 +1661,7 @@ class PostMediaObjects(Base):
                 post_id = post_id,
                 media_object_id = media_objectid,
             )
+'''
 
 class Stories(Base):
 
@@ -1411,15 +1673,15 @@ class Stories(Base):
     __tablename__ = 'stories'
     story_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
-    story_unique_id = Column(Text)
+    story_unique_id = Column(UnicodeText)
     publish_datetime = Column(DateTime)
     edited_datetime = Column(DateTime, nullable=True)
-    title = Column(Text)
-    tags = Column(Text)
-    #top_text = Column(Text)
+    title = Column(UnicodeText)
+    tags = Column(UnicodeText)
+    #top_text = Column(UnicodeText)
     #media_object_id = Column(Integer, \
     #    ForeignKey('mediaobjects.media_object_id'), nullable=True)
-    contents = Column(Text)
+    contents = Column(UnicodeText)
     top_left_lat = Column(Float)
     top_left_lng = Column(Float)
     bottom_right_lat = Column(Float)
@@ -1516,7 +1778,24 @@ class Stories(Base):
             stories = stories_filter_query.slice(start, start+count)
         return stories, total_story_count
 
-
+    def to_dict(self):
+        resp = dict(
+            story_id = self.story_id,
+            user = self.user.to_dict(),
+            story_unique_id = self.story_unique_id,
+            publish_datetime = str(self.publish_datetime),
+            edited_datetime = str(self.publish_datetime),
+            title = self.title,
+            tags = self.tags,
+            contents = self.contents,
+            top_left_lat = self.top_left_lat,
+            top_left_lng = self.top_left_lng,
+            bottom_right_lat = self.bottom_right_lat,
+            bottom_right_lng = self.bottom_right_lng,
+            language = self.language.to_dict(),
+         )
+        return resp
+'''
 class ClientLogs(Base):
 
     """
@@ -1528,11 +1807,11 @@ class ClientLogs(Base):
     client_log_id = Column(Integer, primary_key=True)
     client_id = Column(Integer, ForeignKey('clients.client_id'), \
         nullable=True)
-    url = Column(Text)
+    url = Column(UnicodeText)
     lat = Column(Float)
     lng = Column(Float)
-    request = Column(Text)
-    result = Column(Text)
+    request = Column(UnicodeText)
+    result = Column(UnicodeText)
     success = Column(Boolean)
     log_datetime = Column(DateTime)
 
@@ -1576,6 +1855,28 @@ class ClientLogs(Base):
                 ClientLogs.log_datetime,
             ).all()
         return client_logs
+'''
+
+class CollectionPosts(Base):
+
+    """
+    Table to link posts to a collection.
+    """
+
+    __tablename__ = 'collection_posts'
+    collection_post_id = Column(Integer, primary_key=True)
+    collection_id = Column(Integer, ForeignKey('collections.collection_id'))
+    post_id = Column(Integer, ForeignKey('posts.post_id'))
+
+    @classmethod
+    def create_new_collectionpost(cls, session, collection_id, post_id):
+        with transaction.manager:
+            collection_post = cls(
+                collection_id = collection_id,
+                post_id = post_id,
+            )
+        return collection_post
+
 
 class Collections(Base):
 
@@ -1588,11 +1889,18 @@ class Collections(Base):
     collection_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
     collection_datetime = Column(DateTime)
-    name = Column(Text)
-    description = Column(Text)
-    tags = Column(Text)
+    name = Column(UnicodeText)
+    description = Column(UnicodeText)
+    tags = Column(UnicodeText)
     enabled = Column(Boolean)
     #private = Column(Boolean)
+
+    posts = relationship(
+        "Posts",
+        secondary=CollectionPosts.__table__,
+        backref='collections',
+        lazy='joined'
+    )
 
     @classmethod
     def _build_collections_query(cls, session):
@@ -1700,25 +2008,19 @@ class Collections(Base):
                 success = True
         return success
 
-class CollectionPosts(Base):
+    def to_dict(self):
+        resp = dict(
+            collection_id = self.collection_id,
+            #user_id = self.user_id,
+            collection_datetime = str(collection_datetime),
+            name = self.name,
+            description = self.description,
+            tags = self.tags,
+            enabled = self.enabled,
+            posts = [p.to_dict() for p in self.posts], 
+        )
+        return resp
 
-    """
-    Table to link posts to a collection.
-    """
-
-    __tablename__ = 'collection_posts'
-    collection_post_id = Column(Integer, primary_key=True)
-    collection_id = Column(Integer, ForeignKey('collections.collection_id'))
-    post_id = Column(Integer, ForeignKey('posts.post_id'))
-
-    @classmethod
-    def create_new_collectionpost(cls, session, collection_id, post_id):
-        with transaction.manager:
-            collection_post = cls(
-                collection_id = collection_id,
-                post_id = post_id,
-            )
-        return collection_post
 
 class Notifications(Base):
 
@@ -1729,8 +2031,8 @@ class Notifications(Base):
     notification_id = Column(Integer, primary_key=True)
     client_id = Column(Integer, ForeignKey('clients.client_id'))
     notification_datetime = Column(DateTime)
-    notification_type = Column(Text)
-    payload = Column(Text)
+    notification_type = Column(UnicodeText)
+    payload = Column(UnicodeText)
 
     @classmethod
     def get_notifications_from_client_id(cls, session, client_id):
@@ -1774,9 +2076,9 @@ class Messages(Base):
     message_datetime = Column(DateTime)
     parent_message_id = Column(Integer, \
         ForeignKey('messages.message_id'), nullable=True)
-    subject = Column(Text)
-    text = Column(Text)
-    was_read = Column(Text)
+    subject = Column(UnicodeText)
+    text = Column(UnicodeText)
+    was_read = Column(UnicodeText)
 
     @classmethod
     def get_user_id_from_message_id(cls, session, message_id):
@@ -1960,7 +2262,7 @@ class Messages(Base):
         #for m in messages:
         #    Messages.mark_all_as_read(session,m[2])
         return messages
-
+'''
 class DebugSubmissions(Base):
 
     """ This class is for debug purposes, and will hold debug information
@@ -1970,7 +2272,7 @@ class DebugSubmissions(Base):
     __tablename__ = 'debug_submissions'
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id'))
-    debug_text = Column(Text)
+    debug_text = Column(UnicodeText)
     sumbission_datetime = Column(DateTime)
 
     @classmethod
@@ -1991,7 +2293,9 @@ class DebugSubmissions(Base):
                 DebugSubmissions,
             ).all()
         return submissions
+'''
 
+'''
 class Subscribers(Base):
 
     """ This holds information about the news letter subscribers
@@ -1999,11 +2303,11 @@ class Subscribers(Base):
 
     __tablename__ = 'subscribers'
     subscriber_id = Column(Integer, primary_key=True)
-    email = Column(Text)
+    email = Column(UnicodeText)
     subscribe_datetime = Column(DateTime)
-    name = Column(Text, nullable = True)
-    organization = Column(Text, nullable = True)
-    profession = Column(Text, nullable = True)
+    name = Column(UnicodeText, nullable = True)
+    organization = Column(UnicodeText, nullable = True)
+    profession = Column(UnicodeText, nullable = True)
     receive_updates = Column(Boolean)
     receive_version_announcement = Column(Boolean)
     interested_in_partnering = Column(Boolean)
@@ -2039,15 +2343,19 @@ class Subscribers(Base):
             ).all()
         return subscribers
 
+'''
+
 class Organizations(Base):
 
     __tablename__ = 'organizations'
     organization_id = Column(Integer, primary_key=True)
-    name = Column(Text)
-    description = Column(Text, nullable=True)
-    contact_name = Column(Text, nullable=True)
-    contact_email = Column(Text, nullable=True)
+    name = Column(UnicodeText)
+    description = Column(UnicodeText, nullable=True)
+    contact_name = Column(UnicodeText, nullable=True)
+    contact_email = Column(UnicodeText, nullable=True)
     creation_datetime = Column(DateTime)
+
+    users = relationship('Users', backref='organization', lazy='joined')
 
     @classmethod
     def add_organization(cls, session, name, description, contact_name,\
@@ -2087,13 +2395,24 @@ class Organizations(Base):
             ).all()
         return organizations
 
+    def to_dict(self):
+        resp = dict(
+            organization_id = self.organization_id,
+            name = self.name,
+            description = self.description,
+            contact_name = self.contact_name,
+            contact_email = self.contact_email,
+            creation_datetime = str(self.creation_datetime),
+        )
+        return resp
+
 class Zipcodes(Base):
 
     __tablename__ = 'zipcodes'
     zipcode_id = Column(Integer, primary_key=True)
-    zipcode = Column(Text)
-    city = Column(Text)
-    state_code = Column(Text)
+    zipcode = Column(UnicodeText)
+    city = Column(UnicodeText)
+    state_code = Column(UnicodeText)
     lat = Column(Float)
     lng = Column(Float)
     timezone = Column(Integer)

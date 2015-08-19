@@ -20,14 +20,17 @@ def get_client_info(request):
     lat = 43.1656
     lng = -77.6114
     try:
-        if 'lat' in request.COOKIES and 'lng' in request.COOKIES:
-            lat = float(request.POST['lat'])
-            lng = float(request.POST['lng'])
+        if 'lat' in request.cookies and 'lng' in request.cookies:
+            print '\n\n'; print 'new location:'
+            lat = float(request.cookies['lat'])
+            lng = float(request.cookies['lng'])
+            print "{0}, {1}".format(lat, lng)
             if lat > 90 or lat < -90 or lng > 180 or lng < -180:
                 lat = 43.1656
                 lng = -77.6114
-    except:
-        pass
+    except Exception, e:
+        print "ERROR: {0}".format(e)
+        print "\n\n"
 
     start = 0
     count = 75;
