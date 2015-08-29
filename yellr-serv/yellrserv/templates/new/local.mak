@@ -46,9 +46,20 @@
           <span><i class="fa fa-question-circle question-text"></i> ${post['question_text']}</span>
           % endif
           <div class="post-contents">
+            ## post an image
             % if post['media_objects'][0]['media_type_name'] == "image":
             <p class="post-text">${post['media_objects'][0]['caption']}</p>
             <img src="/media/${post['media_objects'][0]['preview_file_name']}"/>
+            ## post video
+            % elif post['media_objects'][0]['media_type_name'] == "video":
+            <p class="post-text">${post['media_objects'][0]['caption']}</p>
+            <video width="640" height="360" poster="/media/${post['media_objects'][0]['preview_file_name']}" type="video/mp4" id="player1" src="/media/${post['media_objects'][0]['file_name']}" controls="controls" preload="none"></video>
+            ## post audio
+            % elif post['media_objects'][0]['media_type_name'] == "audio":
+            <p class="post-text">${post['media_objects'][0]['caption']}</p>
+            <img src=""/>
+            <audio id="player2" src="/media/${post['media_objects'][0]['file_name']}" type="audio/mp3" controls="controls"> </audio>
+            ## text
             % else:
             <p class="post-text">${post['media_objects'][0]['media_text']}</p>
             % endif
@@ -59,6 +70,9 @@
     % endfor
   </div>
 </div>
+
+<script src="static/new/js/mediaelement-and-player.min.js"></script>
+<link rel="stylesheet" href="static/new/css/mediaelementplayer.min.css" />
 
 <script>
 
