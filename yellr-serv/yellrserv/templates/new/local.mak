@@ -48,7 +48,7 @@
           <div class="post-contents">
             % if post['media_objects'][0]['media_type_name'] == "image":
             <p class="post-text">${post['media_objects'][0]['caption']}</p>
-            <img src="/media/${post['media_objects'][0]['file_name']}"></img>
+            <img src="/media/${post['media_objects'][0]['preview_file_name']}"/>
             % else:
             <p class="post-text">${post['media_objects'][0]['media_text']}</p>
             % endif

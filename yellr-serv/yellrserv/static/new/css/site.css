@@ -133,14 +133,14 @@ button.disabled {
 }
 
 .new-post-contents {
-  padding: 10px; 
+  padding: 10px;
 }
-
+/*
 #post-add-image {
   overflow: hidden;
-}
+}*/
 
-#post-add-image input {
+/*#post-add-image input {
   opacity: 0;
   position: absolute;
   right: 0;
@@ -148,9 +148,19 @@ button.disabled {
   bottom: 0;
   font-size: 100px;
 }
-
+*/
 .anonymous-label {
   font-size: 80%;
   font-weight: bold;
   font-style: italic;
+}
+
+
+
+.show-for-sr {
+    clip: rect(1px, 1px, 1px, 1px);
+    height: 1px;
+    overflow: hidden;
+    position: absolute !important;
+    width: 1px;
 }
