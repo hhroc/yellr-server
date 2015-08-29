@@ -38,7 +38,8 @@
       <div class="row">
         <div class="columns">
           <a href="/"><h1>Yellr</h1></a>
-          <p>Rochester, New York <br/><small>B E T A</small></p>
+          <p><!--Rochester, New York <br/>--><small>B E T A</small></p>
+          <!--<p>Philadelphia, Pennsylvania<br/><small>B E T A</small></p>-->
         </div>
       </div>
     </header>
@@ -53,7 +54,7 @@
       <div class="row">
         <div class="medium-12 columns">
           <div class="footer">
-            <a href="https://yellr.net/">Yellr</a> | Copyright 2015 | <a href="http://wxxinews.org/">WXXI</a> | <a href="http://www.meetup.com/HackshackersROC/">Hacks/Hackers Rochester</a> | <a href="github.com/hhroc/yellr-server">Source</a> 
+            <a href="https://yellr.net/">Yellr</a> | Copyright 2015 | <a href="http://wxxinews.org/">WXXI</a> | <a href="http://www.meetup.com/HackshackersROC/">Hacks/Hackers Rochester</a> | <a href="https://github.com/hhroc/yellr-server">Source</a> 
           </div>
         </div>
       </div>
@@ -68,12 +69,53 @@
   <script>
     $(document).foundation();
 
+    /*
     $(document).ready(function() {
       var c = getCookie('cuid');
       if ( c == '' ) {
         setCookie('cuid', '${cuid}', 365*10);
       } 
     });
+    */
+
+    $(document).ready(function() {
+      console.log('ready(): cuid = ' + getCookie('cuid') + ', lat = ' + getCookie('lat') + ', lng = ' + getCookie('lng') + ', location_set = ' + getCookie('location_set'));
+      var c = getCookie('cuid');
+      if ( c == '' ) {
+        setCookie('cuid', '${cuid}', 365*10);
+      }
+      var location_set = getCookie('location_set');
+      if ( location_set != '1' ) {
+        if (navigator.geolocation) {
+          // get location from browser
+          console.log('getting location ...');
+          navigator.geolocation.getCurrentPosition(registerLocation, handleLocationError);
+        } else {
+          // else, set location to Rochester, NY
+          handleLocationError({});
+        }
+      } else {
+        // do nothing, we already have the right data for the location
+      }
+    });
+
+    function registerLocation(loc) {
+        var lat = loc.coords.latitude;
+        var lng = loc.coords.longitude;
+        console.log('lat: ' + lat + ', lng: ' + lng);
+        // set location for the next 1 hours
+        setCookie('lat', lat, (1.0/24.0));
+        setCookie('lng', lng, (1.0/24.0));
+        setCookie('location_set', '1', (1.0/24.0));
+        window.location.reload();
+    }
+
+    function handleLocationError(error) {
+        console.log('location error, defauling to Rochester, NY')
+        setCookie('lat', 43.1656, 1);
+        setCookie('lng', -77.6114, 1);
+        setCookie('location_set', '1', (1.0/24.0));
+    }
 
     // functions taken from
     //   http://www.w3schools.com/js/js_cookies.asp

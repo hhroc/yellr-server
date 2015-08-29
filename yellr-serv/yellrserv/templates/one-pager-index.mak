@@ -8,6 +8,7 @@
   <link rel="shortcut icon" href="static/one-pager/img/favicon.ico">
   <script src="static/one-pager/js/libs/modernizr.js"></script>
   <link rel="stylesheet" href="static/one-pager/style/one-pager.css">
+  <meta name="google-site-verification" content="9bdoZ7-msf9cppg9zx_PRq9BERnRjhGkZuhSQ5YW8mE" />
 </head>
 <body id="one-pager"><a href="#main" class="assistive-text">Skip to main content</a>
   <div class="container">
