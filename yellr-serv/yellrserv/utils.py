@@ -49,9 +49,9 @@ def ago_decode(dt):
 
 def make_response(resp_dict, status_code=200):
 
-    print "[DEBUG]"
-    print resp_dict
-    print '\n'
+    #print "[DEBUG]"
+    #print resp_dict
+    #print '\n'
 
     resp = Response(json.dumps(resp_dict), content_type='application/json') #, charset='utf8')
     resp.headerlist.append(('Access-Control-Allow-Origin', '*'))
@@ -250,7 +250,7 @@ def _decode_posts(posts, clean=False):
                 if not file_name == "":
                     root_file_name = os.path.splitext(file_name)[0]
                     file_extention = os.path.splitext(file_name)[1]
-                    preview_file_name = "{0}p{1}".format(root_file_name,file_extention)
+                    preview_file_name = "{0}p.jpg".format(root_file_name)
                 media_object = {
                     'media_id': media_id,
                     'file_name': file_name,

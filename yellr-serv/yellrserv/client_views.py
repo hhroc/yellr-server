@@ -17,17 +17,34 @@ from .models import (
 
 def get_client_info(request):
 
-    lat = 43.1656
-    lng = -77.6114
+    #lat = 39.9500
+    #lng = -75.1667
+
+    nash_lat = 36.1667
+    nash_lng = -86.7833    
+    roc_lat = 43.1656
+    roc_lng = -77.6114
+
+    #lat = nash_lat
+    #lng = nash_lng
+
+    lat = roc_lat
+    lng = roc_lng
+
     try:
-        if 'lat' in request.COOKIES and 'lng' in request.COOKIES:
-            lat = float(request.POST['lat'])
-            lng = float(request.POST['lng'])
+        if 'lat' in request.cookies and 'lng' in request.cookies:
+            lat = float(request.cookies['lat'])
+            lng = float(request.cookies['lng'])
             if lat > 90 or lat < -90 or lng > 180 or lng < -180:
-                lat = 43.1656
-                lng = -77.6114
+                #lat = 43.1656
+                #lng = -77.6114
+                #lat = nash_lat
+                #lng = lash_lng
+                lat = roc_lat
+                lng = roc_lng
     except:
         pass
+    
 
     start = 0
     count = 75;

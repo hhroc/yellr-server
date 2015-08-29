@@ -128,7 +128,8 @@ def upload_media(request):
     result = {'success': False}
     status_code = 200
 
-    try:
+    #try:
+    if True:
         success, error_text, language_code, lat, lng, \
             client = client_utils.register_client(request)
         if success == False:
@@ -199,7 +200,7 @@ def upload_media(request):
                 media_object_preview_filename = preview_filename
 
             # cleanup our temp file
-            os.remove(base_filename)
+            #os.remove(base_filename)
 
         elif media_type == 'text':
 
@@ -224,9 +225,9 @@ def upload_media(request):
         result['media_id'] = media_object.media_id
         result['success'] = True
 
-    except Exception, e:
-        status_code = 400
-        result['error_text'] = str(e)
+    #except Exception, e:
+    #    status_code = 400
+    #    result['error_text'] = str(e)
 
     client_utils.log_client_action(
         client = client,

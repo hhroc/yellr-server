@@ -398,8 +398,9 @@ def process_video(base_filename):
     video_filename = ""
     preview_filename = ""
 
-    try:
-
+    #try:
+    if True:
+        '''
         # type incoming file
         mime_type = magic.from_file(base_filename, mime=True)
         allowed_image_types = [
@@ -427,8 +428,86 @@ def process_video(base_filename):
         # TODO: create preview image for video
         #
 
-    except Exception, e:
-        raise Exception(e)
+        '''
+
+        # type incoming file
+        mime_type = magic.from_file(base_filename, mime=True)
+        allowed_image_types = [
+            'video/mpeg',
+            'video/mp4',
+            'video/quicktime',
+            'video/3gpp',
+        ]
+
+        if not mime_type.lower() in allowed_image_types:
+            raise Exception("Unsupported Image Type: %s" % mime_type)
+
+        video_filename = '{0}.mp4'.format(base_filename)
+        preview_filename = '{0}p.jpg'.format(base_filename)
+
+        cmd = [
+            'ffmpeg',
+            '-i',
+            base_filename,
+            '-map_metadata',
+            '-1',
+            '-c:v',
+            'copy',
+            '-c:a',
+            'copy',
+            video_filename,
+        ]
+        resp = subprocess.call(cmd)
+
+        print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
+        print "\n\nRESP: {0}\n\n".format(resp)
+
+        if resp == 1:
+            cmd = [
+                'ffmpeg',
+                '-i',
+                base_filename,
+                '-map_metadata',
+                '-1',
+                '-c:v',
+                'copy',
+                #'-c:a',
+                #'copy',
+                video_filename,
+            ]
+            resp = subprocess.call(cmd)
+
+            print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
+            print "\n\nRESP: {0}\n\n".format(resp)
+        
+        cmd = [
+            'ffmpeg',
+            '-i',
+            video_filename,
+            '-ss',
+            '00:00:01.00',
+            '-vframes',
+            '1',
+            preview_filename,
+        ]
+        resp = subprocess.call(cmd)
+
+        # create preview image
+        #try:
+        if True:
+            subprocess.call(['convert', preview_filename, '-resize', '450', \
+                '-size', '450', preview_filename])
+        #except Exception, ex:
+        #    raise Exception("Error generating preview image: {0}".format(ex))
+
+        #
+        # TODO: create preview image for video
+        #
+
+       #raise Exception("Debug")
+
+    #except Exception, e:
+    #    raise Exception(e)
 
     return video_filename, preview_filename
 
@@ -439,6 +518,7 @@ def process_audio(base_filename):
 
     try:
 
+        '''
         #mp3 file
         if mimetype == "audio/mpeg":
             audio_filename = '{0}.mp3'.format(base_filename)
@@ -463,6 +543,54 @@ def process_audio(base_filename):
         #not mp3 or ogg vorbis
         else:
             raise Exception("invalid audio file")
+
+        #
+        # TODO: generic audio picture for preview name??
+        #
+        '''
+
+        mime_type = magic.from_file(base_filename, mime=True)
+        allowed_audio_types = [
+            'audio/mpeg',
+            'audio/ogg',
+            'audio/x-wav',
+            'audio/mp4',
+            'video/3gpp',
+        ]
+
+        '''
+        exts = [
+            'mp3',
+            'ogg',
+            'wav',
+            'mp4',
+        ]
+        '''
+
+        if not mime_type.lower() in allowed_audio_types:
+            raise Exception("Unsupported Audio Type: %s" % mime_type)
+
+        audio_filename = '{0}.mp3'.format(base_filename)
+
+        cmd = [
+            'ffmpeg',
+            '-i',
+            base_filename,
+            '-f',
+            'mp3',
+            '-map_metadata',
+            '-1',
+            #'-c:v',
+            #'copy',
+            #'-c:a',
+            #'copy',
+            audio_filename,
+        ]
+        resp = subprocess.call(cmd)
+
+        print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
+
+        print "\n\nbase_filename: {0}\n\nRESP: {1}\n\n".format(base_filename, resp)
 
         #
         # TODO: generic audio picture for preview name??
