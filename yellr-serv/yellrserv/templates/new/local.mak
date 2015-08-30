@@ -57,8 +57,9 @@
             ## post audio
             % elif post['media_objects'][0]['media_type_name'] == "audio":
             <p class="post-text">${post['media_objects'][0]['caption']}</p>
-            <img src=""/>
-            <audio id="player2" src="/media/${post['media_objects'][0]['file_name']}" type="audio/mp3" controls="controls"> </audio>
+            ## <img src=""/>
+             <h4>Audio Recording:</h4>
+            <audio id="player-${post["media_objects"][0]["media_id"]}" src="/media/${post['media_objects'][0]['file_name']}" controls> </audio>
             ## text
             % else:
             <p class="post-text">${post['media_objects'][0]['media_text']}</p>

@@ -86,8 +86,10 @@ def register_client(request):
         lat = float(request.GET['lat'])
         lng = float(request.GET['lng'])
 
-        print request.GET
-        print request.POST
+        #print request.GET
+        #print request.POST
+
+        print '{0}: {1}'.format(cuid, request.url)
 
         # creates client if not yet seen
         client = Clients.get_client_by_cuid(
@@ -313,6 +315,29 @@ def get_approved_posts(client_id, language_code, lat, lng, start, count):
 
     return ret_posts 
 
+def get_post(post_id):
+
+    ret_post = None
+
+    #try:
+    if True:
+        post = Posts.get_with_media_objects_from_post_id(
+            session = DBSession,
+            post_id = post_id,
+        )
+
+        print "\n\n"
+        print post
+        print "\n\n"
+
+        if not post is None and len(post) != 0:
+            ret_post = utils._decode_posts(post, clean=False)[0]
+
+    #except:
+    #    raise Exception("Database error.")
+
+    return ret_post
+
 def register_vote(post_id, client_id, is_up_vote):
 
     vote = None
@@ -457,7 +482,7 @@ def process_video(base_filename):
             'copy',
             video_filename,
         ]
-        resp = subprocess.call(cmd)
+        resp = subprocess.call(cmd, stdout=subprocess.PIPE)
 
         print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
         print "\n\nRESP: {0}\n\n".format(resp)
@@ -475,7 +500,7 @@ def process_video(base_filename):
                 #'copy',
                 video_filename,
             ]
-            resp = subprocess.call(cmd)
+            resp = subprocess.call(cmd, stdout=subprocess.PIPE)
 
             print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
             print "\n\nRESP: {0}\n\n".format(resp)
@@ -490,13 +515,16 @@ def process_video(base_filename):
             '1',
             preview_filename,
         ]
-        resp = subprocess.call(cmd)
+        resp = subprocess.call(cmd, stdout=subprocess.PIPE)
 
         # create preview image
         #try:
         if True:
             subprocess.call(['convert', preview_filename, '-resize', '450', \
-                '-size', '450', preview_filename])
+                '-size', '450', preview_filename], stdout=subprocess.PIPE)
+
+            subprocess.call(['convert', preview_filename, './media/play-icon.png', \
+                '-gravity', 'center', '-composite', preview_filename], stdout=subprocess.PIPE)
         #except Exception, ex:
         #    raise Exception("Error generating preview image: {0}".format(ex))
 
@@ -586,10 +614,9 @@ def process_audio(base_filename):
             #'copy',
             audio_filename,
         ]
-        resp = subprocess.call(cmd)
+        resp = subprocess.call(cmd, stdout=subprocess.PIPE)
 
         print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
-
         print "\n\nbase_filename: {0}\n\nRESP: {1}\n\n".format(base_filename, resp)
 
         #

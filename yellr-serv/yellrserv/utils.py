@@ -189,8 +189,8 @@ def _decode_posts(posts, clean=False):
 
     ret_posts = []
 
-    try:
-
+    #try:
+    if True:
         if len(posts) > 0 and posts[0][0] != None:
 
             seen_post_ids = []
@@ -268,8 +268,8 @@ def _decode_posts(posts, clean=False):
 
                 index += 1
 
-    except:
-        raise Exception("Database error.")
+    #except:
+    #    raise Exception("Database error.")
 
     return ret_posts
 

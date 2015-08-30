@@ -645,9 +645,9 @@ class Assignments(Base):
                 desc(Assignments.assignment_id),
             )
 
-            print "\n\nAssignments SQL:\n\n"
-            print str(assignments_query)
-            print "\n\n"
+            #print "\n\nAssignments SQL:\n\n"
+            #print str(assignments_query)
+            #print "\n\n"
 
         return assignments_query
 
@@ -1520,7 +1520,7 @@ class ClientLogs(Base):
     @classmethod
     def log(cls, session, client_id, url, lat, lng, request, result,
             success):
-        print "URL: %s" % url
+        #print "URL: %s" % url
         with transaction.manager:
             client_log = ClientLogs(
                 client_id = client_id,

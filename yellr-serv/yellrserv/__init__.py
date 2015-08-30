@@ -53,6 +53,7 @@ def main(global_config, **settings):
 
     config.add_route('/local','/local')
     config.add_route('/assignments', '/assignments')
+    config.add_route('/view', '/view')
     config.add_route('/stories', '/stories')
     config.add_route('/post', '/post')
 

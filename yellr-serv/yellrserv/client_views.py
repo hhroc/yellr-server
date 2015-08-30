@@ -117,6 +117,26 @@ def local(request):
 
     return {'new_client': new_client, 'cuid': cuid, 'client': client, 'lat': lat, 'lng': lng, 'posts': posts}
 
+@view_config(route_name='/view', renderer='templates/new/view.mak')
+def view(request):
+
+    valid = False
+    post = None
+
+    if 'post_id' in request.GET:
+        post_id = request.GET['post_id']
+
+        post = client_utils.get_post(
+            post_id,
+        )
+
+       
+
+        if not post is None and post['approved'] and not post['deleted']:
+            valid = True
+
+    return {'valid': valid, 'post': post}
+
 @view_config(route_name='/assignments', renderer='templates/new/assignments.mak')
 def assignments(request):
 

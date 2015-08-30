@@ -12,6 +12,10 @@ footer {
   margin-top: 25px;
 }
 
+audio {
+    width: 100%;
+}
+
 .footer {
   padding: 25px;
   text-align: center;
