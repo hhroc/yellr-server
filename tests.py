@@ -5,7 +5,7 @@ import requests
 import datetime
 import hashlib
 
-ROOT_DOMAIN = "http://127.0.0.1:5002/"
+ROOT_DOMAIN = "http://127.0.0.1:5003/"
 
 def log(output):
 
@@ -1364,7 +1364,39 @@ def run_tests():
     )
     log('----')
 
-    log("Done with Tests")
+    success, payload = _execute_test(
+        'flag_post.json',
+        cuid_a,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            'post_id': post_id_a,
+        },
+        'POST',
+    )
+    log('----')
+    log(payload)
+    log('----')
+
+    success, payload = _execute_test(
+        'admin/get_posts.json',
+        token,
+        _language_code,
+        _lat,
+        _lng,
+        {
+            # no fields required
+        },
+        'GET',
+    )
+    for post in payload['posts']:
+        if post['post_id'] == post_id_a:
+            if post['flagged'] == False:
+                raise Exception('Post was not flagged!')
+            break
+
+    log("Done with Tests.")
     log("")
 
 if __name__ == '__main__':
