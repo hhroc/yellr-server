@@ -13,7 +13,14 @@ from .models import (
     Clients,
     )
 
+import uuid
+import os
 import subprocess
+import magic
+
+system_config = {
+    'upload_dir': './uploads',
+}
 
 def get_payload(request):
     try:
@@ -87,44 +94,45 @@ def process_image(base_filename):
     image_filename = ""
     preview_filename = ""
 
-    try:
+    #try:
+    if True:
 
         image_filename = '{0}.jpg'.format(base_filename)
         preview_filename = '{0}p.jpg'.format(base_filename)
 
         # type incoming file
-        mime_type = magic.from_file(base_filename, mime=True)
-        allowed_image_types = [
+        mime_type = str(magic.from_file(base_filename, mime=True))
+        allowed_image_types = (
             'image/jpeg',
             'image/png',
             'image/x-ms-bmp',
             'image/tiff',
-        ]
+        )
 
-        if not mime_type.lower() in allowed_image_types:
+        if not mime_type.lower()[2:-1] in allowed_image_types:
             raise Exception("Unsupported Image Type: %s" % mime_type)
 
         # convert to jpeg from whatever format it was
         try:
             subprocess.call(['convert', base_filename, image_filename])
-        except Exception, ex:
+        except Exception as ex:
             raise Exception("Error converting image: {0}".format(ex))
 
         #strip metadata from images with ImageMagick's mogrify
         try:
             subprocess.call(['mogrify', '-strip', image_filename])
-        except Exception, ex:
+        except Exception as ex:
             raise Exception("Error removing metadata: {0}".format(ex))
 
         # create preview image
         try:
             subprocess.call(['convert', image_filename, '-resize', '450', \
                 '-size', '450', preview_filename])
-        except Exception, ex:
+        except Exception as ex:
             raise Exception("Error generating preview image: {0}".format(ex))
 
-    except Exception, e:
-        raise Exception(e)
+    #except Exception as ex:
+    #    raise Exception(ex)
 
     return image_filename, preview_filename
 
@@ -171,8 +179,8 @@ def process_video(base_filename):
         # TODO: create preview image for video
         #
 
-    except Exception, e:
-        raise Exception(e)
+    except Exception as ex:
+        raise Exception(ex)
 
     return video_filename, preview_filename
 
@@ -214,16 +222,16 @@ def process_audio(base_filename):
         ]
         resp = subprocess.call(cmd)
 
-        print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
+        #print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
 
-        print "\n\nbase_filename: {0}\n\nRESP: {1}\n\n".format(base_filename, resp)
+        #print "\n\nbase_filename: {0}\n\nRESP: {1}\n\n".format(base_filename, resp)
       
         #
         # TODO: generic audio picture for preview name??
         #
 
-    except Exception, e:
-        raise Exception(e)
+    except Exception as ex:
+        raise Exception(ex)
 
     return audio_filename, preview_filename
 
@@ -242,7 +250,8 @@ class AssignmentsAPI(object):
         resp = {'assignments': []}
         if self.client:
             start, count = build_paging(self.request)
-            resp = Assignments.get_all_open(client.last_lat, client.last_lng)
+            _assignments = Assignments.get_all_open(self.client.last_lat, self.client.last_lng)
+            resp = {'assignments': [a.to_dict() for a in _assignments]}
         else:
             self.request.response.status = 400
         return resp
@@ -289,8 +298,6 @@ class PostsAPI(object):
                 assignment_id = int(float(payload['assignment_id']))
             except:
                 assignment_id = None
-            print(self.client.id)
-            print(self.client.cuid)
             post = Posts.add(
                 client_id=self.client.id,
                 assignment_id=assignment_id,
@@ -319,29 +326,51 @@ class MediaObjectsAPI(object):
 
     def __init__(self, request):
         self.request = request
+        self.client = check_in(request)
 
     # [ POST ] - creates media object against a post
     @view_config(request_method='POST')
     def post(self):
         resp = {'media_object': None}
-        if payload and all(r in payload for r in self.post_req) and self.client:
-            try:
+        #payload = get_payload(self.request)
+        #print(type(self.request.POST.iteritemis()))
+        #print(self.request.POST.iteritems()[0])
+        for r in self.post_req:
+            #try:
+            if True:
+                dummy = self.request.POST[r]
+                valid = True
+            #except:
+            #    valid = False
+            #    break
+        if valid and self.client:
+            print('\ninside\n')
+            #try:
+            if True:
                 #filename = request.POST['media_file'].filename
-                input_file = request.POST['media_file']
+                input_file = self.request.POST['media_file'].file
                 base_filename = save_input_file(input_file)
-                if payload['media_type'] == 'image':
-                    object_file, prev_file = process_image(base_filename)
-                elif payload['media_type'] == 'video':
-                    object_file, prev_file = process_video(base_filename)
-                elif payload['media_type'] = 'audio':
-                    object_file, prev_file = process_audio(base_filename)
+                if self.request.POST['media_type'] == 'image':
+                    object_filename, preview_filename = process_image(base_filename)
+                elif self.request.POST['media_type'] == 'video':
+                    object_filename, preview_filename = process_video(base_filename)
+                elif self.request.POST['media_type'] == 'audio':
+                    object_filename, preview_filename = process_audio(base_filename)
                 else:
                     raise Exception('Invalid Media Type')
-            except Exception as ex:
-                self.request.response.status = 400
-                resp.update('error': str(ex))
+                media_object = MediaObjects.add(
+                    post_id=self.request.POST['post_id'],
+                    client_id=self.client.id,
+                    media_type=self.request.POST['media_type'],
+                    filename=object_filename,
+                    preview_filename=preview_filename
+                )
+                resp = {'media_object': media_object.to_dict()}
+            #except Exception as ex:
+            #    self.request.response.status = 400
+            #    resp.update(error = str(ex))
         else:
-            resl.request.response.status = 400
+            self.request.response.status = 400
         return resp
 
 

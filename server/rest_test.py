@@ -2,12 +2,15 @@ import uuid
 import requests
 import json
 import hashlib
+import datetime
+from datetime import timedelta
+
 
 base_url = "http://localhost:5003"
 
 class Client(object):
 
-    def __init__(self, cuid=str(uuid.uuid4()), lat=43.5, lng=-77.1, language_code='en', platform='test'):
+    def __init__(self, cuid=str(uuid.uuid4()), lat=43.1, lng=-77.5, language_code='en', platform='test'):
         self.cuid = cuid
         self.lat = lat
         self.lng = lng
@@ -32,6 +35,7 @@ class User(object):
 def get_posts(client):
     url = base_url + '/api/posts'
     resp = requests.get(client.build_url(url))
+    print(json.dumps(json.loads(resp.text), indent=4))
     return json.loads(resp.text)
 
 def publish_post(client, contents):
@@ -41,6 +45,23 @@ def publish_post(client, contents):
         'contents': contents,
     })
     resp = requests.post(client.build_url(url), data)
+    return json.loads(resp.text)
+
+def upload_media_object(client, post, media_type, filename):
+    url = base_url + '/api/media_objects'
+    data = {
+        'media_type': media_type,
+        'post_id': post['id'],
+        'media_file': filename,
+    }
+    files = {'media_file': open(filename, 'rb')}
+    resp = requests.post(client.build_url(url), data, files=files)
+    return json.loads(resp.text)
+
+def get_assignments(client):
+    url = base_url + '/api/assignments'
+    resp = requests.get(client.build_url(url))
+    print(json.dumps(json.loads(resp.text), indent=4))
     return json.loads(resp.text)
 
 def login(user):
@@ -78,6 +99,36 @@ def admin_update_post(user, post, deleted, flagged, approved):
     resp = requests.put(user.build_url(url), data, cookies=user.cookies)
     return json.loads(resp.text)
 
+def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng):
+    url = base_url + '/api/admin/assignments'
+    data = json.dumps({
+        'life_time': str(life_time),
+        'name': name,
+        'top_left_lat': top_left_lat,
+        'top_left_lng': top_left_lng,
+        'bottom_right_lat': bottom_right_lat,
+        'bottom_right_lng': bottom_right_lng,
+    })
+    resp = requests.post(user.build_url(url), data, cookies=user.cookies)
+    return json.loads(resp.text)
+
+def admin_create_question(user, assignment, langauge_code, question_text, description, question_type, answer0, answer1, answer2, answer3, answer4):
+    url = base_url + '/api/admin/questions'
+    data = json.dumps({
+        'assignment_id': assignment['id'],
+        'language_code': 'en',
+        'question_text': question_text,
+        'description': description,
+        'question_type': question_type,
+        'answer0': answer0,
+        'answer1': answer1,
+        'answer2': answer2,
+        'answer3': answer3,
+        'answer4': answer4,
+    })
+    resp = requests.post(user.build_url(url), data, cookies=user.cookies)
+    return json.loads(resp.text)
+
 if __name__ == '__main__':
 
     client_a = Client(cuid='43c4e9c0-bb48-4cde-ad5a-00f24b43dbfc')
@@ -92,8 +143,9 @@ if __name__ == '__main__':
     print('\tpost id: ' + post_0_a['post']['id'])
 
     print('[POST] /api/media_objects')
-    media_object_0_a = upload_media_object(client_a, "image", "smile.jpg")
-    print('\tmedia object id: ' + media_object_0_a['media_object']['id']
+    media_object_0_a = upload_media_object(client_a, post_0_a['post'], "image", "smiley.png")
+    #print(json.dumps(media_object_0_a, indent=4))
+    print('\tmedia object id: ' + media_object_0_a['media_object']['id'])
 
     print("[POST] /api/admin/login")
     user_a = login(user_a)
@@ -119,4 +171,14 @@ if __name__ == '__main__':
     posts_a = get_posts(client_a)
     print('\tpost count:' + str(len(posts_a['posts'])))
 
-    print("[POST] /api/
+    print("[POST] /api/admin/assignments")
+    assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3)
+    print("\tassignment id:" + assignment_a['assignment']['id'])
+
+    print("[POST] /api/admin/question")
+    question_a = admin_create_question(user_a, assignment_a['assignment'],'en', 'How is your day going?', 'Tell us about your day so far!', 'text', '', '', '', '', '')
+    print('\tquestion id: ' + question_a['question']['id'])
+
+    print('[GET] /api/assignments')
+    assignments_a = get_assignments(client_a)
+    print(json.dumps(assignments_a, indent=4))

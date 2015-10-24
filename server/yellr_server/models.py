@@ -66,6 +66,8 @@ from sqlalchemy.sql import func
 from sqlalchemy_utils import UUIDType
 from sqlalchemy import (
     Column,
+    cast,
+    Date,
     CHAR,
     ForeignKey,
     Integer,
@@ -738,7 +740,7 @@ class Assignments(Base, CreationMixin, TimeStampMixin):
     __tablename__ = 'assignments'
     #assignment_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    publish_datetime = Column(DateTime)
+    #publish_datetime = Column(DateTime)
     expire_datetime = Column(DateTime)
     name = Column(UnicodeText)
     #assignment_unique_id = Column(UnicodeText)
@@ -804,7 +806,7 @@ class Assignments(Base, CreationMixin, TimeStampMixin):
                Assignments,
                #func.count(Posts.post_id),
            ).outerjoin(
-               Posts,Posts.assignment_id == Assignments.assignment_id,
+               Posts,Posts.assignment_id == Assignments.id,
            ).filter(
                 # we add offsets so we can do simple comparisons
                 Assignments.top_left_lat + 90 > lat + 90,
@@ -814,7 +816,8 @@ class Assignments(Base, CreationMixin, TimeStampMixin):
                 cast(Assignments.expire_datetime, Date) >= \
                         cast(datetime.datetime.now(), Date),
             ).group_by(
-                Assignments.assignment_id
+                Assignments.id
+
             ).all()
         return assignments
 
@@ -1057,7 +1060,7 @@ class Assignments(Base, CreationMixin, TimeStampMixin):
             #assignment_id = self.assignment_id,
             #user_id = self.user_id,
             author = self.author.to_dict() if not simple else {},
-            publish_datetime = str(self.publish_datetime),
+            #publish_datetime = str(self.publish_datetime),
             expire_datetime = str(self.expire_datetime),
             name = self.name,
             top_left_lat = self.top_left_lat,
@@ -1826,7 +1829,8 @@ class MediaObjects(Base, CreationMixin, TimeStampMixin):
     #media_type_id = Column(Integer, ForeignKey('mediatypes.id'))
     media_type = Column(UnicodeText, nullable=False)
     #media_id = Column(UnicodeText)
-    file_name = Column(UnicodeText, nullable=False)
+    filename = Column(UnicodeText, nullable=False)
+    preview_filename = Column(UnicodeText, nullable=False)
     #caption = Column(UnicodeText)
     #media_text = Column(UnicodeText)
 
@@ -2158,12 +2162,18 @@ class Collections(Base, CreationMixin, TimeStampMixin):
     __tablename__ = 'collections'
     #collection_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
-    collection_datetime = Column(DateTime)
+    #collection_datetime = Column(DateTime)
     name = Column(UnicodeText)
     description = Column(UnicodeText)
     tags = Column(UnicodeText)
     enabled = Column(Boolean)
     #private = Column(Boolean)
+
+    assignment = relationship(
+        "Assignments",
+        backref='collection',
+        lazy='joined'
+    )
 
     posts = relationship(
         "Posts",
@@ -2297,7 +2307,8 @@ class Collections(Base, CreationMixin, TimeStampMixin):
             description = self.description,
             tags = self.tags,
             enabled = self.enabled,
-            posts = [p.to_dict() for p in self.posts], 
+            #posts = [p.to_dict() for p in self.posts], 
+            post_count = len(self.posts),
         )
         return resp
 

@@ -9,10 +9,15 @@ from .models import (
     #MyModel,
     Users,
     Assignments,
+    Questions,
+    Collections,
     Posts,
     MediaObjects,
     Clients,
     )
+
+import datetime
+from datetime import timedelta
 
 def get_payload(request):
     try:
@@ -38,7 +43,11 @@ def build_paging(request):
 
 def authenticate(request):
     user = None
-    token = request.session['token']
+    token = False
+    try:
+        token = request.session['token']
+    except:
+        pass
     if token:
         user = Users.get_from_token(token)
     return user
@@ -144,6 +153,120 @@ class AdminPostAPI(object):
             resp = {'post': post.to_dict(None)}
         else:
             self.request.response.status = 403
+        return resp
+
+
+@view_defaults(route_name='/api/admin/assignments', renderer='json')
+class AdminAssignmentsAPI(object):
+
+    post_req = (
+        'life_time',
+        'name',
+        'top_left_lat',
+        'top_left_lng',
+        'bottom_right_lat',
+        'bottom_right_lng',
+    )
+
+    def __init__(self, request):
+        self.request = request
+        self.user = authenticate(request)
+
+    @view_config(request_method='GET')
+    def get(self):
+        resp = {'assignments': None}
+        if self.user:
+            _assignments = Assignments.get_all()
+            assignments = [a.to_dict() for a in _assignments]
+            resp = {'assignments': assignments}
+        else:
+            self.request.response.status = 403
+        return resp
+
+    @view_config(request_method='POST')
+    def post(self):
+        resp = {'assignment': None}
+        payload = get_payload(self.request)
+        if self.user and payload and all(r in payload for r in self.post_req): 
+            collection = Collections.add(
+                user_id=self.user.id,
+                name=payload['name'],
+                description='Collection for Assignment: ' + payload['name'],
+                tags='',
+                enabled=True,
+            )
+            assignment = Assignments.add(
+                user_id=self.user.id,
+                expire_datetime=datetime.datetime.now() + timedelta(hours=float(payload['life_time'])),
+                name=payload['name'],
+                top_left_lat=payload['top_left_lat'],
+                top_left_lng=payload['top_left_lng'],
+                bottom_right_lat=payload['bottom_right_lat'],
+                bottom_right_lng=payload['bottom_right_lng'],
+                collection_id=collection.id,
+            )
+            resp = {'assignment': assignment.to_dict()}
+        else:
+            self.response.request.status = 400
+        return resp
+
+@view_defaults(route_name='/api/admin/questions', renderer='json')
+class AdminQuestionsAPI(object):
+
+    post_req = (
+        'assignment_id',
+        'language_code',
+        'question_text',
+        'description',
+        'question_type',
+        'answer0',
+        'answer1',
+        'answer2',
+        'answer3',
+        'answer4',
+    )
+
+    def __init__(self, request):
+        self.request = request
+        self.user = authenticate(request)
+
+    @view_config(request_method='POST')
+    def post(self):
+        resp = {'question': None}
+        payload = get_payload(self.request)
+        print(payload)
+        print(all(r in payload for r in self.post_req))
+        if self.user and payload and all(r in payload for r in self.post_req):
+            print('inside')
+            question = Questions.add(
+                user_id=self.user.id,
+                assignment_id=payload['assignment_id'],
+                language_code=payload['language_code'],
+                question_text=payload['question_text'],
+                description=payload['description'],
+                question_type=payload['question_type'],
+                answer0=payload['answer0'],
+                answer1=payload['answer1'],
+                answer2=payload['answer2'],
+                answer3=payload['answer3'],
+                answer4=payload['answer4'],
+            )
+            resp = {'question': question.to_dict()}
+        else:
+            self.request.response.status = 400
+        return resp
+
+@view_defaults(route_name='/api/admin/collections', renderer='json')
+class AdminCollectionsAPI(object):
+
+    def __init__(self, request):
+        self.request = request
+        self.user = authenticate(request)
+
+    @view_config(request_method='GET')
+    def get(self):
+        resp = {'collections': None}
+        
         return resp
 
 """
