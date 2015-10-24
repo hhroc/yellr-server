@@ -21,7 +21,8 @@ def main(global_config, **settings):
     my_session_factory = SignedCookieSessionFactory('max_secret_yellr_password')
     config.set_session_factory(my_session_factory)
 
-    config.add_static_view('static', 'static', cache_max_age=3600)
+    config.add_static_view('static', 'static', cache_max_age=1)
+    config.add_static_view('moderator', 'moderator', cache_max_age=1)
 
     #config.add_route('home', '/')
 
