@@ -1,21 +1,28 @@
 // media queries
 @mixin mq($breakpoint)
 {
-  @if $breakpoint == mobile
-  {@media only screen and (min-width: 320px){@content; } }
+  // // to implement:
+  // $landscape
+  // $portrait
 
-  @else if $breakpoint == tablet
-  {@media only screen and (min-width: 480px) {@content; } }
+  // small mq
+  @if $breakpoint == small {@media #{$small-up} {@content; } }
+  @if $breakpoint == small-only {@media #{$small-only} {@content; } }
 
-  @else if $breakpoint == netbook
-  {@media only screen and (min-width: 768px) {@content; } }
+  // medium mq
+  @if $breakpoint == medium {@media #{$medium-up} {@content; } }
+  @if $breakpoint == medium-only {@media #{$medium-only} {@content; } }
 
-  @else if $breakpoint == desktop
-  {@media only screen and (min-width: 1024px) {@content; } }
+  // large mq
+  @if $breakpoint == large {@media #{$large-up} {@content; } }
+  @if $breakpoint == large-only {@media #{$large-only} {@content; } }
 
-  @else if $breakpoint == xl
-  {@media only screen and (min-width: 1200px) {@content; } }
+  // xlarge mq
+  @if $breakpoint == xlarge {@media #{$xlarge-up} {@content; } }
+  @if $breakpoint == xlarge-only {@media #{$xlarge-only} {@content; } }
+
 }
+
 
 // this
 @mixin if_there_are($n) {
