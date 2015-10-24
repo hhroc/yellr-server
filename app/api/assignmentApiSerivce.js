@@ -14,8 +14,8 @@ angular
          *                   posts
          * @return posts : http promise containing all posts
          */
-        assignmentApi.getFeed = function (start, count, reported) {
-            var url = '/admin/get_posts.json',
+        assignmentApi.getPosts = function (start, count, reported) {
+            var url = '/api/admin/posts',
                 params = {};
 
             if (start !== undefined) params.start = start;
@@ -37,15 +37,11 @@ angular
          * @return post : js object with post data
          */
         assignmentApi.getPost = function (id) {
-            var url = '/admin/get_post.json',
-                params = {
-                    post_id: id
-                };
+            var url = '/api/admin/posts/' + id;
 
             return $http({
                 method: 'GET',
                 url: url,
-                params: params
             });
         };
 
@@ -55,7 +51,7 @@ angular
          * @return response : response with list of assignments and questions
          */
         assignmentApi.getAssignments = function () {
-            var url = '/admin/get_assignments.json';
+            var url = '/api/assignments';
 
             return $http({
                 method: 'GET',
@@ -76,7 +72,7 @@ angular
         assignmentApi.createQuestion = function (languageCode,
                                            questionText, description,
                                            questionType, answers) {
-            var url = '/admin/create_question.json',
+            var url = '/api/admin/questions',
                 data = {
                     language_code: languageCode,
                     question_text: questionText,
@@ -89,7 +85,7 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                data: $.param(data)
+                data: data,
             });
         };
 
@@ -110,7 +106,7 @@ angular
                                                questions, topLeftLat, topLeftLng,
                                                bottomRightLat, bottomRightLng) {
 
-            var url = '/admin/publish_assignment.json',
+            var url = '/api/admin/assignments',
                 data = {
                     name: name,
                     life_time: lifeTime,
@@ -124,7 +120,7 @@ angular
             return $http({
                 method: 'POST',
                 url: url,
-                data: $.param(data)
+                data: data
             });
         };
 
@@ -191,14 +187,18 @@ angular
          *
          * @return void
          */
-        assignmentApi.approvePost = function (id) {
-            var url = '/admin/approve_post.json',
-                data = { post_id: id };
+        assignmentApi.approvePost = function (id, post) {
+            var url = '/api/admin/posts/' + id,
+                data = {
+                    approved: !post.approved,
+                    deleted: post.deleted,
+                    flagged: post.flagged,
+                };
 
             return $http({
-                method: 'POST',
+                method: 'PUT',
                 url: url,
-                data: $.param(data)
+                data: data,
             });
         };
 
@@ -209,14 +209,18 @@ angular
          *
          * @return post_id : id of the deleted post
          */
-        assignmentApi.deletePost = function (id) {
-            var url = '/admin/delete_post.json',
-                data = { post_id: id };
+        assignmentApi.deletePost = function (id, post) {
+            var url = '/api/admin/posts/' + id,
+                data = {
+                    approved: post.approved,
+                    flagged: post.flagged,
+                    deleted: true,
+                };
 
             return $http({
-                method: 'POST',
+                method: 'PUT',
                 url: url,
-                data: $.param(data)
+                data: data,
             });
         };
 

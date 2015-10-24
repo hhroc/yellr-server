@@ -80,6 +80,7 @@ server/yellr_server/moderator/epiceditor/
 yellr-serv/logs.json
 yellr-serv/log.txt
 yellr-serv/yellr-serv.sqlite
+server/yellr-server.sqlite
 
 # Uploaded files
 yellr-serv/uploads/
