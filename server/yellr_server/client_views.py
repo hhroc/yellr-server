@@ -294,10 +294,11 @@ class PostsAPI(object):
         resp = {'post': None}
         payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req) and self.client:
-            try:
-                assignment_id = int(float(payload['assignment_id']))
-            except:
-                assignment_id = None
+            assignment_id = None
+            if payload['assignment_id'] != None:
+                assignment_id = payload['assignment_id']
+                print(assignment_id)
+                print('\n\n')
             post = Posts.add(
                 client_id=self.client.id,
                 assignment_id=assignment_id,

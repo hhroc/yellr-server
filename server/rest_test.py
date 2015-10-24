@@ -35,19 +35,17 @@ class User(object):
 def get_client(client):
     url = base_url + '/api/clients'
     resp = requests.get(client.build_url(url))
-    print(json.dumps(json.loads(resp.text), indent=4))
     return json.loads(resp.text)
 
 def get_posts(client):
     url = base_url + '/api/posts'
     resp = requests.get(client.build_url(url))
-    print(json.dumps(json.loads(resp.text), indent=4))
     return json.loads(resp.text)
 
-def publish_post(client, contents):
+def publish_post(client, contents, assignment_id=None):
     url = base_url + '/api/posts'
     data = json.dumps({
-        'assignment_id': '',
+        'assignment_id': assignment_id,
         'contents': contents,
     })
     resp = requests.post(client.build_url(url), data)
@@ -67,7 +65,6 @@ def upload_media_object(client, post, media_type, filename):
 def get_assignments(client):
     url = base_url + '/api/assignments'
     resp = requests.get(client.build_url(url))
-    print(json.dumps(json.loads(resp.text), indent=4))
     return json.loads(resp.text)
 
 def loggedin(user):
@@ -140,6 +137,24 @@ def admin_create_question(user, assignment, langauge_code, question_text, descri
     resp = requests.post(user.build_url(url), data, cookies=user.cookies)
     return json.loads(resp.text)
 
+def admin_update_question(user, question, language_code, question_text, description, answer0, answer1, answer2, answer3, answer4):
+    url = base_url + '/api/admin/questions/' + question['id']
+    data = json.dumps({
+        #'assignment_id': assignment['id'],
+        'language_code': 'en',
+        'question_text': question_text,
+        'description': description,
+        #'question_type': question_type,
+        'answer0': answer0,
+        'answer1': answer1,
+        'answer2': answer2,
+        'answer3': answer3,
+        'answer4': answer4,
+    })
+    resp = requests.put(user.build_url(url), data, cookies=user.cookies)
+    print(resp.text)
+    return json.loads(resp.text)
+
 if __name__ == '__main__':
 
     client_a = Client(cuid='43c4e9c0-bb48-4cde-ad5a-00f24b43dbfc')
@@ -197,7 +212,7 @@ if __name__ == '__main__':
     print("[GET] /api/posts")
     posts_a = get_posts(client_a)
     print('\tpost count:' + str(len(posts_a['posts'])))
-    print(json.dumps(posts_a, indents=4))
+    print(json.dumps(posts_a, indent=4))
 
     print("[POST] /api/admin/assignments")
     assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3)
@@ -210,3 +225,36 @@ if __name__ == '__main__':
     print('[GET] /api/assignments')
     assignments_a = get_assignments(client_a)
     print(json.dumps(assignments_a, indent=4))
+
+    print('[POST] /api/posts')
+    post_1_a = publish_post(client_a, "My day is going great, thanks for asking!", assignment_id=assignment_a['assignment']['id'])
+    print('\tassignment_id: ' + assignment_a['assignment']['id'] + ', post id: ' + post_1_a['post']['id'])
+
+    print('[POST] /api/media_objects')
+    media_object_1_a = upload_media_object(client_a, post_1_a['post'], "image", "smiley.png")
+    #print(json.dumps(media_object_0_a, indent=4))
+    print('\tmedia object id: ' + media_object_0_a['media_object']['id'])
+
+    print("[PUT] /api/admin/posts/{id}")
+    post = admin_update_post(user_a, post_1_a['post'], deleted=False, flagged=False, approved=True)
+    print('\tapproved: ' + str(post['post']['approved']))
+
+    print("[POST] /api/admin/assignments")
+    assignment_b = admin_create_assignment(user_a, "Tell me about the wind ...", 72, 43.4, -77.9, 43.0, -77.3)
+    print("\tassignment id:" + assignment_a['assignment']['id'])
+
+    print("[POST] /api/admin/question")
+    question_b = admin_create_question(user_a, assignment_b['assignment'],'en', 'Tell me about the wind ...', 'OMG TELL ME.', 'text', '', '', '', '', '')
+    print('\tquestion id: ' + question_b['question']['id'])
+
+    print('[GET] /api/assignments')
+    assignments_b = get_assignments(client_a)
+    print(json.dumps(assignments_b, indent=4))
+
+    print("[PUT] /api/admin/question")
+    question_c = admin_update_question(user_a, question_b['question'], 'en', 'Tell me about the wind ... maybe?', 'OMG TELL ME ... if you want :/', '', '', '', '', '')
+    print('\tquestion id: ' + question_c['question']['id'])
+
+    print('[GET] /api/assignments')
+    assignments_c = get_assignments(client_a)
+    print(json.dumps(assignments_c, indent=4))

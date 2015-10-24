@@ -750,7 +750,7 @@ class Assignments(Base, CreationMixin, TimeStampMixin):
 
     questions = relationship('Questions', backref='assignment', lazy='joined')
 
-    #posts = relationship('Posts', backref='assignment', lazy='joined')
+    posts = relationship('Posts', backref='assignment', lazy='joined')
 
     '''
     @classmethod
@@ -1353,7 +1353,7 @@ class Posts(Base, CreationMixin, TimeStampMixin):
     flagged = Column(Boolean, nullable=False)
 
     media_objects = relationship('MediaObjects', backref='post')
-    assignment = relationship('Assignments', backref='posts', lazy='joined')
+    #assignment = relationship('Assignments', backref='posts', lazy='joined')
     votes = relationship('Votes', backref='post', lazy='joined')
 
     """
@@ -1686,7 +1686,7 @@ class Posts(Base, CreationMixin, TimeStampMixin):
     def to_dict(self, client_id):
         resp = super(Posts, self).to_dict()
         resp.update(
-            assignment=self.assignment.to_dict() if self.assignment_id != None and self.assignment_id != 0 else None,
+            assignment=self.assignment.to_dict() if self.assignment_id != None else {},
             language_code=self.language_code,
             lat=self.lat,
             lng=self.lng,
