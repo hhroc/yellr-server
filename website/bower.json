@@ -1,0 +1,22 @@
+{
+  "name": "arrow",
+  "description": "web project starter",
+  "authors": [
+    "luis rosario //zapo"
+  ],
+  "homepage": "http://archercom.com/",
+  "version": "0.1.0",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "foundation": "~5.5.3",
+    "konami-js": "*",
+    "howler.js": "howler#~1.1.27"
+  }
+}

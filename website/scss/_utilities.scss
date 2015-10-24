@@ -1,0 +1,118 @@
+//============================================================
+// Generic utility classes for:
+// - padding (.page-section)
+// - margins
+//
+//
+// Table of Contents
+// 01. Page Sections (Padding)
+// 02. No Padding
+// 03. Margins
+//
+//
+// Naming conventions follow those of Foundation
+// ============================================================
+
+
+
+
+// 01. Page Sections (Padding)
+// We use padding-top and padding-bottom because Foundation targets padding-left
+// and -right
+// ----------------------------------------
+@mixin page-section($size) {
+  padding-top: $size;
+  padding-bottom: $size;
+}
+
+.xtra-thin-page-section     { @include page-section($column-gutter * 0.25); }
+.thin-page-section          { @include page-section($column-gutter * 0.5); }
+.page-section               { @include page-section($column-gutter * 1); }
+.thick-page-section         { @include page-section($column-gutter * 1.5); }
+.xtra-thick-page-section    { @include page-section($column-gutter * 2); }
+
+@include mq(netbook) {
+  .medium-xtra-thin-page-section     { @include page-section($column-gutter * 0.25); }
+  .medium-thin-page-section          { @include page-section($column-gutter * 0.5); }
+  .medium-page-section               { @include page-section($column-gutter * 1); }
+  .medium-thick-page-section         { @include page-section($column-gutter * 1.5); }
+  .medium-xtra-thick-page-section    { @include page-section($column-gutter * 2); }
+}
+
+
+
+// 02. No Padding
+// ----------------------------------------
+.no-padding-bottom    { padding-bottom: 0 !important; }
+.no-padding-top       { padding-top: 0 !important; }
+.no-padding-left      { padding-left: 0 !important; }
+.no-padding-right     { padding-right: 0 !important; }
+
+@include mq(netbook) {
+  .medium-no-padding-bottom    { padding-bottom: 0 !important; }
+  .medium-no-padding-top       { padding-top: 0 !important; }
+  .medium-no-padding-left      { padding-left: 0 !important; }
+  .medium-no-padding-right     { padding-right: 0 !important; }
+}
+
+
+
+
+
+// 03. Margins
+// ----------------------------------------
+// margin-bottom
+.xtra-thin-margin-bottom    { margin-bottom: $column-gutter * 0.25 !important; }
+.thin-margin-bottom         { margin-bottom: $column-gutter * 0.5 !important; }
+.margin-bottom              { margin-bottom: $column-gutter * 1 !important; }
+.thick-margin-bottom        { margin-bottom: $column-gutter * 1.5 !important; }
+.xtra-thick-margin-bottom   { margin-bottom: $column-gutter * 2 !important; }
+
+// margin-top
+.xtra-thin-margin-top       { margin-top: $column-gutter * 0.25 !important; }
+.thin-margin-top            { margin-top: $column-gutter * 0.5 !important; }
+.margin-top                 { margin-top: $column-gutter * 1 !important; }
+.thick-margin-top           { margin-top: $column-gutter * 1.5 !important; }
+.xtra-thick-margin-top      { margin-top: $column-gutter * 2 !important; }
+
+// margin-right
+.thin-margin-right          { margin-right: $column-gutter * 0.5 !important; }
+.margin-right               { margin-right: $column-gutter * 1 !important; }
+.thick-margin-right         { margin-right: $column-gutter * 1.5 !important; }
+
+// margin-left
+.thin-margin-left           { margin-left: $column-gutter * 0.5 !important; }
+.margin-left                { margin-left: $column-gutter * 1 !important; }
+.thick-margin-left          { margin-left: $column-gutter * 1.5 !important; }
+
+// no margin
+.no-margin                  { margin: 0 !important; }
+
+@include mq(netbook) {
+  // margin-bottom
+  .medium-xtra-thin-margin-bottom    { margin-bottom: $column-gutter * 0.25 !important; }
+  .medium-thin-margin-bottom         { margin-bottom: $column-gutter * 0.5 !important; }
+  .medium-margin-bottom              { margin-bottom: $column-gutter * 1 !important; }
+  .medium-thick-margin-bottom        { margin-bottom: $column-gutter * 1.5 !important; }
+  .medium-xtra-thick-margin-bottom   { margin-bottom: $column-gutter * 2 !important; }
+
+  // margin-top
+  .medium-xtra-thin-margin-top       { margin-top: $column-gutter * 0.25 !important; }
+  .medium-thin-margin-top            { margin-top: $column-gutter * 0.5 !important; }
+  .medium-margin-top                 { margin-top: $column-gutter * 1 !important; }
+  .medium-thick-margin-top           { margin-top: $column-gutter * 1.5 !important; }
+  .medium-xtra-thick-margin-top      { margin-top: $column-gutter * 2 !important; }
+
+  // margin-right
+  .medium-thin-margin-right          { margin-right: $column-gutter * 0.5 !important; }
+  .medium-margin-right               { margin-right: $column-gutter * 1 !important; }
+  .medium-thick-margin-right         { margin-right: $column-gutter * 1.5 !important; }
+
+  // margin-left
+  .medium-thin-margin-left           { margin-left: $column-gutter * 0.5 !important; }
+  .medium-margin-left                { margin-left: $column-gutter * 1 !important; }
+  .medium-thick-margin-left          { margin-left: $column-gutter * 1.5 !important; }
+
+  // no margin
+  .medium-no-margin                  { margin: 0 !important; }
+}
