@@ -23,6 +23,7 @@ def main(global_config, **settings):
 
     config.add_static_view('static', 'static', cache_max_age=1)
     config.add_static_view('moderator', 'moderator', cache_max_age=1)
+    config.add_static_view('media', '../uploads', cache_max_age=3600*24*7)
 
     #config.add_route('home', '/')
 

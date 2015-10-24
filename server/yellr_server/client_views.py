@@ -17,6 +17,7 @@ import uuid
 import os
 import subprocess
 import magic
+import ntpath
 
 system_config = {
     'upload_dir': './uploads',
@@ -357,7 +358,7 @@ class MediaObjectsAPI(object):
                     post_id=self.request.POST['post_id'],
                     client_id=self.client.id,
                     media_type=self.request.POST['media_type'],
-                    filename=object_filename,
+                    filename=ntpath.basename(object_filename),
                     preview_filename=preview_filename
                 )
                 resp = {'media_object': media_object.to_dict()}
