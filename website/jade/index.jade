@@ -1,0 +1,247 @@
+doctype html
+html(lang="en").no-js
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge,chrome=1")
+    title Yellr Frontpage
+    meta(name="description", content="Yellr Frontpage")
+    include _head.jade
+
+  body
+    a(href="#main").show-for-sr Skip to main content
+    .container
+      header.global-header.yellow-bg
+        .row.thin-page-section
+          .columns.medium-8
+            h1.h1 Yellr Frontpage
+            p.no-margin Contribute to your community
+          .columns.medium-4
+            // need to rename to something more accurate
+            .android-badge--container
+              // contribute thing
+              button.small.no-margin(data-reveal-id="contribute-modal") Contribute
+              #contribute-modal.reveal-modal.small(data-reveal, aria-hidden="true", role="dialog")
+                p form thing to go here
+                a.close-reveal-modal(aria-label="Close") &times;
+              // find on app store
+              a(href="https://play.google.com/store/apps/details?id=yellr.net.yellr_android", target="_blank")
+                img(src="https://developer.android.com/images/brand/en_generic_rgb_wo_60.png", alt="Get it on Google Play")
+
+      main#main
+        .smoke-bg
+          section.row.page-section
+            .columns
+              h2 About Yellr
+            .columns.medium-9
+              p WXXI Public Radio has partnered with HackHackers Rochester to develop Yellr, a new Citizen Journalism mobile app designed to widen audience engagement, especially among younger, technologically-driven and under-represented community members.
+            .columns.medium-3
+              button.expand.medium-no-margin(data-reveal-id="about-yellr") Learn More
+              #about-yellr.reveal-modal.small(data-reveal, aria-hidden="true", role="dialog")
+                p The platform – in English and Spanish - enables broad participation from community members in sharing and posting news and other community related information and events. The project was seeded by a grant funded by the John S. and James L. Knight Foundation, administered by the Institute for Nonprofit News.
+                //-.flex-video
+                  <iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/8U-E1nh1Hzs" frameborder="0" allowfullscreen></iframe>
+                a.close-reveal-modal(aria-label="Close") &times;
+
+        .row.xtra-thick-page-section
+          .columns.medium-6
+            h2 Posts
+            p The latest news coming from your community
+            hr
+            ul#posts-list.list-style-1
+              // HARD CODED
+              // text
+              li.gainsboro-bg
+                div.row.collapse#1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b(
+                  data-post-id="1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b",
+                  data-language-code="en",
+                  data-assignment="null")
+                  // voting side
+                  .columns.small-1
+                    ul.no-bullet.text-center
+                      li
+                        button.reset
+                          i.fa.fa-chevron-up
+                      li  0
+                      li
+                        button.reset
+                          i.fa.fa-chevron-down
+
+                  // content side
+                  .columns.small-10.medium-11
+                    // post details
+                    .post-content
+                      h3 This is a test post!
+                    // post meta
+                    small Posted:&nbsp;
+                      span.creation-datetime(
+                        data-create-datetime="2015-10-24 03:45:16") October 24, 2015 (03:45:16)
+              // picture
+              li.gainsboro-bg
+                div.row.collapse#1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b(
+                  data-post-id="1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b",
+                  data-language-code="en",
+                  data-assignment="null")
+                  // voting side
+                  .columns.small-1
+                    ul.no-bullet.text-center
+                      li
+                        button.reset
+                          i.fa.fa-chevron-up
+                      li  0
+                      li
+                        button.reset
+                          i.fa.fa-chevron-down
+
+                  // content side
+                  .columns.small-10.medium-11
+                    // post details
+                    .post-content
+                      h3 this is an image post example
+                      img(src="images/freedom.jpg")
+                    // post meta
+                    small Posted:&nbsp;
+                      span.creation-datetime(
+                        data-create-datetime="2015-10-24 03:45:16") October 24, 2015 (03:45:16)
+              // audio
+              li.gainsboro-bg
+                div.row.collapse#1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b(
+                  data-post-id="1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b",
+                  data-language-code="en",
+                  data-assignment="null")
+                  // voting side
+                  .columns.small-1
+                    ul.no-bullet.text-center
+                      li
+                        button.reset
+                          i.fa.fa-chevron-up
+                      li  0
+                      li
+                        button.reset
+                          i.fa.fa-chevron-down
+
+                  // content side
+                  .columns.small-10.medium-11
+                    // post details
+                    .post-content
+                      h3 this is an audio post example
+                      .player
+                        audio(controls)
+                          // Audio files
+                          source(src="misc/seinfeld.mp3", type="audio/mp3")
+                          //-source(src="https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg", type="audio/ogg")
+                          // Fallback for browsers that don"t support the <audio> element
+                          a(href="misc/seinfeld.mp3") Download
+
+                    // post meta
+                    small Posted:&nbsp;
+                      span.creation-datetime(
+                        data-create-datetime="2015-10-24 03:45:16") October 24, 2015 (03:45:16)
+              // video
+              li.gainsboro-bg
+                div.row.collapse#1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b(
+                  data-post-id="1eaf645f-99ed-4ea0-ba2c-2c0be5faf09b",
+                  data-language-code="en",
+                  data-assignment="null")
+                  // voting side
+                  .columns.small-1
+                    ul.no-bullet.text-center
+                      li
+                        button.reset
+                          i.fa.fa-chevron-up
+                      li  0
+                      li
+                        button.reset
+                          i.fa.fa-chevron-down
+
+                  // content side
+                  .columns.small-10.medium-11
+                    // post details
+                    .post-content
+                      h3 this is a video post example
+                      .player
+                        video(poster="https://cdn.selz.com/plyr/1.0/poster.jpg", controls)
+                          // Video files
+                          source(src="misc/dog-vocabulary-5Jq06Ga71TM.mp4", type="video/mp4")
+                          //-source(src="https://cdn.selz.com/plyr/1.0/movie.webm", type="video/webm")
+                          // Text track file
+                          //- track(kind="captions", label="English captions", src="https://cdn.selz.com/plyr/1.0/movie_captions_en.vtt", srclang="en", default)
+                          // Fallback for browsers that don"t support the <video> element
+                          a(href="misc/dog-vocabulary-5Jq06Ga71TM.mp4") Download
+
+                    // post meta
+                    small Posted:&nbsp;
+                      span.creation-datetime(
+                        data-create-datetime="2015-10-24 03:45:16") October 24, 2015 (03:45:16)
+
+                //- video, audio, picture
+            //-p "media_objects": [],
+
+          .columns.medium-6
+            h2 Assignments
+            p Contribute your voice to the news
+            hr
+            ul#assignments-list.list-style-1
+              li
+                div#1ecec874-74a9-4903-b418-0cedd14c788a(
+                  data-assignment-id="1ecec874-74a9-4903-b418-0cedd14c788a",
+                  data-collection-id="d77c7247-295b-48a4-af42-f610ed4506b8",
+                  data-response-count=0,
+                  data-expire-datetime="2015-10-27 13:49:11.855581")
+                  h3 Test Assignment
+                  // question
+                  .question#061bac8d-1739-4da9-b355-bcfa85bf8710(
+                    data-question-id="061bac8d-1739-4da9-b355-bcfa85bf8710"
+                    data-language-code="en",
+                    data-question-type="text"
+                    )
+                    p.question_text How is your day going?
+                    p.description Tell us about your day so far!
+                  // meta
+                  .assignment-meta
+                    p Date Posted:
+                      span.creation-datetime 2015-10-24 17:49:11
+                    p Posted by
+                      span.name(
+                        data-author-id="eb86b0d9-1ac3-4e9d-a2bd-63097661712b")
+                        | SYSTEM USER (system), Organization
+
+
+      footer.global-footer.steel-bg
+        .row.page-section
+          .columns
+            h2.h1 Get Involved
+
+        //-.row.page-section
+          .columns.medium-7
+            h2 Get Involved
+            h2 Partners
+            p The Knight Foundation, in partnership with the Investigative News Network, launched the INNovation Fund in January 2014 to explore new innovations and revenue sources, while developing audience engagement techniques and stronger business models. This $1 million fund is part of a $5 million Knight Local Media Initiative focused on helping nonprofit news organizations establish long-term sustainability.
+          .columns.medium-5
+            ul.small-block-grid-2
+              li
+                a(href="http://www.knightfoundation.org/", target="_blank")
+                  img(src="https://yellr.net/static/one-pager/img/partners/knight-logo-300.jpg", alt="Knight Foundation", width="300")
+              li
+                a(href="http://www.wxxi.org/", target="_blank")
+                  img(src="https://yellr.net/static/one-pager/img/partners/Wxxi_logo.png", alt="WXXI")
+            ul.small-block-grid-3
+              li
+                a(href="http://hhroc.github.io/", target="_blank")
+                  img(src="https://yellr.net/static/one-pager/img/partners/hacks_hackers-logo.jpeg", alt="Hacks and Hackers")
+              li
+                a(href="http://www.wdkx.com/", target="_blank")
+                  img(src="https://yellr.net/static/one-pager/img/partners/wdkx-logo.gif", alt="WDKX")
+              li
+                a(href="http://investigativenewsnetwork.org/", target="_blank")
+                  img(src="https://yellr.net/static/one-pager/img/partners/inn-logo.png", alt="Investigative News Network")
+            ul.small-block-grid-2
+              li
+                a(href="http://www.rit.edu/", target="_blank")
+                  img(src="https://yellr.net/static/one-pager/img/partners/rit-logo.jpg", alt="Rochester Institute of Technology")
+              li
+                a(href="https://www2.naz.edu/", target="_blank")
+                  img(src="https://yellr.net/static/one-pager/img/partners/nazareth-logo.png", alt="Nazareth College")
+
+          p yellr - hhroc - 2015
+
+    include _scripts.jade

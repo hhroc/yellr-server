@@ -1,0 +1,99 @@
+doctype html
+html(lang="en").no-js
+  head
+    meta(charset="utf-8")
+    meta(http-equiv="X-UA-Compatible", content="IE=edge,chrome=1")
+    title yellr - Kitchen Sink
+    meta(name="description", content="yellr")
+    include _head.jade
+
+  body
+    a(href="#main").show-for-sr Skip to main content
+    .container
+      header.header
+        .row
+          .columns
+            h1 yellr - Kitchen Sink
+
+      main#main
+        .clearfix
+          //- navigation
+          .columns.medium-2
+            ul.no-bullet
+              li
+                a(href="#colors") Colors
+              li
+                a(href="#icons") Icons
+              li
+                a(href="#typography") Typography
+              li
+                a(href="#buttons") Buttons
+              li
+                a(href="#classes") Classes
+
+
+          //- main area
+          .columns.medium-10
+            h2#colors Colors
+            hr
+            p For every color there are font and background classes.
+            p Ex: red - .red, .red-bg
+            ul.small-block-grid-1.medium-block-grid-4
+              li.text-center
+                .page-section.white-bg
+                  p.no-margin.black white
+              li.text-center
+                .page-section.black-bg
+                  p.no-margin.white black
+              li.text-center
+                .page-section.grey-bg
+                  p.no-margin.white grey
+              li.text-center
+                .page-section.red-bg
+                  p.no-margin.white red
+
+            h2#icons Icons
+            hr
+
+            h2#typography Typography
+            hr
+
+            h2#buttons Buttons
+            hr
+
+
+            h2#classes Classes
+            hr
+            ul.no-bullet
+              li .page-section
+              li .no-margin
+
+
+
+          //- code editor
+          //- .columns.medium-3
+            pre
+              code
+                | &lt;p&gt;
+            .row
+              .columns.medium-6
+                ul.no-bullet
+                  li
+                    label
+                      input(type="radio", name="output", value="html").margin-right
+                      span HTML
+                  li
+                    label
+                      input(type="radio", name="output", value="jade").margin-right
+                      span Jade
+
+              .columns.medium-6
+                button.expand Copy
+
+
+      footer.footer
+        .row
+          .columns
+            p &phi; yellr - Kitchen Sink
+
+    include _scripts.jade

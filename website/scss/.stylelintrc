@@ -1,0 +1,5 @@
+{
+  "rules": {
+    "string-quotes": [1, "double"]
+  }
+}
