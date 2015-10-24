@@ -107,21 +107,3 @@
         background-color: $background;
     }
 }
-
-.write-article-btn {
-    @include primary-btn();
-    @include transition(type, 0.2s, ease-in-out);
-    @include transition(background-color, 0.2s, ease-in-out);
-
-    color: $background;
-    background-color: $info;
-
-    &:visited {
-        color: $background;
-    }
-
-    &:hover {
-        color: $type;
-        background-color: $background;
-    }
-}

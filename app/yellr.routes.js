@@ -27,21 +27,6 @@ angular
                 controller: 'rawFeedCtrl'
             })
 
-            .state('write-article', {
-                templateUrl: 'assets/templates/writeArticle.html',
-                controller: 'writeArticleCtrl'
-            })
-            .state('write-article.write', {
-                url:'/write',
-                templateUrl: 'assets/templates/writeArticleContent.html',
-                controller: 'writeArticleContentCtrl'
-            })
-            .state('write-article.settings', {
-                url: '/write/settings',
-                templateUrl: 'assets/templates/writeArticleSettings.html',
-                controller: 'writeArticleSettingsCtrl'
-            })
-
             .state('new-assignment', {
                 templateUrl: 'assets/templates/newAssignment.html',
                 controller: 'newAssignmentCtrl'
