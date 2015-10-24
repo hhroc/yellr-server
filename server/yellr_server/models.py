@@ -1895,6 +1895,7 @@ class MediaObjects(Base, CreationMixin, TimeStampMixin):
             #media_type = self.media_type.to_dict(),
             media_type = self.media_type,
             filename = self.filename,
+            preview_filename = self.filename.split('.')[0] + 'p.jpg',
             #caption = self.caption,
             #media_text = self.media_text,
         )
