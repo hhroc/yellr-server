@@ -1443,7 +1443,7 @@ class Posts(Base, CreationMixin, TimeStampMixin):
                     (bottom_right_lat + 90 < Posts.lat + 90) &
                     (bottom_right_lng + 180 < Posts.lng + 180))
             ).filter(
-                #Posts.deleted == deleted,
+                Posts.deleted == deleted,
                 #Posts.flagged == flagged,
                 #Posts.approved == approved,
             ).slice(start, count).all()

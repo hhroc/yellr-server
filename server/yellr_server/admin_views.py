@@ -134,12 +134,16 @@ class AdminPostsAPI(object):
     @view_config(request_method='GET')
     def get(self):
         resp = {'posts': None}
+        deleted = False
+        if 'deleted' in self.request.GET:
+            deleted = bool(self.request.GET['deleted'])
         if self.user:
             _posts = Posts.get_posts(
                 top_left_lat=self.user.geo_fence.top_left_lat,
                 top_left_lng=self.user.geo_fence.top_left_lng,
                 bottom_right_lat=self.user.geo_fence.bottom_right_lat,
                 bottom_right_lng=self.user.geo_fence.bottom_right_lng,
+                deleted=deleted,
             )
             posts = [p.to_dict(None) for p in _posts]
             resp = {'posts': posts}

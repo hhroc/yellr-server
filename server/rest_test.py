@@ -258,3 +258,11 @@ if __name__ == '__main__':
     print('[GET] /api/assignments')
     assignments_c = get_assignments(client_a)
     print(json.dumps(assignments_c, indent=4))
+
+    print("[PUT] /api/admin/posts/{id}")
+    post = admin_update_post(user_a, post_1_a['post'], deleted=True, flagged=False, approved=False)
+    print('\tapproved: ' + str(post['post']['approved']))
+
+    print("[GET] /api/admin/posts")
+    posts = admin_get_posts(user_a)
+    print(json.dumps(posts, indent=4))
