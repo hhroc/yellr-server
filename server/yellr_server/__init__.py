@@ -56,9 +56,10 @@ def main(global_config, **settings):
     # 
     # Admin REST end-points
     # 
- 
+
     config.add_route('/api/admin/login', '/api/admin/login')
     config.add_route('/api/admin/logout', '/api/admin/logout')
+    #config.add_route('/api/admin/loggedin', '/api/admin/loggedin')
     config.add_route('/api/admin/posts', '/api/admin/posts')
     config.add_route('/api/admin/posts/{id}', '/api/admin/posts/{id}')
 
@@ -70,6 +71,8 @@ def main(global_config, **settings):
 
     config.add_route('/api/admin/collections', '/api/admin/collections')
     config.add_route('/api/admin/collections/{id}', '/api/admin/collections/{id}')
+
+    config.add_route('/api/admin/users', '/api/admin/users')
 
     config.scan()
     return config.make_wsgi_app()

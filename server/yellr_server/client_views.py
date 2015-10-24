@@ -332,21 +332,15 @@ class MediaObjectsAPI(object):
     @view_config(request_method='POST')
     def post(self):
         resp = {'media_object': None}
-        #payload = get_payload(self.request)
-        #print(type(self.request.POST.iteritemis()))
-        #print(self.request.POST.iteritems()[0])
         for r in self.post_req:
-            #try:
-            if True:
+            try:
                 dummy = self.request.POST[r]
                 valid = True
-            #except:
-            #    valid = False
-            #    break
+            except:
+                valid = False
+                break
         if valid and self.client:
-            print('\ninside\n')
-            #try:
-            if True:
+            try:
                 #filename = request.POST['media_file'].filename
                 input_file = self.request.POST['media_file'].file
                 base_filename = save_input_file(input_file)
@@ -366,9 +360,9 @@ class MediaObjectsAPI(object):
                     preview_filename=preview_filename
                 )
                 resp = {'media_object': media_object.to_dict()}
-            #except Exception as ex:
-            #    self.request.response.status = 400
-            #    resp.update(error = str(ex))
+            except Exception as ex:
+                self.request.response.status = 400
+                resp.update(error = str(ex))
         else:
             self.request.response.status = 400
         return resp
@@ -425,16 +419,21 @@ class FlagAPI(object):
         return resp
 
 
-@view_defaults(route_name='/api/clients')
+@view_defaults(route_name='/api/clients', renderer='json')
 class ClientsAPI(object):
 
     def __init__(self, request):
         self.request = request
-    
+        self.client = check_in(request)    
+
     # [ GET ] - get clients profile
     @view_config(request_method='GET')
     def get(self):
-        resp = {}
+        resp = {'client': None}
+        if self.client:
+            resp = {'client': self.client.to_dict()}
+        else:
+            self.request.response = 400
         return resp
 
     # [ PUT ] - updates a clients profile

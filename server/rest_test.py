@@ -32,6 +32,12 @@ class User(object):
     def build_url(self, base_url):
         return base_url
 
+def get_client(client):
+    url = base_url + '/api/clients'
+    resp = requests.get(client.build_url(url))
+    print(json.dumps(json.loads(resp.text), indent=4))
+    return json.loads(resp.text)
+
 def get_posts(client):
     url = base_url + '/api/posts'
     resp = requests.get(client.build_url(url))
@@ -62,6 +68,11 @@ def get_assignments(client):
     url = base_url + '/api/assignments'
     resp = requests.get(client.build_url(url))
     print(json.dumps(json.loads(resp.text), indent=4))
+    return json.loads(resp.text)
+
+def loggedin(user):
+    url = base_url + '/api/admin/login'
+    resp = requests.get(user.build_url(url), cookies=user.cookies)
     return json.loads(resp.text)
 
 def login(user):
@@ -134,6 +145,10 @@ if __name__ == '__main__':
     client_a = Client(cuid='43c4e9c0-bb48-4cde-ad5a-00f24b43dbfc')
     user_a = User()
 
+    print('[GET] /api/clients')
+    client_resp_a = get_client(client_a)
+    print('client id: ' + client_resp_a['client']['id'])
+
     print('[GET] /api/posts')
     posts_a = get_posts(client_a)
     print('\tpost count: ' + str(len(posts_a['posts'])))
@@ -147,13 +162,25 @@ if __name__ == '__main__':
     #print(json.dumps(media_object_0_a, indent=4))
     print('\tmedia object id: ' + media_object_0_a['media_object']['id'])
 
+    print("[GET] /api/admin/loggedin")
+    logged_in_0 = loggedin(user_a)
+    print("\tlogged in = " + str(logged_in_0['loggedin']))
+
     print("[POST] /api/admin/login")
     user_a = login(user_a)
     print('\ttoken: ' + str(user_a.token))
 
+    print("[GET] /api/admin/loggedin")
+    logged_in_0 = loggedin(user_a)
+    print("\tlogged in = " + str(logged_in_0['loggedin']))
+
     print("[POST] /api/admin/logout")
     user_a = logout(user_a)
     print('\ttoken: ' + str(user_a.token))
+
+    print("[GET] /api/admin/loggedin")
+    logged_in_0 = loggedin(user_a)
+    print("\tlogged in = " + str(logged_in_0['loggedin']))
 
     print("[POST] /api/admin/login")
     user_a = login(user_a)
@@ -170,6 +197,7 @@ if __name__ == '__main__':
     print("[GET] /api/posts")
     posts_a = get_posts(client_a)
     print('\tpost count:' + str(len(posts_a['posts'])))
+    print(json.dumps(posts_a, indents=4))
 
     print("[POST] /api/admin/assignments")
     assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3)

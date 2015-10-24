@@ -63,6 +63,16 @@ class AdminLoginAPI(object):
 
     def __init__(self, request):
         self.request = request
+        self.user = authenticate(request)
+
+    @view_config(request_method='GET')
+    def get(self):
+        resp = {'loggedin': False}
+        if self.user:
+            resp = {'loggedin': True}
+        else:
+            self.request.response.status = 403
+        return resp
         
     @view_config(request_method='POST')
     def post(self):
@@ -85,6 +95,7 @@ class AdminLogoutAPI(object):
 
     def __init__(self, request):
         self.request = request
+        self.user = authenticate(request)
 
     @view_config(request_method='POST')
     def post(self):
@@ -95,6 +106,23 @@ class AdminLogoutAPI(object):
             resp = {'user': user.to_dict()}
         return resp    
 
+'''
+@view_defaults(route_name='/api/admin/loggedin', renderer='json')
+class AdminLoggedinAPI(object):
+
+    def __init__(self, request):
+        self.request = request
+        self.user = authenticate(request)
+
+    @view_config(request_method='GET')
+    def get(self):
+        resp = {'loggedin': False}
+        if self.user:
+            resp = {'loggedin': True}
+        else:
+            self.request.response.status = 403
+        return resp
+'''
 
 @view_defaults(route_name='/api/admin/posts', renderer='json')
 class AdminPostsAPI(object):
@@ -268,6 +296,32 @@ class AdminCollectionsAPI(object):
         resp = {'collections': None}
         
         return resp
+
+@view_defaults(route_name='/api/admin/users', renderer='json')
+class AdminUsersAPI(object):
+
+    
+
+    def __init__(self, request):
+        self.request = request
+        self.user = authenticate(request)
+
+    @view_config(request_method='POST')
+    def post(self):
+        resp = {'user': None}
+        payload = get_payload(self.request)
+        if self.user and payload and all(r in payload for r in self.post_req):
+            user = Users.create_new_user(
+                username=payload['username'],
+                first=payload['first'],
+                last=payload['last'],
+                organization_id=payload['organization_id'],
+                email=payload['email'],
+                
+            )
+        else:
+            self.request.response.status = 400
+        
 
 """
 @view_defaults(route_name='/api/assignments', renderer='json')

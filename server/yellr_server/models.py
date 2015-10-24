@@ -587,15 +587,12 @@ class Clients(Base, CreationMixin, TimeStampMixin):
             #).first()
             #print "check_in(): client.cuid: {0}, client.client_id: {1}".format(client.cuid, client.client_id)
             client = Clients.get_by_cuid(cuid, lat, lng, language_code, platform)
-            #client.last_lat = lat
-            #client.last_lng = lng
-            #client.last_check_in_datetime = datetime.datetime.now()
-            #client.platform = platform
-            #DBSession.add(client)
-            #transaction.commit()
-            #client.update(
-            #    
-            #)
+            client.last_lat = lat
+            client.last_lng = lng
+            client.modified_datetime = datetime.datetime.now()
+            client.platform = platform
+            DBSession.add(client)
+            transaction.commit()
         return client
 
     @classmethod
@@ -719,7 +716,7 @@ class Clients(Base, CreationMixin, TimeStampMixin):
             verified = self.verified,
             verified_datetime = str(self.verified_datetime),
             creation_datetime = str(self.creation_datetime),
-            last_check_in_datetime = str(self.last_checking_datetime),
+            #last_check_in_datetime = str(self.last_checking_datetime),
             #home_zipcode_id = self.home_zipcode_id,
             last_lat = self.last_lat,
             last_lng = self.last_lng,
