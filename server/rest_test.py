@@ -4,7 +4,7 @@ import json
 import hashlib
 import datetime
 from datetime import timedelta
-
+from time import sleep
 
 base_url = "http://localhost:5003"
 
@@ -35,11 +35,13 @@ class User(object):
 def get_client(client):
     url = base_url + '/api/clients'
     resp = requests.get(client.build_url(url))
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def get_posts(client):
     url = base_url + '/api/posts'
     resp = requests.get(client.build_url(url))
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def publish_post(client, contents, assignment_id=None):
@@ -49,6 +51,7 @@ def publish_post(client, contents, assignment_id=None):
         'contents': contents,
     })
     resp = requests.post(client.build_url(url), data)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def upload_media_object(client, post, media_type, filename):
@@ -65,11 +68,13 @@ def upload_media_object(client, post, media_type, filename):
 def get_assignments(client):
     url = base_url + '/api/assignments'
     resp = requests.get(client.build_url(url))
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def loggedin(user):
     url = base_url + '/api/admin/login'
     resp = requests.get(user.build_url(url), cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def login(user):
@@ -79,8 +84,8 @@ def login(user):
         'password': user.password,
     })
     resp = requests.post(user.build_url(url), data)
+    print('[' + str(resp.status_code) + ']')
     payload = json.loads(resp.text)
-    #print(json.dumps(payload, indent=4))
     user.token = payload['user']['token']
     user.cookies = resp.cookies
     return user
@@ -88,13 +93,15 @@ def login(user):
 def logout(user):
     url = base_url + '/api/admin/logout'
     resp = requests.post(user.build_url(url), cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
     payload = json.loads(resp.text)
-    user.token = payload['user']['token']
+    #user.token = payload['user']['token']
     return user
 
 def admin_get_posts(user):
     url = base_url + '/api/admin/posts'
     resp = requests.get(user.build_url(url), cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def admin_update_post(user, post, deleted, flagged, approved):
@@ -105,6 +112,7 @@ def admin_update_post(user, post, deleted, flagged, approved):
         'approved': approved,
     })
     resp = requests.put(user.build_url(url), data, cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng):
@@ -118,6 +126,7 @@ def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, b
         'bottom_right_lng': bottom_right_lng,
     })
     resp = requests.post(user.build_url(url), data, cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def admin_create_question(user, assignment, langauge_code, question_text, description, question_type, answer0, answer1, answer2, answer3, answer4):
@@ -135,6 +144,7 @@ def admin_create_question(user, assignment, langauge_code, question_text, descri
         'answer4': answer4,
     })
     resp = requests.post(user.build_url(url), data, cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def admin_update_question(user, question, language_code, question_text, description, answer0, answer1, answer2, answer3, answer4):
@@ -152,14 +162,14 @@ def admin_update_question(user, question, language_code, question_text, descript
         'answer4': answer4,
     })
     resp = requests.put(user.build_url(url), data, cookies=user.cookies)
-    print(resp.text)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 if __name__ == '__main__':
 
     client_a = Client(cuid='43c4e9c0-bb48-4cde-ad5a-00f24b43dbfc')
     user_a = User()
-
+ 
     print('[GET] /api/clients')
     client_resp_a = get_client(client_a)
     print('client id: ' + client_resp_a['client']['id'])
@@ -184,10 +194,26 @@ if __name__ == '__main__':
     print("[POST] /api/admin/login")
     user_a = login(user_a)
     print('\ttoken: ' + str(user_a.token))
+    print('\tsession cookie: ' + user_a.cookies['session'])
+
+    print('----')
+
+    _loggedin = False
+    while not _loggedin:
+        print("[GET] /api/admin/loggedin")
+        logged_in_0 = loggedin(user_a)
+        print("\tlogged in = " + str(logged_in_0['loggedin']))
+        #print('\tsession cookie: ' + user_a.cookies['session'])
+        if logged_in_0['loggedin'] == False:
+            raise Exception('not logged in')
+        _loggedin = logged_in_0['loggedin']
+
+    print('----')
 
     print("[GET] /api/admin/loggedin")
     logged_in_0 = loggedin(user_a)
     print("\tlogged in = " + str(logged_in_0['loggedin']))
+    #print('\tsession cookie: ' + user_a.cookies['session'])
 
     print("[POST] /api/admin/logout")
     user_a = logout(user_a)
@@ -207,6 +233,8 @@ if __name__ == '__main__':
 
     print("[PUT] /api/admin/posts/{id}")
     post = admin_update_post(user_a, post_0_a['post'], deleted=False, flagged=False, approved=True)
+    print('post id: ' + post_0_a['post']['id'])
+    print(post)
     print('\tapproved: ' + str(post['post']['approved']))
 
     print("[GET] /api/posts")
@@ -266,3 +294,4 @@ if __name__ == '__main__':
     print("[GET] /api/admin/posts")
     posts = admin_get_posts(user_a)
     print(json.dumps(posts, indent=4))
+

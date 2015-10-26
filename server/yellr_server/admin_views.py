@@ -5,12 +5,12 @@ from pyramid.view import view_config
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
-    #DBSession,
+    DBSession,
     #MyModel,
     Users,
     Assignments,
     Questions,
-    Collections,
+    #Collections,
     Posts,
     MediaObjects,
     Clients,
@@ -18,6 +18,7 @@ from .models import (
 
 import datetime
 from datetime import timedelta
+import json
 
 def get_payload(request):
     try:
@@ -45,8 +46,12 @@ def authenticate(request):
     user = None
     token = False
     try:
+        print('session items:')
+        print(request.session.items())
         token = request.session['token']
+        print('\n\n\nToken: ' + token)
     except:
+        print('\n\n\nBAD TOKEN')
         pass
     if token:
         user = Users.get_from_token(token)
@@ -62,20 +67,35 @@ class AdminLoginAPI(object):
     )
 
     def __init__(self, request):
+        print('/api/admin/login')
         self.request = request
+        #DBSession.commit()
         self.user = authenticate(request)
 
     @view_config(request_method='GET')
     def get(self):
+        print('\n[GET] /api/admin/login')
         resp = {'loggedin': False}
+        print('\nToken:' + self.request.session['token'] if 'token' in self.request.session else None)
+        print('\n\n')
+        print([u.to_dict() for u in Users.get_all()])
+        print('\n\n')
+        for u in Users.get_all():
+            DBSession.refresh(u)
+        print('\n\n')
+        print([u.to_dict() for u in Users.get_all()])
+        print('\n\n')
         if self.user:
             resp = {'loggedin': True}
-        else:
-            self.request.response.status = 403
+        #else:
+            #self.request.response.status = 403
+        if self.user:
+            DBSession.expire(self.user)
         return resp
         
     @view_config(request_method='POST')
     def post(self):
+        print('\n[POST] /api/admin/login')
         resp = {'user': None}
         payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req):
@@ -85,8 +105,15 @@ class AdminLoginAPI(object):
             )
             resp = {'user': user.to_dict()}
             self.request.session['token'] = user.token
-        else:
-            self.request.response.status = 403
+            if user.token is None:
+                raise Exception('user token is None after login')
+            print('\n\nLogin Token:')
+            print(user.token)
+            print(self.request.session['token'])
+        #else:
+        #    self.request.response.status = 403
+        if self.user:
+            DBSession.expire(self.user)
         return resp
 
 
@@ -94,16 +121,24 @@ class AdminLoginAPI(object):
 class AdminLogoutAPI(object):
 
     def __init__(self, request):
+        print('/api/admin/logout')
         self.request = request
+        #DBSession.commit()
         self.user = authenticate(request)
 
     @view_config(request_method='POST')
     def post(self):
+        print('\n[POST] /api/admin/logout')
         resp = {'user': None}
         token = self.request.session['token']
         if token:
             user = Users.invalidate_token(token)
-            resp = {'user': user.to_dict()}
+            if user:
+                resp = {'user': user.to_dict()}
+            else:
+                self.request.response.stats = 403
+        if self.user:
+            DBSession.expire(self.user)
         return resp    
 
 '''
@@ -139,10 +174,10 @@ class AdminPostsAPI(object):
             deleted = bool(self.request.GET['deleted'])
         if self.user:
             _posts = Posts.get_posts(
-                top_left_lat=self.user.geo_fence.top_left_lat,
-                top_left_lng=self.user.geo_fence.top_left_lng,
-                bottom_right_lat=self.user.geo_fence.bottom_right_lat,
-                bottom_right_lng=self.user.geo_fence.bottom_right_lng,
+                top_left_lat=self.user.user_geo_fence.top_left_lat,
+                top_left_lng=self.user.user_geo_fence.top_left_lng,
+                bottom_right_lat=self.user.user_geo_fence.bottom_right_lat,
+                bottom_right_lng=self.user.user_geo_fence.bottom_right_lng,
                 deleted=deleted,
             )
             posts = [p.to_dict(None) for p in _posts]
@@ -220,13 +255,13 @@ class AdminAssignmentsAPI(object):
         resp = {'assignment': None}
         payload = get_payload(self.request)
         if self.user and payload and all(r in payload for r in self.post_req): 
-            collection = Collections.add(
-                user_id=self.user.id,
-                name=payload['name'],
-                description='Collection for Assignment: ' + payload['name'],
-                tags='',
-                enabled=True,
-            )
+            #collection = Collections.add(
+            #    user_id=self.user.id,
+            #    name=payload['name'],
+            #    description='Collection for Assignment: ' + payload['name'],
+            #    tags='',
+            #    enabled=True,
+            #)
             assignment = Assignments.add(
                 user_id=self.user.id,
                 expire_datetime=datetime.datetime.now() + timedelta(hours=float(payload['life_time'])),
@@ -235,7 +270,7 @@ class AdminAssignmentsAPI(object):
                 top_left_lng=payload['top_left_lng'],
                 bottom_right_lat=payload['bottom_right_lat'],
                 bottom_right_lng=payload['bottom_right_lng'],
-                collection_id=collection.id,
+                #collection_id=collection.id,
             )
             resp = {'assignment': assignment.to_dict()}
         else:
