@@ -169,7 +169,7 @@ if __name__ == '__main__':
 
     client_a = Client(cuid='43c4e9c0-bb48-4cde-ad5a-00f24b43dbfc')
     user_a = User()
- 
+
     print('[GET] /api/clients')
     client_resp_a = get_client(client_a)
     print('client id: ' + client_resp_a['client']['id'])
@@ -186,7 +186,7 @@ if __name__ == '__main__':
     media_object_0_a = upload_media_object(client_a, post_0_a['post'], "image", "smiley.png")
     #print(json.dumps(media_object_0_a, indent=4))
     print('\tmedia object id: ' + media_object_0_a['media_object']['id'])
-
+    
     print("[GET] /api/admin/loggedin")
     logged_in_0 = loggedin(user_a)
     print("\tlogged in = " + str(logged_in_0['loggedin']))
@@ -195,25 +195,31 @@ if __name__ == '__main__':
     user_a = login(user_a)
     print('\ttoken: ' + str(user_a.token))
     print('\tsession cookie: ' + user_a.cookies['session'])
+    
 
-    print('----')
+    #print('----')
 
-    _loggedin = False
-    while not _loggedin:
+    #_loggedin = False
+    #while not _loggedin:
+    if True:
         print("[GET] /api/admin/loggedin")
         logged_in_0 = loggedin(user_a)
         print("\tlogged in = " + str(logged_in_0['loggedin']))
         #print('\tsession cookie: ' + user_a.cookies['session'])
         if logged_in_0['loggedin'] == False:
             raise Exception('not logged in')
-        _loggedin = logged_in_0['loggedin']
+        #_loggedin = logged_in_0['loggedin']
 
-    print('----')
+    #print('----')
 
-    print("[GET] /api/admin/loggedin")
-    logged_in_0 = loggedin(user_a)
-    print("\tlogged in = " + str(logged_in_0['loggedin']))
-    #print('\tsession cookie: ' + user_a.cookies['session'])
+    #raise Exception('debug')
+
+    #print("[GET] /api/admin/loggedin")
+    #logged_in_0 = loggedin(user_a)
+    #print("\tlogged in = " + str(logged_in_0['loggedin']))
+    ##print('\tsession cookie: ' + user_a.cookies['session'])
+    
+    #raise Exception('debug')
 
     print("[POST] /api/admin/logout")
     user_a = logout(user_a)

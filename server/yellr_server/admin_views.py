@@ -5,7 +5,7 @@ from pyramid.view import view_config
 from sqlalchemy.exc import DBAPIError
 
 from .models import (
-    DBSession,
+    #DBSession,
     #MyModel,
     Users,
     Assignments,
@@ -44,17 +44,18 @@ def build_paging(request):
 
 def authenticate(request):
     user = None
-    token = False
+    token = None
     try:
-        print('session items:')
-        print(request.session.items())
+        #print('session items:')
+        #print(request.session.items())
         token = request.session['token']
-        print('\n\n\nToken: ' + token)
+        #print('\n\n\nToken: ' + token)
     except:
-        print('\n\n\nBAD TOKEN')
+        #print('\n\n\nBAD TOKEN')
         pass
+    print('autheticate() Token: ' + str(token))
     if token:
-        user = Users.get_from_token(token)
+        user = Users.get_by_token(token)
     return user
     
 
@@ -74,28 +75,29 @@ class AdminLoginAPI(object):
 
     @view_config(request_method='GET')
     def get(self):
-        print('\n[GET] /api/admin/login')
+        print('---- start [GET] /api/admin/login')
         resp = {'loggedin': False}
-        print('\nToken:' + self.request.session['token'] if 'token' in self.request.session else None)
-        print('\n\n')
-        print([u.to_dict() for u in Users.get_all()])
-        print('\n\n')
-        for u in Users.get_all():
-            DBSession.refresh(u)
-        print('\n\n')
-        print([u.to_dict() for u in Users.get_all()])
-        print('\n\n')
+        #print('\nToken:' + self.request.session['token'] if 'token' in self.request.session else None)
+        #print('\n\n')
+        #print([u.to_dict() for u in Users.get_all()])
+        #print('\n\n')
+        #for u in Users.get_all():
+        #    DBSession.refresh(u)
+        #print('\n\n')
+        #print([u.to_dict() for u in Users.get_all()])
+        #print('\n\n')
         if self.user:
             resp = {'loggedin': True}
         #else:
             #self.request.response.status = 403
-        if self.user:
-            DBSession.expire(self.user)
+        #if self.user:
+        #    DBSession.expire(self.user)
+        print('---- end [GET] /api/admin/login')
         return resp
         
     @view_config(request_method='POST')
     def post(self):
-        print('\n[POST] /api/admin/login')
+        print('---- start [POST] /api/admin/login')
         resp = {'user': None}
         payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req):
@@ -107,13 +109,14 @@ class AdminLoginAPI(object):
             self.request.session['token'] = user.token
             if user.token is None:
                 raise Exception('user token is None after login')
-            print('\n\nLogin Token:')
-            print(user.token)
-            print(self.request.session['token'])
+            #print('\n\nLogin Token:')
+            #print(user.token)
+            #print(self.request.session['token'])
         #else:
         #    self.request.response.status = 403
-        if self.user:
-            DBSession.expire(self.user)
+        #if self.user:
+        #    DBSession.expire(self.user)
+        print('---- end [POST] /api/admin/login')
         return resp
 
 
@@ -128,7 +131,7 @@ class AdminLogoutAPI(object):
 
     @view_config(request_method='POST')
     def post(self):
-        print('\n[POST] /api/admin/logout')
+        print('---- start [POST] /api/admin/logout')
         resp = {'user': None}
         token = self.request.session['token']
         if token:
@@ -137,8 +140,9 @@ class AdminLogoutAPI(object):
                 resp = {'user': user.to_dict()}
             else:
                 self.request.response.stats = 403
-        if self.user:
-            DBSession.expire(self.user)
+        #if self.user:
+        #    DBSession.expire(self.user)
+        print('---- end /api/admin/logout')
         return resp    
 
 '''

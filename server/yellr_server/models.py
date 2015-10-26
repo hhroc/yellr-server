@@ -18,6 +18,7 @@ from sqlalchemy import (
     UnicodeText,
     DateTime,
     Index,
+    CHAR,
 )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -28,33 +29,40 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 
-from zope.sqlalchemy import ZopeTransactionExtension
-import transaction
+#from zope.sqlalchemy import ZopeTransactionExtension
+#from zope.sqlalchemy import mark_changed
+#import transaction
 
 #DBSession = scoped_session(sessionmaker(
 #    extension=ZopeTransactionExtension(), #keep_session=True),
 #    expire_on_commit=False,
 #))
 #Base = declarative_base()
+#DBSession = scoped_session(sessionmaker(
+#    extension=ZopeTransactionExtension(keep_session=True),
+#    #autoflush=True,
+#    #expire_on_commit=False,
+#))
+#Base = declarative_base()
+
 DBSession = scoped_session(sessionmaker(
-    extension=ZopeTransactionExtension(keep_session=True),
-    #autoflush=True,
-    expire_on_commit=False,
-))
+    #extension=ZopeTransactionExtension(), #keep_session=True),
+    expire_on_commit=False))
 Base = declarative_base()
 
 # taken from ( and modified ):
 # http://docs.sqlalchemy.org/en/rel_0_9/core/custom_types.html?highlight=guid#backend-agnostic-guid-type
 
+'''
 from sqlalchemy.types import TypeDecorator, CHAR
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 
-class GUID(TypeDecorator):
-    """Platform-independent GUID type.
+class UUIDType(binary=False)(TypeDecorator):
+    """Platform-independent UUIDType(binary=False) type.
 
     Uses Postgresql's UUID type, otherwise uses
-    CHAR(32), storing as stringified hex values.
+    UUIDType(binary=False), storing as stringified hex values.
 
     """
     impl = CHAR
@@ -63,7 +71,7 @@ class GUID(TypeDecorator):
         if dialect.name == 'postgresql':
             return dialect.type_descriptor(UUID())
         else:
-            return dialect.type_descriptor(CHAR(32))
+            return dialect.type_descriptor(UUIDType(binary=False))
 
     def process_bind_param(self, value, dialect):
         if value is None:
@@ -82,6 +90,7 @@ class GUID(TypeDecorator):
             return value
         else:
             return "%.32x" % uuid.UUID(value)
+'''
 
 class TimeStampMixin(object):
     creation_datetime = Column(DateTime, server_default=func.now())
@@ -89,90 +98,91 @@ class TimeStampMixin(object):
 
 class CreationMixin():
 
-    id = Column(GUID, primary_key=True, unique=True)
+    id = Column(UUIDType(binary=False), primary_key=True, unique=True)
 
     @classmethod
     def add(cls, **kwargs):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+        #with transaction.manager:
+        if True:
+            #mark_changed(DBSession.
             thing = cls(**kwargs)
             if thing.id is None:
                 thing.id = str(uuid4())
             DBSession.add(thing)
-            #DBSession.flush()
-            transaction.commit()
-        #DBSession.flush()
+            DBSession.commit()
+            #DBSession.close()
+            #mark_changed(DBSession.
+            #transaction.commit()
         return thing
 
     @classmethod
     def get_all(cls):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+        if True:
+        #with transaction.manager:
+            #mark_changed(DBSession.
             things = DBSession.query(
                 cls,
             ).all()
-            transaction.commit()
-        #DBSession.flush()
         return things
 
     @classmethod
     def get_paged(cls, start=0, count=50):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+        if True:
+        #with transaction.manager:
+            #mark_changed(DBSession.
             things = DBSession.query(
                 cls,
             ).slice(start, count).all()
-            transaction.commit()
-        #DBSession.flush()
+            #transaction.commit()
         return things
 
     @classmethod
     def get_by_id(cls, id):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+        if True:
+        #with transaction.manager:
+            #mark_changed(DBSession.
             thing = DBSession.query(
                 cls,
             ).filter(
                 cls.id == id,
             ).first()
-            transaction.commit()
-        #DBSession.flush()
         return thing
 
     @classmethod
     def delete_by_id(cls, id):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+        if True:
+        #with transaction.manager:
+            #mark_changed(DBSession.
             thing = cls.get_by_id(id)
             if thing is not None:
                 DBSession.delete(thing)
-            #DBSession.flush()
-            transaction.commit()
-        #DBSession.flush()
+                DBSession.commit()
+                #DBSession.close()
+                #mark_changed(DBSession.
+                #transaction.commit()
         return thing
 
     @classmethod
     def update_by_id(cls, id, **kwargs):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+        if True:
+        #with transaction.manager:
+            #mark_changed(DBSession.
             keys = set(cls.__dict__)
-            thing = cls.get_by_id(id)
+            thing = DBSession.query(cls).filter(cls.id==id).first() #cls.get_by_id(id)
             if thing is not None:
                 for k in kwargs:
                     if k in keys:
                         setattr(thing, k, kwargs[k])
                 thing.modified_datetime = datetime.datetime.now()
+                print('\n---- updating thing ----\n')
                 DBSession.add(thing)
-                #DBSession.expunge(thing)
-            #DBSession.flush()
-            transaction.commit()
-        #DBSession.flush()
+                DBSession.commit()
+                #DBSession.close()
+                print('\n---- done updating thing ----\n')
+                #mark_changed(DBSession.
+                #transaction.commit()
+            else:
+                raise Exception('update_by_id() - invalid ID')
         return thing
 
     @classmethod
@@ -237,126 +247,106 @@ class Users(Base, TimeStampMixin, CreationMixin):
     """
 
     __tablename__ = 'users'
-    #user_id = Column(Integer, primary_key=True)
-    #user_type_id = Column(GUID, ForeignKey('usertypes.id'))
     user_type = Column(UnicodeText, nullable=False)
-
-    #client_id = Column(UnicodeText)
-
     username = Column(UnicodeText, nullable=False)
     first = Column(UnicodeText, nullable=False)
     last = Column(UnicodeText, nullable=False)
-    #organization = Column(UnicodeText)
-    organization_id = Column(GUID, ForeignKey('organizations.id'), nullable=True)
+    #organization_id = Column(UUIDType(binary=False), ForeignKey('organizations.id'), nullable=True)
+    #organization = relationship('Organizations', backref='user')
     email = Column(UnicodeText, nullable=False)
     pass_salt = Column(UnicodeText, nullable=False)
     pass_hash = Column(UnicodeText, nullable=False)
-    user_geo_fence_id = Column(GUID,
+    user_geo_fence_id = Column(UUIDType(binary=False),
         ForeignKey('user_geo_fences.id'), nullable=True)
     user_geo_fence = relationship('UserGeoFences', backref='user')
     token = Column(UnicodeText, nullable=True)
     token_expire_datetime = Column(DateTime, nullable=True)
 
-    assignments = relationship('Assignments', backref='author')
-
     @classmethod
-    def create_new_user(cls, user_type, user_geo_fence, \
-            username, password, first, last, email, organization_id):
+    def create_new_user(cls, user_type, user_geo_fence_id, 
+            username, password, first, last, email): #, organization_id):
         user = None
-        #DBSession.flush()
-        if True:
-        #with transaction.manager:
-            salt_bytes = str(uuid4()).encode('utf-8')
-            pass_bytes = password.encode('utf-8')
-            pass_hash = hashlib.sha256(pass_bytes + salt_bytes).hexdigest()
-            print(salt_bytes)
-            print(pass_bytes)
-            print(pass_hash)
-            user = Users.add(
-                user_type = user_type,
-                first = first,
-                last = last,
-                #organization = organization,
-                organization_id = organization_id,
-                email = email,
-                username = username,
-                pass_salt = salt_bytes,
-                pass_hash = pass_hash,
-                #user_geo_fence_id = user_geo_fence_id,
-                user_geo_fence = user_geo_fence,
-                token = None,
-                token_expire_datetime = None,
-            ) 
+        salt_bytes = hashlib.sha256(str(uuid4()).encode('utf-8')).hexdigest()
+        pass_bytes = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        pass_val = pass_bytes + salt_bytes
+        pass_hash = hashlib.sha256(pass_val.encode('utf-8')).hexdigest()
+        user = Users.add(
+            user_type = user_type,
+            first = first,
+            last = last,
+            #organization_id = organization_id,
+            #organization = organization,
+            email = email,
+            username = username,
+            pass_salt = salt_bytes,
+            pass_hash = pass_hash,
+            user_geo_fence_id = user_geo_fence_id,
+            #user_geo_fence = user_geo_fence,
+            token = None,
+            token_expire_datetime = None,
+        )
+        print('Users.create_new_user:')
+        print(user.to_dict())
+        print('\n')
         return user
 
     
     @classmethod
     def get_by_username(cls, username):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+        if True:
+        #with transaction.manager:
+            #mark_changed(DBSession.
             user = DBSession.query(
                 Users,
             ).filter(
                 Users.username == username,
             ).first()
-            DBSession.flush()
-            transaction.commit()
-        #DBSession.flush()
+        print('Users.get_by_username()')
+        print(user.to_dict())
+        print('\n')
         return user
     
     @classmethod
-    def get_from_token(cls, token):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
+    def get_by_token(cls, token):
+        if True:
+        #with transaction.manager:
+            #mark_changed(DBSession.
             user = DBSession.query(
                 Users,
             ).filter(
                 Users.token == token,
             ).first()
-            DBSession.flush()
-            transaction.commit()
-            #users = DBSession.query(Users).all()
-        #DBSession.flush()
+        print('Users.get_by_token()')
+        print(user.to_dict() if user != None else 'user == None')
+        print('\n')
+        if not user:
+            import json
+            print('Users.get_by_token() - Users.get_all()')
+            print('\n'.join([json.dumps(u.to_dict()) for u in Users.get_all()]))
+            print('\n')
         return user
 
     @classmethod
     def authenticate(cls, username, password):
-        #DBSession.flush()
-        with transaction.manager:
-            transaction.commit()
-            user = DBSession.query(
-                Users,
-            ).filter(
-                Users.username == username,
-            ).first()
-            org = None
-            token = None
-            print('\n\nUsers.authenticate user:')
-            print(user.to_dict())
-            print('\n\n')
-            DBSession.flush()
-            transaction.commit()
+        user = Users.get_by_username(username)
+        print('Users.authenticate() - Users.get_by_username()')
+        print(user.to_dict() if user != None else 'user == None')
+        print('\n')
+        org = None
+        token = None
         if user is not None:
-            print('Users.authenticate() - inside')
-            #pass_bytes = str(password)
-            #salt_bytes = str(user.pass_salt)
-            #pass_val = pass_bytes + salt_bytes
-            #pass_hash = hashlib.sha256(pass_val.encode('utf-8')).hexdigest()
+            print('Users.authenticate() - valid username.')
             if isinstance(user.pass_salt, bytes):
                 salt_bytes = user.pass_salt.decode('utf-8') #str(uuid4()).encode('utf-8')
             elif isinstance(user.pass_salt, str):
                 salt_bytes = user.pass_salt
-            pass_bytes = password #.decode('utf-8')
+            else:
+                salt_bytes = user.pass_salt
+            pass_bytes = hashlib.sha256(password.encode('utf-8')).hexdigest() #password #.decode('utf-8')
             pass_val = pass_bytes + salt_bytes
             pass_hash = hashlib.sha256(pass_val.encode('utf-8')).hexdigest()
-            print(salt_bytes)
-            print(pass_bytes)
-            print(pass_hash)
-            print(user.pass_hash)
-            print(user.pass_hash == pass_hash)
             if (user.pass_hash == pass_hash):
+                print('Users.authenticate() - valid password.')
                 token = str(uuid4())
                 token_expire_datetime = datetime.datetime.now() + datetime.timedelta(hours=24*30)
                 user = Users.update_by_id(
@@ -364,73 +354,71 @@ class Users(Base, TimeStampMixin, CreationMixin):
                     token=token,
                     token_expire_datetime=token_expire_datetime,
                 )
-                print('\n\nUser.authenticate() USER:')
+                print('Users.authenticate() - updated user:')
                 print(user.to_dict())
+                print('\n')
             else:
                 raise Exception('invalid password')
-            #transaction.commit()
-        #DBSession.flush()
+        else:
+            raise Exception('invalid username')
+        print('Users.authenticate() - exit')
+        print(user.to_dict() if user != None else 'user == None')
+        print('\n')
         return user
 
 
     @classmethod
     def validate_token(cls, token):
-        #DBSession.flush()
-        user = Users.get_from_token(token)
+        user = Users.get_by_token(token)
         valid = False
         if user != None:
             if user.token_expire_datetime > datetime.datetime.now():
                 valid = True
+        print('Users.validate_token() - exit')
+        print(user.to_dict())
+        print('\n')
         return valid, user
 
 
     @classmethod
     def invalidate_token(cls, token):
-        #DBSession.flush()
-        if True:
-        #with transaction.manager:
-            user = Users.get_from_token(token)
-            if user != None:
-                user = Users.update_by_id(
-                    user.id,
-                    token=None,
-                    token_expire_datetime=None,
-                )
-        #with transaction.manager:
-        #    queried_user = DBSession.query(Users).filter(Users.token==token).first()
-        #DBSession.flush()
+        user = Users.get_by_token(token)
+        if user != None:
+            user = Users.update_by_id(
+                user.id,
+                token=None,
+                token_expire_datetime=None,
+            )
+        print('Users.invalidate_token() - exit')
+        print(user.to_dict())
+        print('\n')
         return user
 
 
+    # TODO: make this work with new salt scheme
+    '''
     @classmethod
     def change_password(cls, user, old_password, new_password):
-        DBSession.flush()
-        if True:
-        #with transaction.manager:
-            old_pass_bytes = old_password.encode('utf-8')
-            old_salt_bytes = user.pass_salt.encode('utf-8')
-            old_pass_hash = hashlib.sha256(
-                old_pass_bytes + old_salt_bytes
-            ).hexdigest()
-            success = False
-            if user != None and old_pass_hash == user.pass_hash:
-                pass_salt = str(uuid4())
-                pass_hash = hashlib.sha256('{0}{1}'.format(
-                    new_password,
-                    pass_salt
-                )).hexdigest()
-                user = Users.update_by_id(
-                    user.id,
-                    pass_salt=pass_salt,
-                    pass_hash=pass_hash,
-                )
-                #user.pass_salt = pass_salt
-                #user.pass_hash = pass_hash
-                #BSession.add(user)
-                #transaction.commit()
-                success = True
+        old_pass_bytes = old_password.encode('utf-8')
+        old_salt_bytes = user.pass_salt.encode('utf-8')
+        old_pass_hash = hashlib.sha256(
+            old_pass_bytes + old_salt_bytes
+        ).hexdigest()
+        success = False
+        if user != None and old_pass_hash == user.pass_hash:
+            pass_salt = str(uuid4())
+            pass_hash = hashlib.sha256('{0}{1}'.format(
+                new_password,
+                pass_salt
+            )).hexdigest()
+            user = Users.update_by_id(
+                user.id,
+                pass_salt=pass_salt,
+                pass_hash=pass_hash,
+            )
+            success = True
         return user, success
-
+    '''
 
     def to_dict(self):
         resp = super(Users, self).to_dict()
@@ -440,7 +428,7 @@ class Users(Base, TimeStampMixin, CreationMixin):
             last = self.last,
             #organization = self.organization.to_dict() if self.organization != None else None,
             email = self.email, 
-            #user_geo_fence = self.user_geo_fence.to_dict() if self.user_geo_fence != None else None,
+            user_geo_fence = self.user_geo_fence.to_dict() if self.user_geo_fence != None else None,
             token = self.token, 
             token_expire_datetime = str(self.token_expire_datetime),
         )
@@ -506,7 +494,7 @@ class Clients(Base, TimeStampMixin, CreationMixin):
     #creation_datetime = Column(DateTime)
     #last_check_in_datetime = Column(DateTime, nullable=False)
 
-    #home_zipcode_id = Column(GUID, ForeignKey('zipcodes.id'))
+    #home_zipcode_id = Column(UUIDType(binary=False), ForeignKey('zipcodes.id'))
 
     last_lat = Column(Float, nullable=False)
     last_lng = Column(Float, nullable=False)
@@ -545,13 +533,14 @@ class Clients(Base, TimeStampMixin, CreationMixin):
     @classmethod
     def get_by_cuid(cls, cuid, lat, lng, language_code, platform, create=True):
         client = None
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             client = DBSession.query(
                 Clients,
             ).filter(
                 Clients.cuid == cuid,
             ).first()
-            transaction.commit()
+            #transaction.commit()
         #DBSession.flush()
         if not client and create == True:
 
@@ -668,7 +657,7 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'assignments'
     #assignment_id = Column(Integer, primary_key=True)
-    user_id = Column(GUID, ForeignKey('users.id'))
+    user_id = Column(UUIDType(binary=False), ForeignKey('users.id'))
     #publish_datetime = Column(DateTime)
     expire_datetime = Column(DateTime)
     name = Column(UnicodeText)
@@ -678,7 +667,7 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
     bottom_right_lat = Column(Float)
     bottom_right_lng = Column(Float)
     use_fence = Column(Boolean)
-    #collection_id = Column(GUID, ForeignKey('collections.id'), nullable=True)
+    #collection_id = Column(UUIDType(binary=False), ForeignKey('collections.id'), nullable=True)
 
     questions = relationship('Questions', backref='assignment', lazy='joined')
 
@@ -686,7 +675,8 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def get_all_open(cls, lat, lng):
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             assignments = DBSession.query(
                Assignments,
                #func.count(Posts.post_id),
@@ -700,11 +690,10 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
                 Assignments.bottom_right_lng + 180 > lng + 180,
                 cast(Assignments.expire_datetime, Date) >= \
                         cast(datetime.datetime.now(), Date),
-            ).group_by(
-                Assignments.id
-
+            #).group_by(
+            #    Assignments.id
             ).all()
-            transaction.commit()
+            #transaction.commit()
         #DBSession.flush()
         return assignments
 
@@ -730,7 +719,7 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
         resp.update(
             #assignment_id = self.assignment_id,
             #user_id = self.user_id,
-            author = self.author.to_dict() if not simple else {},
+            #author = self.author.to_dict() if not simple else {},
             #publish_datetime = str(self.publish_datetime),
             expire_datetime = str(self.expire_datetime),
             name = self.name,
@@ -765,12 +754,12 @@ class Questions(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'questions'
     #question_id = Column(Integer, primary_key=True)
-    user_id = Column(GUID, ForeignKey('users.id'))
-    #language_id = Column(GUID, ForeignKey('languages.language_id'))
+    user_id = Column(UUIDType(binary=False), ForeignKey('users.id'))
+    #language_id = Column(UUIDType(binary=False), ForeignKey('languages.language_id'))
     language_code = Column(UnicodeText)
     question_text = Column(UnicodeText)
     description = Column(UnicodeText)
-    #question_type_id = Column(GUID, ForeignKey('questiontypes.question_type_id'))
+    #question_type_id = Column(UUIDType(binary=False), ForeignKey('questiontypes.question_type_id'))
     question_type = Column(UnicodeText)
     answer0 = Column(UnicodeText)
     answer1 = Column(UnicodeText)
@@ -783,12 +772,12 @@ class Questions(Base, TimeStampMixin, CreationMixin):
     answer8 = Column(UnicodeText)
     answer9 = Column(UnicodeText)
 
-    assignment_id = Column(GUID, ForeignKey('assignments.id'))
+    assignment_id = Column(UUIDType(binary=False), ForeignKey('assignments.id'))
 
     def to_dict(self):
         resp = super(Questions, self).to_dict()
         resp.update(
-            user_id = self.user_id,
+            user_id = str(self.user_id),
             language_code = self.language_code,
             question_text = self.question_text,
             description = self.description,
@@ -851,12 +840,12 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'posts'
     #post_id = Column(Integer, primary_key=True)
-    #user_id = Column(GUID, ForeignKey('users.user_id'))
-    client_id = Column(GUID, ForeignKey('clients.id'), nullable=False)
-    assignment_id = Column(GUID, ForeignKey('assignments.id'), nullable=True)
+    #user_id = Column(UUIDType(binary=False), ForeignKey('users.user_id'))
+    client_id = Column(UUIDType(binary=False), ForeignKey('clients.id'), nullable=False)
+    assignment_id = Column(UUIDType(binary=False), ForeignKey('assignments.id'), nullable=True)
     #title = Column(UnicodeText)
     #post_datetime = Column(DateTime)
-    #language_id = Column(GUID, ForeignKey('languages.language_id'))
+    #language_id = Column(UUIDType(binary=False), ForeignKey('languages.language_id'))
     language_code = Column(UnicodeText, nullable=False)
     lat = Column(Float, nullable=False)
     lng = Column(Float, nullable=False)
@@ -868,11 +857,12 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     media_objects = relationship('MediaObjects', backref='post')
     #assignment = relationship('Assignments', backref='posts', lazy='joined')
-    votes = relationship('Votes', backref='post', lazy='joined')
+    votes = relationship('Votes', backref='post')
 
     @classmethod
     def get_approved_posts(cls, lat, lng, start=0, count=50):
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             posts = DBSession.query(
                 Posts,
             ).outerjoin(
@@ -896,7 +886,8 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def get_posts(cls, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng, deleted=False, flagged=False, approved=True, start=0, count=50):
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             posts = DBSession.query(
                 Posts,
             #).join(
@@ -918,7 +909,8 @@ class Posts(Base, TimeStampMixin, CreationMixin):
     @classmethod
     def get_all_from_assignment_id(cls, assignment_id,
             deleted=False, start=0, count=0):
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             posts = DBSession.query(
                 Posts,
             ).filter(
@@ -947,7 +939,8 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def get_all_from_cuid(cls, cuid, deleted=False, start=0, count=0):
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             client = Clients.get_by_cuid(cuid)
             posts = DBSession.query(
                 Posts,
@@ -960,7 +953,8 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def delete_post(cls, post_id):
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             #post = DBSession.query(
             #    Posts,
             #).filter(
@@ -979,7 +973,8 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def approve_post(cls, post_id):
-        with transaction.manager:
+        if True:
+        #with transaction.manager:
             #post = DBSession.query(
             #    Posts,
             #).filter(
@@ -1059,8 +1054,8 @@ class Votes(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'votes'
     #vote_id = Column(Integer, primary_key=True)
-    post_id = Column(GUID, ForeignKey('posts.id'))
-    client_id = Column(GUID, ForeignKey('clients.id'))
+    post_id = Column(UUIDType(binary=False), ForeignKey('posts.id'))
+    client_id = Column(UUIDType(binary=False), ForeignKey('clients.id'))
     is_up_vote = Column(Boolean)
     vote_datetime = Column(DateTime)
 
@@ -1123,10 +1118,10 @@ class MediaObjects(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'mediaobjects'
     #media_object_id = Column(Integer, primary_key=True)
-    post_id = Column(GUID, ForeignKey('posts.id'), nullable=False)
-    #user_id = Column(GUID, ForeignKey('users.id'))
-    client_id = Column(GUID, ForeignKey('clients.id'), nullable=False)
-    #media_type_id = Column(GUID, ForeignKey('mediatypes.id'))
+    post_id = Column(UUIDType(binary=False), ForeignKey('posts.id'), nullable=False)
+    #user_id = Column(UUIDType(binary=False), ForeignKey('users.id'))
+    client_id = Column(UUIDType(binary=False), ForeignKey('clients.id'), nullable=False)
+    #media_type_id = Column(UUIDType(binary=False), ForeignKey('mediatypes.id'))
     media_type = Column(UnicodeText, nullable=False)
     #media_id = Column(UnicodeText)
     filename = Column(UnicodeText, nullable=False)
@@ -1150,15 +1145,15 @@ class MediaObjects(Base, TimeStampMixin, CreationMixin):
     def to_dict(self):
         resp = super(MediaObjects, self).to_dict()
         resp.update(
-            #media_object_id = self.media_object_id,
-            post_id = self.post_id,
-            client_id = self.client_id,
-            #media_type = self.media_type.to_dict(),
-            media_type = self.media_type,
-            filename = self.filename,
-            preview_filename = self.filename.split('.')[0] + 'p.jpg',
-            #caption = self.caption,
-            #media_text = self.media_text,
+            #media_object_id=self.media_object_id,
+            post_id=str(self.post_id),
+            client_id=str(self.client_id),
+            #media_type=self.media_type.to_dict(),
+            media_type=self.media_type,
+            filename=self.filename,
+            preview_filename=self.filename.split('.')[0] + 'p.jpg',
+            #caption=self.caption,
+            #media_text=self.media_text,
         )
         return resp
 
@@ -1175,8 +1170,8 @@ class CollectionPosts(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'collection_posts'
     #collection_post_id = Column(Integer, primary_key=True)
-    collection_id = Column(GUID, ForeignKey('collections.id'), nullable=False)
-    post_id = Column(GUID, ForeignKey('posts.id'), nullable=False)
+    collection_id = Column(UUIDType(binary=False), ForeignKey('collections.id'), nullable=False)
+    post_id = Column(UUIDType(binary=False), ForeignKey('posts.id'), nullable=False)
 
     def to_dict(self):
         resp = super(CollectionPosts, self).to_dict()
@@ -1200,7 +1195,7 @@ class Collections(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'collections'
     #collection_id = Column(Integer, primary_key=True)
-    user_id = Column(GUID, ForeignKey('users.id'))
+    user_id = Column(UUIDType(binary=False), ForeignKey('users.id'))
     #collection_datetime = Column(DateTime)
     name = Column(UnicodeText)
     description = Column(UnicodeText)
@@ -1304,7 +1299,7 @@ class Organizations(Base, TimeStampMixin, CreationMixin):
     contact_email = Column(UnicodeText, nullable=False)
     #creation_datetime = Column(DateTime)
 
-    users = relationship('Users', backref='organization', lazy='joined')
+    #users = relationship('Users', backref='organization', lazy='joined')
 
     def to_dict(self):
         resp = super(Organizations, self).to_dict()

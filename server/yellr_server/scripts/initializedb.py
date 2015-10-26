@@ -53,11 +53,11 @@ def main(argv=sys.argv):
 
     system_user = Users.create_new_user(
         user_type = 'SYSTEM',
-        user_geo_fence = system_user_geo_fence,
+        user_geo_fence_id = system_user_geo_fence.id,
         username = 'system',
         password = hashlib.sha256('password'.encode('utf-8')).hexdigest(),
         first = 'SYSTEM',
         last = 'USER',
         email = '',
-        organization_id = None,
+        #organization_id = None,
     )
