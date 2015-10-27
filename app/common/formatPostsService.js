@@ -10,10 +10,10 @@ angular
             for (i = 0; i < post.media_objects.length; i++) {
                 mediaObject = post.media_objects[i];
 
-                if (mediaObject.media_type_name == 'text') {
+                if (mediaObject.media_type == 'text') {
                     post.contentTypes.push('text');
                     return mediaObject.media_text;
-                } else if (mediaObject.media_type_name == 'image') {
+                } else if (mediaObject.media_type == 'image') {
                     if (mediaObject.caption !== '') {
                         return mediaObject.caption;
                     }
@@ -27,11 +27,11 @@ angular
             for (i = 0; i < post.media_objects.length; i++) {
                 mediaObject = post.media_objects[i];
 
-                if (mediaObject.media_type_name == 'image') {
+                if (mediaObject.media_type == 'image') {
                     post.contentTypes.push('image');
                     return {
                         'background-image': 'url(/media/' +
-                            mediaObject.preview_file_name + ')'
+                            mediaObject.preview_filename + ')'
                     };
                 }
             }

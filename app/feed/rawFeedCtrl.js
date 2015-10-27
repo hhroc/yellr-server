@@ -48,7 +48,7 @@ angular
          * @return void
          */
         $scope.loadMore = function () {
-            assignmentApiService.getFeed(postIndex, postCount)
+            assignmentApiService.getPosts(postIndex, postCount)
             .success(function (data) {
                 console.log(data);
                 $scope.posts = $scope.posts.concat(formatPosts(data.posts));
@@ -57,7 +57,7 @@ angular
         };
 
         $scope.approvePost = function (post) {
-            assignmentApiService.approvePost(post.post_id)
+            assignmentApiService.approvePost(post.id, post)
             .success(function (data) {
                 post.approved = !post.approved;
                 console.log('post approved?', data);
@@ -82,7 +82,7 @@ angular
          * @return void
          */
         $scope.addPostToCollection = function (post, collection) {
-            collectionApiService.addPost(collection.collection_id, post.post_id)
+            collectionApiService.addPost(collection.id, post.id)
             .success(function (data) {
                 collection.post_count++;
             });
@@ -94,10 +94,10 @@ angular
          * @return void
          */
         $scope.deletePost = function (post) {
-            assignmentApiService.deletePost(post.post_id)
+            assignmentApiService.deletePost(post.id, post)
             .success(function (data) {
                 for(var i=0; i<$scope.posts.length; i++) {
-                    if ( $scope.posts[i].post_id == post.post_id ) {
+                    if ( $scope.posts[i].id == post.id ) {
                         $scope.posts.splice(i,1);
                         break;
                     }

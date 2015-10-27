@@ -298,8 +298,8 @@ class PostsAPI(object):
             assignment_id = None
             if payload['assignment_id'] != None:
                 assignment_id = payload['assignment_id']
-                print(assignment_id)
-                print('\n\n')
+                #print(assignment_id)
+                #print('\n\n')
             post = Posts.add(
                 client_id=self.client.id,
                 assignment_id=assignment_id,
@@ -425,17 +425,20 @@ class FlagAPI(object):
 class ClientsAPI(object):
 
     def __init__(self, request):
+        print('/api/clients')
         self.request = request
         self.client = check_in(request)    
 
     # [ GET ] - get clients profile
     @view_config(request_method='GET')
     def get(self):
+        print('---- start [GET] /api/clients')
         resp = {'client': None}
         if self.client:
             resp = {'client': self.client.to_dict()}
         else:
-            self.request.response = 400
+            self.request.response.status = 400
+        print('---- end [GET] /api/clients')
         return resp
 
     # [ PUT ] - updates a clients profile

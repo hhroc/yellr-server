@@ -13,7 +13,7 @@
                 </div>
                 <div class="post-body">
                     <h4 class="post-title" ng-if="post.title">{{post.title}}</h4>
-                    <p class="post-text">{{post.description}}</p>
+                    <p class="post-text">{{post.contents}}</p>
                     <p class="post-assignment-name" ng-if="post.assignment_name">Assignment: <a href="#/assignments/{{post.assignment_id}}">{{post.assignment_name}}</a></p>
                     <p class="post-assignment-name" ng-if="!post.assignment_name">Free Post</p>
                     <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>

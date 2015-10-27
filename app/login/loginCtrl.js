@@ -22,7 +22,7 @@ angular
          */
         $scope.login = function (username, password) {
 
-            userApiService.getAccessToken(username, password)
+            userApiService.login(username, password)
             .success(function (data, status, headers, config) {
                 window.user = {
                     name: data.first_name + ' ' + data.last_name,

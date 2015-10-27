@@ -18,17 +18,17 @@ angular
          *                   this function)
          * @return DEPRECATED
          */
-        userApi.getAccessToken = function (username, password) {
+        userApi.login = function (username, password) {
             var hashedPass = CryptoJS.SHA256(password).toString(),
-                url = '/admin/get_access_token.json';
+                url = '/api/admin/login';
 
             return $http({
                 method: 'POST',
                 url: url,
-                data: $.param({
+                data: {
                     username: username,
                     password: hashedPass
-                })
+                }
             });
         };
 
@@ -36,7 +36,7 @@ angular
          * Logs the user out
          */
         userApi.logout = function () {
-            var url = '/admin/logout.json';
+            var url = '/api/admin/logout';
 
             return $http({
                 method: 'POST',
@@ -50,7 +50,7 @@ angular
          * @return response - object with "logged_in" as answer
          */
         userApi.isLoggedIn = function () {
-            var url = '/admin/check_logged_in.json';
+            var url = '/api/admin/login';
 
             return $http({
                 method: 'GET',
@@ -87,8 +87,6 @@ angular
                 };
 
             params.password = CryptoJS.SHA256(password).toString();
-
-            console.log('params', params);
 
             return $http({
                 method: 'POST',
