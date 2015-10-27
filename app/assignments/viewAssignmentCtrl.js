@@ -9,7 +9,8 @@ angular
               assignmentApiService, formatPosts, collectionApiService) {
 
         if (!window.loggedIn) {
-            $location.path('/login');
+            //$location.path('/login');
+            window.location = '/login'; 
             return;
         }
 

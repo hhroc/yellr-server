@@ -164,25 +164,15 @@ class CreationMixin():
 
     @classmethod
     def update_by_id(cls, id, **kwargs):
-        if True:
-        #with transaction.manager:
-            #mark_changed(DBSession.
-            keys = set(cls.__dict__)
-            thing = DBSession.query(cls).filter(cls.id==id).first() #cls.get_by_id(id)
-            if thing is not None:
-                for k in kwargs:
-                    if k in keys:
-                        setattr(thing, k, kwargs[k])
-                thing.modified_datetime = datetime.datetime.now()
-                print('\n---- updating thing ----\n')
-                DBSession.add(thing)
-                DBSession.commit()
-                #DBSession.close()
-                print('\n---- done updating thing ----\n')
-                #mark_changed(DBSession.
-                #transaction.commit()
-            else:
-                raise Exception('update_by_id() - invalid ID')
+        keys = set(cls.__dict__)
+        thing = DBSession.query(cls).filter(cls.id==id).first() #cls.get_by_id(id)
+        if thing is not None:
+            for k in kwargs:
+                if k in keys:
+                    setattr(thing, k, kwargs[k])
+            thing.modified_datetime = datetime.datetime.now()
+            DBSession.add(thing)
+            DBSession.commit()
         return thing
 
     @classmethod
@@ -302,7 +292,7 @@ class Users(Base, TimeStampMixin, CreationMixin):
                 Users.username == username,
             ).first()
         print('Users.get_by_username()')
-        print(user.to_dict())
+        print(user.to_dict() if user != None else None)
         print('\n')
         return user
     
@@ -328,42 +318,26 @@ class Users(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def authenticate(cls, username, password):
-        user = Users.get_by_username(username)
-        print('Users.authenticate() - Users.get_by_username()')
-        print(user.to_dict() if user != None else 'user == None')
-        print('\n')
-        org = None
-        token = None
-        if user is not None:
-            print('Users.authenticate() - valid username.')
-            if isinstance(user.pass_salt, bytes):
-                salt_bytes = user.pass_salt.decode('utf-8') #str(uuid4()).encode('utf-8')
-            elif isinstance(user.pass_salt, str):
-                salt_bytes = user.pass_salt
+        _user = Users.get_by_username(username)
+        user = None
+        if _user is not None:
+            if isinstance(_user.pass_salt, bytes):
+                salt_bytes = _user.pass_salt.decode('utf-8')
+            elif isinstance(_user.pass_salt, str):
+                salt_bytes = _user.pass_salt
             else:
-                salt_bytes = user.pass_salt
-            pass_bytes = hashlib.sha256(password.encode('utf-8')).hexdigest() #password #.decode('utf-8')
+                salt_bytes = _user.pass_salt
+            pass_bytes = hashlib.sha256(password.encode('utf-8')).hexdigest()
             pass_val = pass_bytes + salt_bytes
             pass_hash = hashlib.sha256(pass_val.encode('utf-8')).hexdigest()
-            if (user.pass_hash == pass_hash):
-                print('Users.authenticate() - valid password.')
+            if (_user.pass_hash == pass_hash):
                 token = str(uuid4())
                 token_expire_datetime = datetime.datetime.now() + datetime.timedelta(hours=24*30)
                 user = Users.update_by_id(
-                    user.id,
+                    _user.id,
                     token=token,
                     token_expire_datetime=token_expire_datetime,
                 )
-                print('Users.authenticate() - updated user:')
-                print(user.to_dict())
-                print('\n')
-            else:
-                raise Exception('invalid password')
-        else:
-            raise Exception('invalid username')
-        print('Users.authenticate() - exit')
-        print(user.to_dict() if user != None else 'user == None')
-        print('\n')
         return user
 
 
@@ -374,9 +348,6 @@ class Users(Base, TimeStampMixin, CreationMixin):
         if user != None:
             if user.token_expire_datetime > datetime.datetime.now():
                 valid = True
-        print('Users.validate_token() - exit')
-        print(user.to_dict())
-        print('\n')
         return valid, user
 
 
@@ -389,9 +360,6 @@ class Users(Base, TimeStampMixin, CreationMixin):
                 token=None,
                 token_expire_datetime=None,
             )
-        print('Users.invalidate_token() - exit')
-        print(user.to_dict())
-        print('\n')
         return user
 
 
@@ -426,7 +394,6 @@ class Users(Base, TimeStampMixin, CreationMixin):
             username = self.username,
             first = self.first,
             last = self.last,
-            #organization = self.organization.to_dict() if self.organization != None else None,
             email = self.email, 
             user_geo_fence = self.user_geo_fence.to_dict() if self.user_geo_fence != None else None,
             token = self.token, 

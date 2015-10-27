@@ -6,7 +6,8 @@ angular
     ['$scope', '$rootScope', '$location', 'userApiService',
     function ($scope, $rootScope, $location, userApiService) {
         if ($rootScope.user === undefined) {
-            $location.path('/login');
+            //$location.path('/login');
+            window.location = '/login';
             return;
         }
 

@@ -1,0 +1,94 @@
+body {
+  font-size: 150%;
+  width: 100%;
+  height: 100%;
+  padding: 0px;
+  margin: 0px;
+  line-height: 1.5;
+  font-family: 'Open Sans', sans-serif;
+  /*font-family: sans-serif;*/
+  text-rendering: optimizelegibility;
+  background-color: #FFCF13;
+  color: #222;
+}
+
+.login-wrapper {
+  margin: auto;
+  margin-top: 6rem;
+  width: 20%;
+}
+
+.login-box {
+  margin: 0.3rem;
+  border: 1px solid #DFB200;
+  padding: 1rem;
+  padding-right: 1.5rem;
+  border-radius: 5px;
+  transition: all 0.2s ease-in-out 0s;
+}
+
+h1 {
+  font-size: 3em;
+  line-height: 1;
+  margin: 0px;
+  width: 100%;
+  text-align: center;
+}
+
+p {
+  margin: 0px 0px 2em;
+  color: #333;
+  text-align: center;
+  font-size: 1rem;
+}
+
+label {
+  display: block;
+  color: #4D4D4D;
+  font-weight: normal;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-top: .5rem;
+  margin-bottom: 0px;
+}
+
+input {
+  display: block;
+  padding: .3rem;
+  font-size: 1.2rem;
+  width: 100%;
+  border: medium none;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out 0s;
+  background-color: #FFE479;
+}
+
+button {
+  margin-top: 1rem;
+  display: block;
+  padding: .3rem;
+  font-size: 1.2rem;
+  width: auto;
+  border: medium none;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out 0s;
+  background-color: #FFE479;
+}
+
+input:focus {
+  background-color: #DFB200;
+}
+
+#bad-login-box {
+  display: none;
+  background-color: #FF8E7A;
+  border: 1px solid #FF6347;
+  border-radius: 2px solid;
+  width: 100%;
+  padding: .3rem;
+  font-size: 1rem;
+  margin-top: 1rem;
+  font-weight: bold;
+  color: #EEE;
+  text-align: center;
+}
