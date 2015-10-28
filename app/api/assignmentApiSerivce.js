@@ -26,7 +26,7 @@ angular
                 method: 'GET',
                 url: url,
                 params: params
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -42,7 +42,7 @@ angular
             return $http({
                 method: 'GET',
                 url: url,
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -51,12 +51,12 @@ angular
          * @return response : response with list of assignments and questions
          */
         assignmentApi.getAssignments = function () {
-            var url = '/api/assignments';
+            var url = '/api/admin/assignments';
 
             return $http({
                 method: 'GET',
                 url: url
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -86,7 +86,7 @@ angular
                 method: 'POST',
                 url: url,
                 data: data,
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -121,7 +121,7 @@ angular
                 method: 'POST',
                 url: url,
                 data: data
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -153,7 +153,7 @@ angular
                 method: 'POST',
                 url: url,
                 params: params
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -177,7 +177,7 @@ angular
                 method: 'POST',
                 url: url,
                 params: params
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -199,7 +199,7 @@ angular
                 method: 'PUT',
                 url: url,
                 data: data,
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -221,7 +221,7 @@ angular
                 method: 'PUT',
                 url: url,
                 data: data,
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -243,7 +243,7 @@ angular
                 method: 'PUT',
                 url: url,
                 data: data,
-            });
+            }).error(function(responce){ window.location = '/login'; });
         }
 
         /**
@@ -262,7 +262,7 @@ angular
                 data: $.param({
                     post_id: id
                 })
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         return assignmentApi;

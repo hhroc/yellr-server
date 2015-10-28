@@ -20,7 +20,7 @@ angular
             .state('feed', {
                 url: '/feed',
                 templateUrl: 'assets/templates/feed.html',
-                controller: 'rawFeedCtrl'
+                controller: 'localFeedCtrl'
             })
 
             .state('new-assignment', {

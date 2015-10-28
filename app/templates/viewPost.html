@@ -1,6 +1,8 @@
 <h1>{{post.title}}</h1>
+<p>{{post.contents}}</p>
 <div ng-repeat="media_object in post.media_objects">
-    <p ng-if="media_object.media_type_name == 'text'">{{media_object.media_text}}</p>
-    <img ng-src="/media/{{media_object.file_name}}" ng-if="media_object.media_type_name == 'image'" alt=""/>
-    <p ng-if="media_object.caption">{{media_object.caption}}</p>
+    <img ng-src="/media/{{media_object.filename}}" ng-if="media_object.media_type == 'image'" alt=""/>
+    <!-- TODO: video here -->
+    <!-- TODO: audio here -->
 </div>
+
