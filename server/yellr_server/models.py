@@ -764,37 +764,20 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def approve_post(cls, post_id):
-        if True:
-        #with transaction.manager:
-            #post = DBSession.query(
-            #    Posts,
-            #).filter(
-            #    Posts.post_id == post_id,
-            #).first()
-            post = Posts.get_by_id(post_id)
-            # change the approved state of the post (T -> F, F -> T)
-            if post.approved == False:
-                approved = True
-            else:
-                approved = False
-            #DBSession.add(post)
-            #transaction.commit()
-            post = Posts.update_by_id(
-                post.id,
-                approved=approved,
-            )
-        #DBSession.flush()
+        post = Posts.get_by_id(post_id)
+        if post.approved == False:
+            approved = True
+        else:
+            approved = False
+        post = Posts.update_by_id(
+            post.id,
+            approved=approved,
+        )
         return post
 
 
     @classmethod
     def flag_post(cls, post_id):
-        #with transaction.manager:
-            #post = DBSession.query(
-            #    Posts,
-            #).filter(
-            #    Posts.post_id == post_id,
-            #).first()
         post = Posts.get_by_id(post_id)
         if post.flagged == False:
             flagged = True
@@ -804,7 +787,6 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             post_id,
             flagged=flagged,
         )
-        #DBSession.flush()
         return post
 
     def to_dict(self, client_id):
@@ -817,7 +799,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             contents = self.contents, 
             deleted=self.deleted,
             approved=self.approved,
-            flagged=self.approved,
+            flagged=self.flagged,
             media_objects = [m.to_dict() for m in self.media_objects],
             #votes = [v.to_dict() for v in self.votes],
             up_count = sum(1 for v in self.votes if v.is_up_vote),

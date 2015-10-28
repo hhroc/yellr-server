@@ -225,6 +225,28 @@ angular
         };
 
         /**
+         * Unflag a post from the feed
+         *
+         * @param id : id of the post to be unflagged
+         *
+         * @return post_id : id of the unflagged post
+         */
+        assignmentApi.unflagPost = function (id, post) {
+            var url = '/api/admin/posts/' + id,
+                data = {
+                    approved: post.approved,
+                    flagged: false,
+                    deleted: post.deleted,
+                };
+
+            return $http({
+                method: 'PUT',
+                url: url,
+                data: data,
+            });
+        }
+
+        /**
          * Registers a post viewed
          *
          * @param id : id of post viewed
