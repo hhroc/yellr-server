@@ -100,8 +100,11 @@
     @include primary-btn();
     @include transition(background-color, 0.2s, ease-in-out);
 
-    color: $type;
-    background-color: $primary;
+    margin-top: 1.5rem;
+
+    color: $button-text;
+    //background-color: $primary;
+    background-color: $button;
 
     &:hover {
         background-color: $background;

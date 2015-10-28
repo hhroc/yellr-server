@@ -7,18 +7,14 @@ angular
     function ($scope, $http, $rootScope, userApiService) {
         window.loggedIn = false;
         $scope.feedPage = false;
-        $scope.contributorsPage = false;
         $scope.assignmentsPage = false;
-        $scope.collectionsPage = false;
         $scope.messagesPage = false;
         $scope.settingsPage = false;
         $scope.loading = true;
 
         $scope.clear = function () {
             $scope.feedPage = false;
-            $scope.contributorsPage = false;
             $scope.assignmentsPage = false;
-            $scope.collectionsPage = false;
             $scope.messagesPage = false;
             $scope.settingsPage = false;
         };

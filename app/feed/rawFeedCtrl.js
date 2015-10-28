@@ -5,10 +5,10 @@ var moment = moment || {};
 angular
     .module('Yellr')
     .controller('rawFeedCtrl',
-    ['$scope', '$rootScope', '$location', '$modal', 'collectionApiService',
+    ['$scope', '$rootScope', '$location', '$modal',
      'assignmentApiService', 'formatPosts',
-     function ($scope, $rootScope, $location, $modal, collectionApiService,
-               assignmentApiService, formatPosts) {
+     function ($scope, $rootScope, $location, $modal, assignmentApiService, 
+               formatPosts) {
         var postIndex = 0,
             postCount = 50;
 
@@ -64,30 +64,6 @@ angular
                 console.log('post approved?', data);
             });
         };
-        /**
-         * Gets all current collections
-         *
-         * @return void
-         */
-        $scope.getCollections = function () {
-            collectionApiService.getAllCollections()
-                .success(function (data) {
-
-                $scope.collections = data.collections;
-            });
-        };
-
-        /**
-         * Adds the given post to a collection
-         *
-         * @return void
-         */
-        $scope.addPostToCollection = function (post, collection) {
-            collectionApiService.addPost(collection.id, post.id)
-            .success(function (data) {
-                collection.post_count++;
-            });
-        };
 
         /**
          * Deletes a post from the feed
@@ -107,5 +83,4 @@ angular
         };
 
         $scope.loadMore();
-        $scope.getCollections();
     }]);
