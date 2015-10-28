@@ -2,10 +2,6 @@ build
 node_modules
 bower_components
 *.html
-!markup/*.html
+!html/*.html
 *.map
-js/main.js
-js/main.min.js
-js/vendors.js
-js/vendors.min.js
 *.mp4
