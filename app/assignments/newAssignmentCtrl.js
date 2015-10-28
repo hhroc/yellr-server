@@ -10,7 +10,8 @@ angular
     function ($scope, $rootScope, $location, $timeout, assignmentApiService) {
 
         if (!window.loggedIn) {
-            $location.path('/login');
+            //$location.path('/login');
+            window.location = '/login';
             return;
         }
 

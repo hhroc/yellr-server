@@ -54,6 +54,12 @@ def main(global_config, **settings):
     config.add_route('/api/clients', '/api/clients')
 
 
+    #
+    # Admin html pages
+    #
+
+    config.add_route('/login', '/login')
+
     # 
     # Admin REST end-points
     # 

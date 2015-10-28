@@ -21,10 +21,12 @@ from datetime import timedelta
 import json
 
 def get_payload(request):
+    print('body: ' + str(request.body))
     try:
         payload = request.json_body
     except:
         payload = None
+    print("Payload: " + str(payload))
     return payload
 
 def build_paging(request):
@@ -59,6 +61,17 @@ def authenticate(request):
     return user
     
 
+@view_defaults(route_name='/login')
+class AdminLoginScreen(object):
+
+    def __init__(self, request):
+        self.request = request
+
+    @view_config(request_method='GET', renderer='templates/login.pt')
+    def get(self):
+        return {} 
+
+
 @view_defaults(route_name='/api/admin/login', renderer='json')
 class AdminLoginAPI(object):
 
@@ -70,34 +83,22 @@ class AdminLoginAPI(object):
     def __init__(self, request):
         print('/api/admin/login')
         self.request = request
-        #DBSession.commit()
         self.user = authenticate(request)
 
     @view_config(request_method='GET')
     def get(self):
         print('---- start [GET] /api/admin/login')
         resp = {'loggedin': False}
-        #print('\nToken:' + self.request.session['token'] if 'token' in self.request.session else None)
-        #print('\n\n')
-        #print([u.to_dict() for u in Users.get_all()])
-        #print('\n\n')
-        #for u in Users.get_all():
-        #    DBSession.refresh(u)
-        #print('\n\n')
-        #print([u.to_dict() for u in Users.get_all()])
-        #print('\n\n')
         if self.user:
             resp = {'loggedin': True}
-        #else:
-            #self.request.response.status = 403
-        #if self.user:
-        #    DBSession.expire(self.user)
         print('---- end [GET] /api/admin/login')
         return resp
         
     @view_config(request_method='POST')
     def post(self):
         print('---- start [POST] /api/admin/login')
+        self.user = None
+        self.request.session['token'] = None
         resp = {'user': None}
         payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req):
@@ -105,17 +106,12 @@ class AdminLoginAPI(object):
                 username=payload['username'],
                 password=payload['password'],
             )
-            resp = {'user': user.to_dict()}
-            self.request.session['token'] = user.token
-            if user.token is None:
-                raise Exception('user token is None after login')
-            #print('\n\nLogin Token:')
-            #print(user.token)
-            #print(self.request.session['token'])
-        #else:
-        #    self.request.response.status = 403
-        #if self.user:
-        #    DBSession.expire(self.user)
+            print('\n----User----\n')
+            print(user.to_dict() if user != None else None)
+            print('\n----User----\n')
+            if user:
+                resp = {'user': user.to_dict()}
+                self.request.session['token'] = user.token
         print('---- end [POST] /api/admin/login')
         return resp
 
@@ -126,7 +122,6 @@ class AdminLogoutAPI(object):
     def __init__(self, request):
         print('/api/admin/logout')
         self.request = request
-        #DBSession.commit()
         self.user = authenticate(request)
 
     @view_config(request_method='POST')
@@ -140,8 +135,6 @@ class AdminLogoutAPI(object):
                 resp = {'user': user.to_dict()}
             else:
                 self.request.response.stats = 403
-        #if self.user:
-        #    DBSession.expire(self.user)
         print('---- end /api/admin/logout')
         return resp    
 

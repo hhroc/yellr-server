@@ -8,14 +8,15 @@ angular
 
         ngClipProvider.setPath('assets/js/ZeroClipboard.swf');
 
-        $urlRouterProvider.otherwise('/login');
+        //$urlRouterProvider.otherwise('/login');
+        $urlRouterProvider.otherwise('/feed');
 
         $stateProvider
-            .state('login', {
-                url: '/login',
-                templateUrl: 'assets/templates/login.html',
-                controller: 'loginCtrl'
-            })
+            //.state('login', {
+            //    url: '/login',
+            //    templateUrl: 'assets/templates/login.html',
+            //    controller: 'loginCtrl'
+            //})
             .state('logout', {
                 url: '/logout',
                 controller: 'logoutCtrl'
