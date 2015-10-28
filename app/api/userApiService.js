@@ -71,7 +71,7 @@ angular
          */
         userApi.createUser = function (userType, userName, password, firstName,
                                        lastName, email, organization) {
-            var url = '/admin/create_user.json',
+            var url = '/admin/users',
                 params = {
                     user_type: userType,
                     username: userName,
@@ -92,24 +92,24 @@ angular
                 method: 'POST',
                 url: url,
                 data: $.param(params)
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         userApi.changePassword = function (username, oldPassword, newPassword) {
-            var url = '/admin/change_password.json';
+            var url = '/api/admin/users';
 
             oldPassword = CryptoJS.SHA256(oldPassword).toString();
             newPassword = CryptoJS.SHA256(newPassword).toString();
 
             return $http({
-                method: 'POST',
+                method: 'PUT',
                 url: url,
                 data: $.param({
                     username: username,
                     old_password: oldPassword,
                     new_password: newPassword
                 })
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -118,26 +118,12 @@ angular
          * @return languages : list of all languages
          */
         userApi.getLanguages = function () {
-            var url = '/admin/get_languages.json';
+            var url = '/api/admin/languages';
 
             return $http({
                 method: 'GET',
                 url: url
-            });
-        };
-
-        /**
-         * Gets all available question types
-         *
-         * @return questionTypes : list of all question types
-         */
-        userApi.getQuestionTypes = function () {
-            var url = '/admin/get_question_types';
-
-            return $http({
-                method: 'GET',
-                url: url
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         return userApi;
