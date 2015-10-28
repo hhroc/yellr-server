@@ -51,7 +51,7 @@ angular
          * @return response : response with list of assignments and questions
          */
         assignmentApi.getAssignments = function () {
-            var url = '/api/assignments';
+            var url = '/api/admin/assignments';
 
             return $http({
                 method: 'GET',

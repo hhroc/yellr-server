@@ -193,6 +193,7 @@ class AdminPostAPI(object):
     )
 
     def __init__(self, request):
+        print('/api/admin/posts')
         self.request = request
         self.user = authenticate(request)
 
@@ -219,6 +220,17 @@ class AdminPostAPI(object):
             self.request.response.status = 403
         return resp
 
+    @view_config(request_method='GET')
+    def get(self):
+        resp = {'post': None}
+        if self.user:
+            id = self.request.matchdict['id']
+            post = Posts.get_by_id(id)
+            if post:
+                resp = {'post': post.to_dict(None)}
+            else:
+                self.request.response = 404
+        return resp
 
 @view_defaults(route_name='/api/admin/assignments', renderer='json')
 class AdminAssignmentsAPI(object):

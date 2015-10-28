@@ -4,7 +4,7 @@ var moment = moment || {};
 
 angular
     .module('Yellr')
-    .controller('rawFeedCtrl',
+    .controller('localFeedCtrl',
     ['$scope', '$rootScope', '$location', '$modal',
      'assignmentApiService', 'formatPosts',
      function ($scope, $rootScope, $location, $modal, assignmentApiService, 

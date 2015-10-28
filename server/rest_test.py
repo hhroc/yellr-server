@@ -168,11 +168,20 @@ def admin_update_question(user, question, language_code, question_text, descript
 if __name__ == '__main__':
 
     client_a = Client(cuid='43c4e9c0-bb48-4cde-ad5a-00f24b43dbfc')
+    client_b = Client(cuid='e8fda109-1452-404b-8024-d6d23d7d5f51')
     user_a = User()
+
+    #
+    # Test Get Client Information
+    #
 
     print('[GET] /api/clients')
     client_resp_a = get_client(client_a)
     print('client id: ' + client_resp_a['client']['id'])
+
+    #
+    # Test Posts
+    # 
 
     print('[GET] /api/posts')
     posts_a = get_posts(client_a)
@@ -184,9 +193,15 @@ if __name__ == '__main__':
 
     print('[POST] /api/media_objects')
     media_object_0_a = upload_media_object(client_a, post_0_a['post'], "image", "smiley.png")
-    #print(json.dumps(media_object_0_a, indent=4))
     print('\tmedia object id: ' + media_object_0_a['media_object']['id'])
-    
+   
+    print('[POST] /api/posts')
+    post_no_media_object = publish_post(client_b, "Sometimes I just go outside and look at the clouds for hours ...");
+
+    #
+    # Test moderator login
+    #
+ 
     print("[GET] /api/admin/loggedin")
     logged_in_0 = loggedin(user_a)
     print("\tlogged in = " + str(logged_in_0['loggedin']))
@@ -194,32 +209,12 @@ if __name__ == '__main__':
     print("[POST] /api/admin/login")
     user_a = login(user_a)
     print('\ttoken: ' + str(user_a.token))
-    print('\tsession cookie: ' + user_a.cookies['session'])
     
-
-    #print('----')
-
-    #_loggedin = False
-    #while not _loggedin:
-    if True:
-        print("[GET] /api/admin/loggedin")
-        logged_in_0 = loggedin(user_a)
-        print("\tlogged in = " + str(logged_in_0['loggedin']))
-        #print('\tsession cookie: ' + user_a.cookies['session'])
-        if logged_in_0['loggedin'] == False:
-            raise Exception('not logged in')
-        #_loggedin = logged_in_0['loggedin']
-
-    #print('----')
-
-    #raise Exception('debug')
-
-    #print("[GET] /api/admin/loggedin")
-    #logged_in_0 = loggedin(user_a)
-    #print("\tlogged in = " + str(logged_in_0['loggedin']))
-    ##print('\tsession cookie: ' + user_a.cookies['session'])
-    
-    #raise Exception('debug')
+    print("[GET] /api/admin/loggedin")
+    logged_in_0 = loggedin(user_a)
+    print("\tlogged in = " + str(logged_in_0['loggedin']))
+    if logged_in_0['loggedin'] == False:
+        raise Exception('not logged in')
 
     print("[POST] /api/admin/logout")
     user_a = logout(user_a)
@@ -232,6 +227,10 @@ if __name__ == '__main__':
     print("[POST] /api/admin/login")
     user_a = login(user_a)
     print('\ttoken: ' + str(user_a.token))
+
+    #
+    # Test approve post
+    #
 
     print("[GET] /api/admin/posts")
     posts = admin_get_posts(user_a)
@@ -248,6 +247,10 @@ if __name__ == '__main__':
     print('\tpost count:' + str(len(posts_a['posts'])))
     print(json.dumps(posts_a, indent=4))
 
+    #
+    # Test Assignments
+    #
+
     print("[POST] /api/admin/assignments")
     assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3)
     print("\tassignment id:" + assignment_a['assignment']['id'])
@@ -259,6 +262,10 @@ if __name__ == '__main__':
     print('[GET] /api/assignments')
     assignments_a = get_assignments(client_a)
     print(json.dumps(assignments_a, indent=4))
+
+    #
+    # Test Assignment response
+    #
 
     print('[POST] /api/posts')
     post_1_a = publish_post(client_a, "My day is going great, thanks for asking!", assignment_id=assignment_a['assignment']['id'])
@@ -272,6 +279,10 @@ if __name__ == '__main__':
     print("[PUT] /api/admin/posts/{id}")
     post = admin_update_post(user_a, post_1_a['post'], deleted=False, flagged=False, approved=True)
     print('\tapproved: ' + str(post['post']['approved']))
+
+    #
+    # Test Update Assignment Question
+    # 
 
     print("[POST] /api/admin/assignments")
     assignment_b = admin_create_assignment(user_a, "Tell me about the wind ...", 72, 43.4, -77.9, 43.0, -77.3)
@@ -293,6 +304,10 @@ if __name__ == '__main__':
     assignments_c = get_assignments(client_a)
     print(json.dumps(assignments_c, indent=4))
 
+    #
+    # Test Delete Post
+    #
+
     print("[PUT] /api/admin/posts/{id}")
     post = admin_update_post(user_a, post_1_a['post'], deleted=True, flagged=False, approved=False)
     print('\tapproved: ' + str(post['post']['approved']))
@@ -301,3 +316,6 @@ if __name__ == '__main__':
     posts = admin_get_posts(user_a)
     print(json.dumps(posts, indent=4))
 
+    #
+    #
+    #
