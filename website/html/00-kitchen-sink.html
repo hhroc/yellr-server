@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>yellr - Kitchen Sink</title>
+    <meta name="description" content="yellr">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+  <body><a href="#main" class="show-for-sr">Skip to main content</a>
+    <div class="container">
+      <header class="header">
+        <div class="row">
+          <div class="columns">
+            <h1>yellr - Kitchen Sink</h1>
+          </div>
+        </div>
+      </header>
+      <main id="main">
+        <div class="clearfix">
+          <div class="columns medium-2">
+            <ul class="no-bullet">
+              <li><a href="#colors">Colors</a></li>
+              <li><a href="#icons">Icons</a></li>
+              <li><a href="#typography">Typography</a></li>
+              <li><a href="#buttons">Buttons</a></li>
+              <li><a href="#classes">Classes</a></li>
+            </ul>
+          </div>
+          <div class="columns medium-10">
+            <h2 id="colors">Colors</h2>
+            <hr>
+            <p>For every color there are font and background classes.</p>
+            <p>Ex: red - .red, .red-bg</p>
+            <ul class="small-block-grid-1 medium-block-grid-4">
+              <li class="text-center">
+                <div class="page-section white-bg">
+                  <p class="no-margin black">white</p>
+                </div>
+              </li>
+              <li class="text-center">
+                <div class="page-section black-bg">
+                  <p class="no-margin white">black</p>
+                </div>
+              </li>
+              <li class="text-center">
+                <div class="page-section grey-bg">
+                  <p class="no-margin white">grey</p>
+                </div>
+              </li>
+              <li class="text-center">
+                <div class="page-section red-bg">
+                  <p class="no-margin white">red</p>
+                </div>
+              </li>
+            </ul>
+            <h2 id="icons">Icons</h2>
+            <hr>
+            <h2 id="typography">Typography</h2>
+            <hr>
+            <h2 id="buttons">Buttons</h2>
+            <hr>
+            <h2 id="classes">Classes</h2>
+            <hr>
+            <ul class="no-bullet">
+              <li>.page-section</li>
+              <li>.no-margin</li>
+            </ul>
+          </div>
+        </div>
+      </main>
+      <footer class="footer">
+        <div class="row">
+          <div class="columns">
+            <p>&phi; yellr - Kitchen Sink</p>
+          </div>
+        </div>
+      </footer>
+    </div>
+    <script>
+      (function(d, p){
+          var a = new XMLHttpRequest(),
+              b = d.body;
+          a.open("GET", p, true);
+          a.send();
+          a.onload = function(){
+              var c = d.createElement("div");
+              c.style.display = "none";
+              c.innerHTML = a.responseText;
+              b.insertBefore(c, b.childNodes[0]);
+          }
+      })(document, "misc/sprite.svg");
+    </script>
+    <script src="js/vendors.js"></script>
+    <script src="js/main.js"></script>
+  </body>
+</html>
