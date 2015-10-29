@@ -1,0 +1,62 @@
+@import "base";
+@import "colors";
+
+.h1 {
+  margin: 0;
+  font-size: rem-calc(24);
+  font-weight: bold;
+}
+
+
+// todo: rename this class
+.android-badge--container {
+  position: fixed;
+  z-index: 1;
+  backface-visibility: hidden;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: $yellow;
+  text-align: center;
+  padding: rem-calc(5);
+  img {
+    max-width: rem-calc(90);
+  }
+  @include mq(medium) {
+    position: static;
+    background-color: transparent;
+    text-align: right;
+    img {
+      max-width: rem-calc(125);
+    }
+  }
+}
+
+
+.list-style-1 {
+  margin-left: 0;
+  list-style: none;
+  > li {
+    padding: rem-calc(16);
+    + li {
+      margin-top: rem-calc(20);
+    }
+  }
+}
+
+
+button,
+.button {
+  &.reset {
+    padding: 0;
+    background-color: transparent;
+    color: inherit;
+    margin: 0;
+  }
+}
+
+// plyr min-width ovverride
+.player {
+  min-width: rem-calc(200) !important;
+  margin-top: rem-calc(30);
+}

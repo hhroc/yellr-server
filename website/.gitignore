@@ -1,0 +1,7 @@
+build
+node_modules
+bower_components
+*.html
+!html/*.html
+*.map
+*.mp4

@@ -18,7 +18,7 @@ angular
         messageApi.createMessage = function (toClientId, subject, text,
                                              parentMessageId) {
 
-            var url = '/admin/create_message.json',
+            var url = '/api/admin/messages',
                 params = {
                     to_client_id: toClientId,
                     subject: subject,
@@ -32,16 +32,16 @@ angular
                 method: 'POST',
                 url: url,
                 params: params
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         messageApi.getMessages = function () {
-            var url = '/admin/get_my_messages.json';
+            var url = '/api/admin/messages';
 
             return $http({
                 method: 'GET',
                 url: url
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         return messageApi;

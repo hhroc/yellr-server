@@ -9,7 +9,8 @@ angular
         userApiService.logout()
         .success(function (data) {
             window.loggedIn = false;
-            $location.path('/login');
+            //$location.path('/login');
+            window.location = '/login';
         })
         .error(function (data) {
             console.log(data);

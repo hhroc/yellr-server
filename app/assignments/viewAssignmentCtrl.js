@@ -4,12 +4,13 @@ angular
     .module('Yellr')
     .controller('viewAssignmentCtrl',
     ['$scope', '$stateParams', '$location', '$rootScope', '$modal',
-        'assignmentApiService', 'formatPosts', 'collectionApiService',
+        'assignmentApiService',
     function ($scope, $stateParams, $location, $rootScope, $modal,
-              assignmentApiService, formatPosts, collectionApiService) {
+              assignmentApiService) {
 
         if (!window.loggedIn) {
-            $location.path('/login');
+            //$location.path('/login');
+            window.location = '/login'; 
             return;
         }
 
@@ -33,18 +34,6 @@ angular
         };
 
         /**
-         * Adds the given post to a collection
-         *
-         * @return void
-         */
-        $scope.addPostToCollection = function (post, collection) {
-            collectionApiService.addPost(collection.collection_id, post.post_id)
-            .success(function (data) {
-                collection.post_count++;
-            });
-        };
-
-        /**
          * Create view assignments function
          *
          * @return void
@@ -60,14 +49,8 @@ angular
 
         assignmentApiService.getAssignmentResponses($stateParams.assignmentId)
         .success(function (data) {
-            console.log(formatPosts(data.posts));
-            $scope.posts = formatPosts(data.posts);
-        });
-
-        collectionApiService.getAllCollections()
-        .success(function (data) {
-
-            $scope.collections = data.collections;
+            console.log(data.posts);
+            $scope.posts = data.posts;
         });
 
     }]);

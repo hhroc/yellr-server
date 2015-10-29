@@ -7,30 +7,32 @@ angular
     function ($scope, $http, $rootScope, userApiService) {
         window.loggedIn = false;
         $scope.feedPage = false;
-        $scope.contributorsPage = false;
         $scope.assignmentsPage = false;
-        $scope.collectionsPage = false;
         $scope.messagesPage = false;
         $scope.settingsPage = false;
         $scope.loading = true;
 
         $scope.clear = function () {
             $scope.feedPage = false;
-            $scope.contributorsPage = false;
             $scope.assignmentsPage = false;
-            $scope.collectionsPage = false;
             $scope.messagesPage = false;
             $scope.settingsPage = false;
         };
 
-        $http.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
+        $scope.getMediaObjectURL = function(filename) {
+            return '/media/' + filename;
+        }
+
+        $scope.getMediaObjectPreviewURL = function(preview_filename) {
+            return '/media/' + preview_filename;
+        }
 
         userApiService.isLoggedIn()
         .success(function (data) {
-            window.loggedIn = data.logged_in;
+            window.loggedIn = data.loggedin;
             $rootScope.user = data;
             $scope.loading = false;
-            if (data.logged_in) {
+            if (data.loggedin) {
                 $('#side-nav').show();
             }
         });

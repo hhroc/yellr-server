@@ -54,6 +54,12 @@ def main(global_config, **settings):
     config.add_route('/api/clients', '/api/clients')
 
 
+    #
+    # Admin html pages
+    #
+
+    config.add_route('/login', '/login')
+
     # 
     # Admin REST end-points
     # 
@@ -69,9 +75,6 @@ def main(global_config, **settings):
 
     config.add_route('/api/admin/questions', '/api/admin/questions')
     config.add_route('/api/admin/questions/{id}', '/api/admin/questions/{id}')
-
-    config.add_route('/api/admin/collections', '/api/admin/collections')
-    config.add_route('/api/admin/collections/{id}', '/api/admin/collections/{id}')
 
     config.add_route('/api/admin/users', '/api/admin/users')
 

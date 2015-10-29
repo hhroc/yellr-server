@@ -1,0 +1,44 @@
+// media queries
+@mixin mq($breakpoint)
+{
+  // // to implement:
+  // $landscape
+  // $portrait
+
+  // small mq
+  @if $breakpoint == small {@media #{$small-up} {@content; } }
+  @if $breakpoint == small-only {@media #{$small-only} {@content; } }
+
+  // medium mq
+  @if $breakpoint == medium {@media #{$medium-up} {@content; } }
+  @if $breakpoint == medium-only {@media #{$medium-only} {@content; } }
+
+  // large mq
+  @if $breakpoint == large {@media #{$large-up} {@content; } }
+  @if $breakpoint == large-only {@media #{$large-only} {@content; } }
+
+  // xlarge mq
+  @if $breakpoint == xlarge {@media #{$xlarge-up} {@content; } }
+  @if $breakpoint == xlarge-only {@media #{$xlarge-only} {@content; } }
+
+}
+
+
+// this
+@mixin if_there_are($n) {
+  &:nth-last-child(n+#{$n}),
+  &:nth-last-child(n+#{$n}) ~ * {
+    @content;
+  }
+}
+
+
+// css circle
+@mixin circle($size, $color, $alignment:middle) {
+  display: inline-block;
+  vertical-align: $alignment;
+  height: $size;
+  width: $size;
+  border-radius: $size;
+  background: $color;
+}

@@ -18,17 +18,17 @@ angular
          *                   this function)
          * @return DEPRECATED
          */
-        userApi.getAccessToken = function (username, password) {
+        userApi.login = function (username, password) {
             var hashedPass = CryptoJS.SHA256(password).toString(),
-                url = '/admin/get_access_token.json';
+                url = '/api/admin/login';
 
             return $http({
                 method: 'POST',
                 url: url,
-                data: $.param({
+                data: {
                     username: username,
                     password: hashedPass
-                })
+                }
             });
         };
 
@@ -36,7 +36,7 @@ angular
          * Logs the user out
          */
         userApi.logout = function () {
-            var url = '/admin/logout.json';
+            var url = '/api/admin/logout';
 
             return $http({
                 method: 'POST',
@@ -50,7 +50,7 @@ angular
          * @return response - object with "logged_in" as answer
          */
         userApi.isLoggedIn = function () {
-            var url = '/admin/check_logged_in.json';
+            var url = '/api/admin/login';
 
             return $http({
                 method: 'GET',
@@ -71,7 +71,7 @@ angular
          */
         userApi.createUser = function (userType, userName, password, firstName,
                                        lastName, email, organization) {
-            var url = '/admin/create_user.json',
+            var url = '/admin/users',
                 params = {
                     user_type: userType,
                     username: userName,
@@ -88,30 +88,28 @@ angular
 
             params.password = CryptoJS.SHA256(password).toString();
 
-            console.log('params', params);
-
             return $http({
                 method: 'POST',
                 url: url,
                 data: $.param(params)
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         userApi.changePassword = function (username, oldPassword, newPassword) {
-            var url = '/admin/change_password.json';
+            var url = '/api/admin/users';
 
             oldPassword = CryptoJS.SHA256(oldPassword).toString();
             newPassword = CryptoJS.SHA256(newPassword).toString();
 
             return $http({
-                method: 'POST',
+                method: 'PUT',
                 url: url,
                 data: $.param({
                     username: username,
                     old_password: oldPassword,
                     new_password: newPassword
                 })
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**
@@ -120,26 +118,12 @@ angular
          * @return languages : list of all languages
          */
         userApi.getLanguages = function () {
-            var url = '/admin/get_languages.json';
+            var url = '/api/admin/languages';
 
             return $http({
                 method: 'GET',
                 url: url
-            });
-        };
-
-        /**
-         * Gets all available question types
-         *
-         * @return questionTypes : list of all question types
-         */
-        userApi.getQuestionTypes = function () {
-            var url = '/admin/get_question_types';
-
-            return $http({
-                method: 'GET',
-                url: url
-            });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         return userApi;

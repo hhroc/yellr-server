@@ -7,23 +7,20 @@
             ng-if="posts"
             ng-repeat="post in filteredPosts = (posts | filter:search | postType:selectedType)">
             <div class="inner-post">
-                <div ng-if="post.imageUrl" ng-style="post.imageUrl" ng-class="post.description ? 'post-image' : 'full-image'"></div>
-                <div ng-if="!post.imageUrl" class="post-image post-image-blank">
+                <div ng-if="post.media_objects.length !== 0" ng-click="openPost(post.id)" style="background-image: url(&quot;{{getMediaObjectURL(post.media_objects[0].preview_filename)}}&quot;)" class="full-image">
+                </div>
+                <div ng-if="post.media_objects.length === 0" class="post-image post-image-blank">
                     <h2>Yellr</h2>
                 </div>
                 <div class="post-body">
-                    <h4 class="post-title" ng-if="post.title">{{post.title}}</h4>
-                    <p class="post-text">{{post.description}}</p>
-                    <p class="post-assignment-name" ng-if="post.assignment_name">Assignment: <a href="#/assignments/{{post.assignment_id}}">{{post.assignment_name}}</a></p>
-                    <p class="post-assignment-name" ng-if="!post.assignment_name">Free Post</p>
+                    <div ng-if="post.media_objects.length !== 0" class="post-media-type">{{post.media_objects[0].media_type}}</div>
+                    <p class="post-text">{{post.contents}}</p>
+                    <p class="post-assignment-name" ng-if="post.assignment.id">Assignment: <a href="#/assignments/{{post.assignment.id}}">{{post.assignment.name}}</a></p>
+                    <p class="post-assignment-name" ng-if="!post.assignment">Free Post</p>
                     <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>
                     <button ng-class="{'approve-post-active': post.approved}" class="approve-post" title="Approve Post for Local Feed." ng-click="approvePost(post)"><i class="fa fa-star"></i></button>
                     <button class="delete-post" title="Delete Post." ng-click="deletePost(post)"><i class="fa fa-trash"></i></button>
-                    <button ng-if="!collectionPage"class="add-post" title="Add to Collection for use with a Story." dropdown-toggle="#drop-{{post.post_id}}"><i class="fa fa-plus"></i></button>
-                    <ul id="drop-{{post.post_id}}" class="f-dropdown add-post-dropdown">
-                        <li ng-repeat="collection in collections" ng-click="addPostToCollection(post, collection)">{{collection.name}}</li>
-                    </ul>
-                    <button class="view-post" ng-click="openPost(post.post_id)">VIEW POST</button>
+                    <button class="view-post" ng-click="openPost(post.id)">VIEW POST</button>
                 </div>
             </div>
         </div>

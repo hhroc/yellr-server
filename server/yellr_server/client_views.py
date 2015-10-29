@@ -95,8 +95,7 @@ def process_image(base_filename):
     image_filename = ""
     preview_filename = ""
 
-    #try:
-    if True:
+    try:
 
         image_filename = '{0}.jpg'.format(base_filename)
         preview_filename = '{0}p.jpg'.format(base_filename)
@@ -132,8 +131,8 @@ def process_image(base_filename):
         except Exception as ex:
             raise Exception("Error generating preview image: {0}".format(ex))
 
-    #except Exception as ex:
-    #    raise Exception(ex)
+    except Exception as ex:
+        raise Exception(ex)
 
     return image_filename, preview_filename
 
@@ -148,17 +147,19 @@ def process_video(base_filename):
         # type incoming file
         mime_type = magic.from_file(base_filename, mime=True)
         allowed_image_types = [
-            'video/mpeg',
-            'video/mp4',
-            'video/quicktime',
-            'video/3gpp',
+            b'video/mpeg',
+            b'video/mp4',
+            b'video/quicktime',
+            b'video/3gpp',
         ]
 
         if not mime_type.lower() in allowed_image_types:
             raise Exception("Unsupported Image Type: %s" % mime_type)
 
         video_filename = '{0}.mp4'.format(base_filename)
+        preview_filename = '{0}p.jpg'.format(base_filename)
 
+        # convert and strip of medta data
         cmd = [
             'ffmpeg',
             '-i',
@@ -173,12 +174,22 @@ def process_video(base_filename):
         ]
         resp = subprocess.call(cmd)
        
-        #print "\n\nCMD: {0}\n\n".format(' '.join(cmd)) 
-	#print "\n\nRESP: {0}\n\n".format(resp)
- 
-        #
-        # TODO: create preview image for video
-        #
+        # create preview file
+        cmd = [
+            'ffmpeg',
+            '-i',
+            video_filename,
+            '-ss',
+            '00:00:00',
+            '-frames:v',
+            '1',
+            preview_filename,
+        ]
+        resp = subprocess.call(cmd)
+
+        # resize preview file
+        subprocess.call(['convert', preview_filename, '-resize', '450', \
+                '-size', '450', preview_filename])
 
     except Exception as ex:
         raise Exception(ex)
@@ -298,8 +309,8 @@ class PostsAPI(object):
             assignment_id = None
             if payload['assignment_id'] != None:
                 assignment_id = payload['assignment_id']
-                print(assignment_id)
-                print('\n\n')
+                #print(assignment_id)
+                #print('\n\n')
             post = Posts.add(
                 client_id=self.client.id,
                 assignment_id=assignment_id,
@@ -342,7 +353,8 @@ class MediaObjectsAPI(object):
                 valid = False
                 break
         if valid and self.client:
-            try:
+            if True:
+            #try:
                 #filename = request.POST['media_file'].filename
                 input_file = self.request.POST['media_file'].file
                 base_filename = save_input_file(input_file)
@@ -362,9 +374,9 @@ class MediaObjectsAPI(object):
                     preview_filename=preview_filename
                 )
                 resp = {'media_object': media_object.to_dict()}
-            except Exception as ex:
-                self.request.response.status = 400
-                resp.update(error = str(ex))
+            #except Exception as ex:
+            #    self.request.response.status = 400
+            #    resp.update(error = str(ex))
         else:
             self.request.response.status = 400
         return resp
@@ -425,17 +437,20 @@ class FlagAPI(object):
 class ClientsAPI(object):
 
     def __init__(self, request):
+        print('/api/clients')
         self.request = request
         self.client = check_in(request)    
 
     # [ GET ] - get clients profile
     @view_config(request_method='GET')
     def get(self):
+        print('---- start [GET] /api/clients')
         resp = {'client': None}
         if self.client:
             resp = {'client': self.client.to_dict()}
         else:
-            self.request.response = 400
+            self.request.response.status = 400
+        print('---- end [GET] /api/clients')
         return resp
 
     # [ PUT ] - updates a clients profile

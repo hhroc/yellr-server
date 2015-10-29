@@ -8,14 +8,10 @@ angular
 
         ngClipProvider.setPath('assets/js/ZeroClipboard.swf');
 
-        $urlRouterProvider.otherwise('/login');
+        //$urlRouterProvider.otherwise('/login');
+        $urlRouterProvider.otherwise('/feed');
 
         $stateProvider
-            .state('login', {
-                url: '/login',
-                templateUrl: 'assets/templates/login.html',
-                controller: 'loginCtrl'
-            })
             .state('logout', {
                 url: '/logout',
                 controller: 'logoutCtrl'
@@ -24,7 +20,7 @@ angular
             .state('feed', {
                 url: '/feed',
                 templateUrl: 'assets/templates/feed.html',
-                controller: 'rawFeedCtrl'
+                controller: 'localFeedCtrl'
             })
 
             .state('new-assignment', {
@@ -56,17 +52,6 @@ angular
                 url: '/assignments/:assignmentId',
                 templateUrl: 'assets/templates/viewAssignment.html',
                 controller: 'viewAssignmentCtrl'
-            })
-
-            .state('collections', {
-                url: '/collections',
-                templateUrl: 'assets/templates/viewCollections.html',
-                controller: 'viewCollectionsCtrl'
-            })
-            .state('view-collection', {
-                url: '/collections/:collectionId',
-                templateUrl: 'assets/templates/viewCollection.html',
-                controller: 'viewCollectionCtrl'
             })
 
             .state('settings', {
