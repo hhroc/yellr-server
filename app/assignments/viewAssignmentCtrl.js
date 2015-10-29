@@ -4,9 +4,9 @@ angular
     .module('Yellr')
     .controller('viewAssignmentCtrl',
     ['$scope', '$stateParams', '$location', '$rootScope', '$modal',
-        'assignmentApiService', 'formatPosts',
+        'assignmentApiService',
     function ($scope, $stateParams, $location, $rootScope, $modal,
-              assignmentApiService, formatPosts) {
+              assignmentApiService) {
 
         if (!window.loggedIn) {
             //$location.path('/login');
@@ -49,8 +49,8 @@ angular
 
         assignmentApiService.getAssignmentResponses($stateParams.assignmentId)
         .success(function (data) {
-            console.log(formatPosts(data.posts));
-            $scope.posts = formatPosts(data.posts);
+            console.log(data.posts);
+            $scope.posts = data.posts;
         });
 
     }]);

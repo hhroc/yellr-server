@@ -63,6 +63,7 @@ def upload_media_object(client, post, media_type, filename):
     }
     files = {'media_file': open(filename, 'rb')}
     resp = requests.post(client.build_url(url), data, files=files)
+    print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
 def get_assignments(client):
@@ -180,23 +181,44 @@ if __name__ == '__main__':
     print('client id: ' + client_resp_a['client']['id'])
 
     #
-    # Test Posts
+    # Text Text Post
+    #
+
+    print('[POST] /api/posts')
+    text_post = publish_post(client_b, "Sometimes I just go outside and look at the clouds for hours ...");
+    print('\tpost id: ' + text_post['post']['id'])
+
+    #
+    # Test Get Local Posts (with no response )
     # 
 
     print('[GET] /api/posts')
-    posts_a = get_posts(client_a)
-    print('\tpost count: ' + str(len(posts_a['posts'])))
+    posts = get_posts(client_a)
+    print('\tpost count: ' + str(len(posts['posts'])))
+
+    #
+    # Test Image Post
+    # 
 
     print('[POST] /api/posts')
-    post_0_a = publish_post(client_a, "This is a test post!")
-    print('\tpost id: ' + post_0_a['post']['id'])
+    image_post = publish_post(client_a, "This is a test post!")
+    print('\tpost id: ' + image_post['post']['id'])
 
     print('[POST] /api/media_objects')
-    media_object_0_a = upload_media_object(client_a, post_0_a['post'], "image", "smiley.png")
-    print('\tmedia object id: ' + media_object_0_a['media_object']['id'])
-   
+    image_media_object = upload_media_object(client_a, image_post['post'], "image", "smiley.png")
+    print('\tmedia object id: ' + image_media_object['media_object']['id']) 
+
+    #
+    # Test Video Post
+    #
+
     print('[POST] /api/posts')
-    post_no_media_object = publish_post(client_b, "Sometimes I just go outside and look at the clouds for hours ...");
+    video_post = publish_post(client_a, "The video is strong with this one ...")
+    print('\tpost id: ' + video_post['post']['id'])
+
+    print('[POST] /api/media_objects')
+    video_media_object = upload_media_object(client_a, video_post['post'], "video", "video.mp4")
+    print('\tmedia object id: ' + video_media_object['media_object']['id'])
 
     #
     # Test moderator login
@@ -237,15 +259,18 @@ if __name__ == '__main__':
     print('\tpost count: ' + str(len(posts)) if posts != None else None)
 
     print("[PUT] /api/admin/posts/{id}")
-    post = admin_update_post(user_a, post_0_a['post'], deleted=False, flagged=False, approved=True)
-    print('post id: ' + post_0_a['post']['id'])
-    print(post)
+    post = admin_update_post(user_a, image_post['post'], deleted=False, flagged=False, approved=True)
+    print('\tpost id: ' + image_post['post']['id'])
+    print('\tapproved: ' + str(post['post']['approved']))
+
+    print("[PUT] /api/admin/posts/{id}")
+    post = admin_update_post(user_a, video_post['post'], deleted=False, flagged=False, approved=True)
+    print('post id: ' + image_post['post']['id'])
     print('\tapproved: ' + str(post['post']['approved']))
 
     print("[GET] /api/posts")
     posts_a = get_posts(client_a)
     print('\tpost count:' + str(len(posts_a['posts'])))
-    print(json.dumps(posts_a, indent=4))
 
     #
     # Test Assignments
@@ -261,23 +286,23 @@ if __name__ == '__main__':
 
     print('[GET] /api/assignments')
     assignments_a = get_assignments(client_a)
-    print(json.dumps(assignments_a, indent=4))
+    print('\tassignment count' + str(len(assignments_a['assignments'])))
+    #print(json.dumps(assignments_a, indent=4))
 
     #
     # Test Assignment response
     #
 
     print('[POST] /api/posts')
-    post_1_a = publish_post(client_a, "My day is going great, thanks for asking!", assignment_id=assignment_a['assignment']['id'])
-    print('\tassignment_id: ' + assignment_a['assignment']['id'] + ', post id: ' + post_1_a['post']['id'])
+    response_post = publish_post(client_a, "My day is going great, thanks for asking!", assignment_id=assignment_a['assignment']['id'])
+    print('\tassignment_id: ' + assignment_a['assignment']['id'] + ', post id: ' + response_post['post']['id'])
 
     print('[POST] /api/media_objects')
-    media_object_1_a = upload_media_object(client_a, post_1_a['post'], "image", "smiley.png")
-    #print(json.dumps(media_object_0_a, indent=4))
-    print('\tmedia object id: ' + media_object_0_a['media_object']['id'])
+    response_media_object = upload_media_object(client_a, response_post['post'], "image", "smiley.png")
+    print('\tmedia object id: ' + response_media_object['media_object']['id'])
 
     print("[PUT] /api/admin/posts/{id}")
-    post = admin_update_post(user_a, post_1_a['post'], deleted=False, flagged=False, approved=True)
+    post = admin_update_post(user_a, response_post['post'], deleted=False, flagged=False, approved=True)
     print('\tapproved: ' + str(post['post']['approved']))
 
     #
@@ -294,7 +319,8 @@ if __name__ == '__main__':
 
     print('[GET] /api/assignments')
     assignments_b = get_assignments(client_a)
-    print(json.dumps(assignments_b, indent=4))
+    print('\nassignment count: ' + str(len(assignments_b['assignments'])))
+    #print(json.dumps(assignments_b, indent=4))
 
     print("[PUT] /api/admin/question")
     question_c = admin_update_question(user_a, question_b['question'], 'en', 'Tell me about the wind ... maybe?', 'OMG TELL ME ... if you want :/', '', '', '', '', '')
@@ -302,19 +328,25 @@ if __name__ == '__main__':
 
     print('[GET] /api/assignments')
     assignments_c = get_assignments(client_a)
-    print(json.dumps(assignments_c, indent=4))
+    #print(json.dumps(assignments_c, indent=4))
+    print('\tassignment count' + str(len(assignments_c['assignments'])))
 
     #
     # Test Delete Post
     #
 
+    print('[POST] /api/posts')
+    deleted_post = publish_post(client_b, "I poop on you!");
+    print('\tpost id: ' + deleted_post['post']['id'])
+
     print("[PUT] /api/admin/posts/{id}")
-    post = admin_update_post(user_a, post_1_a['post'], deleted=True, flagged=False, approved=False)
+    post = admin_update_post(user_a, deleted_post['post'], deleted=True, flagged=False, approved=False)
     print('\tapproved: ' + str(post['post']['approved']))
 
     print("[GET] /api/admin/posts")
     posts = admin_get_posts(user_a)
-    print(json.dumps(posts, indent=4))
+    #print(json.dumps(posts, indent=4))
+    print('\tpost count: ' + str(len(posts['posts'])))
 
     #
     #

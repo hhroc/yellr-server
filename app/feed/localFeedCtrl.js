@@ -6,9 +6,8 @@ angular
     .module('Yellr')
     .controller('localFeedCtrl',
     ['$scope', '$rootScope', '$location', '$modal',
-     'assignmentApiService', 'formatPosts',
-     function ($scope, $rootScope, $location, $modal, assignmentApiService, 
-               formatPosts) {
+     'assignmentApiService', 
+     function ($scope, $rootScope, $location, $modal, assignmentApiService) {
         var postIndex = 0,
             postCount = 50;
 
@@ -52,7 +51,7 @@ angular
             assignmentApiService.getPosts(postIndex, postCount)
             .success(function (data) {
                 console.log(data);
-                $scope.posts = $scope.posts.concat(formatPosts(data.posts));
+                $scope.posts = $scope.posts.concat(data.posts);
             });
             postIndex += postCount;
         };

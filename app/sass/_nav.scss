@@ -1,7 +1,7 @@
 @import 'vars';
 
 .side-nav {
-    @extend .small-2;
+    @extend .small-1;
     @extend .columns;
 
     background-color: $type;
@@ -96,11 +96,13 @@
     }
 }
 
-.create-assignment-btn {
+.new-question-btn {
     @include primary-btn();
     @include transition(background-color, 0.2s, ease-in-out);
 
     margin-top: 1.5rem;
+    margin-left: .5rem;
+    margin-right: .5rem;
 
     color: $button-text;
     //background-color: $primary;

@@ -19,6 +19,14 @@ angular
             $scope.settingsPage = false;
         };
 
+        $scope.getMediaObjectURL = function(filename) {
+            return '/media/' + filename;
+        }
+
+        $scope.getMediaObjectPreviewURL = function(preview_filename) {
+            return '/media/' + preview_filename;
+        }
+
         userApiService.isLoggedIn()
         .success(function (data) {
             window.loggedIn = data.loggedin;

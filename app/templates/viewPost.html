@@ -1,8 +1,24 @@
 <h1>{{post.title}}</h1>
 <p>{{post.contents}}</p>
 <div ng-repeat="media_object in post.media_objects">
-    <img ng-src="/media/{{media_object.filename}}" ng-if="media_object.media_type == 'image'" alt=""/>
-    <!-- TODO: video here -->
-    <!-- TODO: audio here -->
+
+    <! -- image -->
+    <div class="view-post-image-display">
+        <img class="view-post-image" ng-src="{{getMediaObjectURL(media_object.filename)}}" ng-if="media_object.media_type == 'image'" alt=""/>
+    </div>
+
+    <!-- video -->
+    <div ng-if="media_object.media_type == 'video'" class="player">
+      <video class="embedded-player" poster="{{getMediaObjectPreviewURL(media_object.preview_filename)}}" controls>
+        <!-- Video files-->
+        <source ng-src="{{getMediaObjectURL(media_object.filename)}}" type="video/mp4"/>
+        <!-- Text track file-->
+        <!-- Fallback for browsers that don"t support the <video> element-->
+        <a href="misc/dog-vocabulary-5Jq06Ga71TM.mp4">Download</a>
+      </video>
+    </div>
+
+    <!-- TODO: audio -->
+
 </div>
 
