@@ -206,11 +206,11 @@ def process_audio(base_filename):
 
         mime_type = magic.from_file(base_filename, mime=True)
         allowed_audio_types = [
-            'audio/mpeg',
-            'audio/ogg',
-            'audio/x-wav',
-            'audio/mp4',
-            'video/3gpp',
+            b'audio/mpeg',
+            b'audio/ogg',
+            b'audio/x-wav',
+            b'audio/mp4',
+            b'video/3gpp',
         ]
 
         if not mime_type.lower() in allowed_audio_types:
@@ -234,13 +234,11 @@ def process_audio(base_filename):
         ]
         resp = subprocess.call(cmd)
 
-        #print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
+        #
+        # Generic audio picture for preview name??
+        #
 
-        #print "\n\nbase_filename: {0}\n\nRESP: {1}\n\n".format(base_filename, resp)
-      
-        #
-        # TODO: generic audio picture for preview name??
-        #
+        preview_filename = 'audio_file.png'
 
     except Exception as ex:
         raise Exception(ex)
@@ -371,7 +369,7 @@ class MediaObjectsAPI(object):
                     client_id=self.client.id,
                     media_type=self.request.POST['media_type'],
                     filename=ntpath.basename(object_filename),
-                    preview_filename=preview_filename
+                    preview_filename=ntpath.basename(preview_filename),
                 )
                 resp = {'media_object': media_object.to_dict()}
             #except Exception as ex:

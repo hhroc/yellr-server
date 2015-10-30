@@ -178,7 +178,7 @@ if __name__ == '__main__':
 
     print('[GET] /api/clients')
     client_resp_a = get_client(client_a)
-    print('client id: ' + client_resp_a['client']['id'])
+    print('\tclient id: ' + client_resp_a['client']['id'])
 
     #
     # Text Text Post
@@ -219,6 +219,18 @@ if __name__ == '__main__':
     print('[POST] /api/media_objects')
     video_media_object = upload_media_object(client_a, video_post['post'], "video", "video.mp4")
     print('\tmedia object id: ' + video_media_object['media_object']['id'])
+
+    #
+    # Test Audio Post
+    #
+
+    print('[POST] /api/posts')
+    audio_post = publish_post(client_a, "My voice ... IT IS IN YOU!")
+    print('\tpost id: ' + audio_post['post']['id'])
+
+    print('[POST] /api/media_objects')
+    audio_media_object = upload_media_object(client_a, audio_post['post'], "audio", "audio.mp3")
+    print('\tmedia object id: ' + audio_media_object['media_object']['id'])
 
     #
     # Test moderator login
@@ -265,7 +277,7 @@ if __name__ == '__main__':
 
     print("[PUT] /api/admin/posts/{id}")
     post = admin_update_post(user_a, video_post['post'], deleted=False, flagged=False, approved=True)
-    print('post id: ' + image_post['post']['id'])
+    print('\tpost id: ' + image_post['post']['id'])
     print('\tapproved: ' + str(post['post']['approved']))
 
     print("[GET] /api/posts")
@@ -319,7 +331,7 @@ if __name__ == '__main__':
 
     print('[GET] /api/assignments')
     assignments_b = get_assignments(client_a)
-    print('\nassignment count: ' + str(len(assignments_b['assignments'])))
+    print('\tassignment count: ' + str(len(assignments_b['assignments'])))
     #print(json.dumps(assignments_b, indent=4))
 
     print("[PUT] /api/admin/question")
