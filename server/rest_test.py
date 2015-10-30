@@ -54,11 +54,12 @@ def register_vote(client, post, is_up_vote):
     return json.loads(resp.text)
 
 
-def publish_post(client, contents, assignment_id=None):
+def publish_post(client, contents, assignment_id=None, poll_response=-1):
     url = base_url + '/api/posts'
     data = json.dumps({
-        'assignment_id': assignment_id,
         'contents': contents,
+        'assignment_id': assignment_id,
+        'poll_response': poll_response,
     })
     resp = requests.post(client.build_url(url), data)
     print('[' + str(resp.status_code) + ']')
@@ -386,5 +387,44 @@ if __name__ == '__main__':
     print('\tpost count: ' + str(len(posts['posts'])))
 
     #
+    # Test Polls
     #
-    #
+
+    print("[POST] /api/admin/assignments")
+    poll_assignment = admin_create_assignment(user_a, "Test Poll Assignment", 72, 43.4, -77.9, 43.0, -77.3, 'poll')
+    print("\tassignment id:" + poll_assignment['assignment']['id'])
+
+    print("[POST] /api/admin/question")
+    poll_question = admin_create_question(
+        user_a,
+        poll_assignment['assignment'],
+        'en',
+        'What is your favorite Color?',
+        "You've got to have a favorite color, tell us which one it is!",
+        'Red',
+        'Green',
+        'Blue',
+        'Black',
+        'Other',
+    )
+    print('\tquestion id: ' + question_a['question']['id'])
+
+    print('[GET] /api/assignments')
+    poll_assignments = get_assignments(client_a)
+    print('\tassignment count' + str(len(poll_assignments['assignments'])))
+
+    print('[POST] /api/posts')
+    poll_response_post = publish_post(client_a, "", assignment_id=poll_assignment['assignment']['id'], poll_response=1) # green
+    print('\tassignment_id: ' + poll_assignment['assignment']['id'] + ', post id: ' + poll_response_post['post']['id'])
+
+    print("[PUT] /api/admin/posts/{id}")
+    poll_post = admin_update_post(user_a, poll_response_post['post'], deleted=False, flagged=False, approved=True)
+    print('\tapproved: ' + str(poll_post['post']['approved']))
+
+    print('[GET] /api/posts')
+    posts = get_posts(client_a)
+    print('\tpost count: ' + str(len(posts['posts'])))
+ 
+    print('[GET] /api/assignments')
+    poll_assignments = get_assignments(client_a)
+    print('\tassignment count' + str(len(poll_assignments['assignments'])))

@@ -276,8 +276,9 @@ class AssignmentsAPI(object):
 class PostsAPI(object):
 
     post_req = (
-        'assignment_id',
         'contents',
+        'assignment_id',
+        'poll_response',
     )
 
     def __init__(self, request):
@@ -322,6 +323,7 @@ class PostsAPI(object):
                 lng=self.client.last_lng,
                 language_code=self.client.language_code,
                 contents=payload['contents'],
+                poll_response=payload['poll_response'],
                 deleted=False,
                 approved=False,
                 flagged=False,

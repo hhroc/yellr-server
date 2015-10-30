@@ -127,19 +127,19 @@ class Users(Base, TimeStampMixin, CreationMixin):
     last = Column(UnicodeText, nullable=False)
     organization_id = Column(UUIDType(binary=False),
         ForeignKey('organizations.id'), nullable=True)
-    organization = relationship('Organizations', backref='user', lazy='joined')
+    organization = relationship('Organizations', backref='user')
     email = Column(UnicodeText, nullable=False)
     pass_salt = Column(UnicodeText, nullable=False)
     pass_hash = Column(UnicodeText, nullable=False)
     user_geo_fence_id = Column(UUIDType(binary=False),
         ForeignKey('user_geo_fences.id'), nullable=True)
-    user_geo_fence = relationship('UserGeoFences', backref='user', lazy='joined')
+    user_geo_fence = relationship('UserGeoFences', backref='user')
     token = Column(UnicodeText, nullable=True)
     token_expire_datetime = Column(DateTime, nullable=True)
 
     @classmethod
     def create_new_user(cls, user_type, user_geo_fence_id, 
-            username, password, first, last, email): #, organization_id):
+            username, password, first, last, email, organization_id):
         user = None
         salt_bytes = hashlib.sha256(str(uuid4()).encode('utf-8')).hexdigest()
         pass_bytes = hashlib.sha256(password.encode('utf-8')).hexdigest()
@@ -149,8 +149,7 @@ class Users(Base, TimeStampMixin, CreationMixin):
             user_type = user_type,
             first = first,
             last = last,
-            #organization_id = organization_id,
-            #organization = organization,
+            organization_id = organization_id,
             email = email,
             username = username,
             pass_salt = salt_bytes,
@@ -287,13 +286,12 @@ class UserGeoFences(Base, TimeStampMixin, CreationMixin):
     def to_dict(self):
         resp = super(UserGeoFences, self).to_dict()
         resp.update(
-            #user_geo_fence_id = self.user_geo_fence_id,
-            top_left_lat = self.top_left_lat,
-            top_left_lng = self.top_left_lng,
-            bottom_right_lat = self.bottom_right_lat,
-            bottom_right_lng = self.bottom_right_lng,
-            center_lat = self.center_lat,
-            center_lng = self.center_lng,
+            top_left_lat=self.top_left_lat,
+            top_left_lng=self.top_left_lng,
+            bottom_right_lat=self.bottom_right_lat,
+            bottom_right_lng=self.bottom_right_lng,
+            center_lat=self.center_lat,
+            center_lng=self.center_lng,
         )
         return resp
 
@@ -309,7 +307,6 @@ class Clients(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'clients'
     cuid = Column(UnicodeText, nullable=False)
-
     first = Column(UnicodeText, nullable=True)
     last = Column(UnicodeText, nullable=True)
     email = Column(UnicodeText, nullable=True)
@@ -317,13 +314,10 @@ class Clients(Base, TimeStampMixin, CreationMixin):
     pass_salt = Column(UnicodeText, nullable=True)
     verified = Column(Boolean, nullable=False)
     verified_datetime = Column(DateTime, nullable=True)
-
     last_lat = Column(Float, nullable=False)
     last_lng = Column(Float, nullable=False)
-
     language_code = Column(UnicodeText, nullable=False)
     platform = Column(UnicodeText, nullable=False)
-
     deleted = Column(Boolean, nullable=False)
 
     @classmethod
@@ -471,19 +465,15 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
     bottom_right_lng = Column(Float)
     use_fence = Column(Boolean)
     question_type = Column(UnicodeText, nullable=False)
-
     questions = relationship('Questions', backref='assignment', lazy='joined')
-
     response_count = 0
     has_responded = False
-
     answer0_count = 0
     answer1_count = 0
     answer2_count = 0
     answer3_count = 0
     answer4_count = 0
 
-    #posts = relationship('Posts', backref='assignment', lazy='joined')
 
     @classmethod
     def get_all_open(cls, client_id, lat, lng):
@@ -510,25 +500,25 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
                 func.count(distinct(Posts.id)).label('answer1_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 1,
             ).label('answer1_count'),
             DBSession.query(
                 func.count(distinct(Posts.id)).label('answer2_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 2,
             ).label('answer2_count'),
             DBSession.query(
                 func.count(distinct(Posts.id)).label('answer3_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 3,
             ).label('answer3_count'),
             DBSession.query(
                 func.count(distinct(Posts.id)).label('answer4_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 4,
             ).label('answer4_count'),        
         #).outerjoin(
         #   Posts,Posts.assignment_id == Assignments.id,
@@ -605,7 +595,6 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
         ).filter(
             Assignments.id == assignment_id,
         ).all()
-
         assignment = None
         if _result[0].question_type == 'poll':
             assignment = _results[0]
@@ -616,7 +605,6 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
             assignment.answer2_count = _results[5]
             assignment.answer3_count = _results[6]
             assignment.answer4_count = _results[7]
-
         return assignment
 
 
@@ -632,17 +620,14 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
             use_fence=self.use_fence,
             question_type=self.question_type,
             questions=[q.to_dict() for q in self.questions],
-            response_count=self.response_count, #len(self.posts),
+            response_count=self.response_count,
             answer0_count=self.answer0_count,
             answer1_count=self.answer1_count,
             answer2_count=self.answer2_count,
             answer3_count=self.answer3_count,
             answer4_count=self.answer4_count,
+            has_responded = self.has_responded,
         )
-        if client_id != None:
-            resp.update(
-                has_responded = self.has_responded, #any(p.client_id == client_id for p in self.posts),
-            )
         return resp 
 
 
@@ -664,7 +649,6 @@ class Questions(Base, TimeStampMixin, CreationMixin):
     language_code = Column(UnicodeText)
     question_text = Column(UnicodeText)
     description = Column(UnicodeText)
-    #question_type = Column(UnicodeText)
     answer0 = Column(UnicodeText)
     answer1 = Column(UnicodeText)
     answer2 = Column(UnicodeText)
@@ -685,7 +669,6 @@ class Questions(Base, TimeStampMixin, CreationMixin):
             language_code = self.language_code,
             question_text = self.question_text,
             description = self.description,
-            #question_type = self.question_type,
         )
         return resp
 
@@ -744,7 +727,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
     lng = Column(Float, nullable=False)
     contents = Column(UnicodeText, nullable=False)
 
-    poll_response = Column(Integer, nullable=True)
+    poll_response = Column(Integer, nullable=False)
 
     deleted = Column(Boolean, nullable=False)
     approved = Column(Boolean, nullable=False)
@@ -759,8 +742,6 @@ class Posts(Base, TimeStampMixin, CreationMixin):
     
     assignment = None
     
-    #media_objects = relationship('MediaObjects', backref='post', lazy='subquery')
-    #votes = relationship('Votes', backref='post', lazy='subquery')
 
     @classmethod
     def get_approved_posts(cls, client_id, lat, lng, start=0, count=50):
@@ -805,7 +786,8 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             (((lat + 0.5) + 90 > Posts.lat + 90) &
                 ((lng + 0.5) + 180 > Posts.lng + 180) &
                 ((lat - 0.5) + 90 < Posts.lat + 90) &
-                ((lng - 0.5) + 180 < Posts.lng + 180))
+                ((lng - 0.5) + 180 < Posts.lng + 180)),
+            Posts.contents != '',
         ).filter(
             Posts.deleted == False,
             Posts.flagged == False,
@@ -821,7 +803,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             post.is_up_vote = p[4]
             # TODO: add logic to support more than one media object 
             #       when we decide to support that ...
-            post.media_objects = p[5] if p[5] != None else []
+            post.media_objects = p[5] if p[5] != None else None
             post.assignment = p[6] if p[6] != None else None
             posts.append(post)
 
@@ -829,17 +811,28 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
 
     @classmethod
-    def get_posts(cls, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng, deleted=False, flagged=False, approved=True, start=0, count=50):
-        posts = DBSession.query(
+    def get_posts(cls, top_left_lat, top_left_lng, bottom_right_lat,
+            bottom_right_lng, deleted=False, flagged=False, approved=True,
+            start=0, count=50):
+        _results = DBSession.query(
             Posts,
+            MediaObjects,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
         ).filter(
             ((top_left_lat + 90 > Posts.lat + 90) &
                 (top_left_lng + 180 > Posts.lng + 180) &
                 (bottom_right_lat + 90 < Posts.lat + 90) &
-                (bottom_right_lng + 180 < Posts.lng + 180))
+                (bottom_right_lng + 180 < Posts.lng + 180)),
+            Posts.contents != '',
         ).filter(
             Posts.deleted == deleted,
         ).slice(start, count).all()
+        posts = []
+        for result in _results:
+            post = result[0]
+            post.media_objects = result[1] if result[1] != None else None
+            posts.append(post)
         return posts
 
 
@@ -906,7 +899,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
     def to_dict(self, client_id):
         resp = super(Posts, self).to_dict()
         resp.update(
-            assignment=self.assignment.to_dict() if self.assignment != None else {}, #self.assignment_id != None else {},
+            assignment=self.assignment.to_dict() if self.assignment != None else {},
             language_code=self.language_code,
             lat=self.lat,
             lng=self.lng,
@@ -916,14 +909,11 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             approved=self.approved,
             flagged=self.flagged,
             media_objects = [self.media_objects.to_dict()] if self.media_objects != None else [],
-            up_vote_count = self.up_vote_count, #sum(1 for v in self.votes if v.is_up_vote),
-            down_vote_count = self.down_vote_count, #sum(1 for v in self.votes if not v.is_up_vote),
+            up_vote_count = self.up_vote_count,
+            down_vote_count = self.down_vote_count,
+            has_voted=self.has_voted,
+            is_up_vote=self.is_up_vote,
         )
-        if client_id:
-            resp.update(
-                has_voted=self.has_voted, #any(v.client_id == client_id for v in self.votes),
-                is_up_vote=self.is_up_vote, #any(v.client_id == client_id and v.is_up_vote for v in self.votes),
-            )
         return resp
 
 
