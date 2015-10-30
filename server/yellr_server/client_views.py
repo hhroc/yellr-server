@@ -10,6 +10,7 @@ from .models import (
     Assignments,
     Posts,
     MediaObjects,
+    Votes,
     Clients,
     )
 
@@ -260,7 +261,11 @@ class AssignmentsAPI(object):
         resp = {'assignments': []}
         if self.client:
             start, count = build_paging(self.request)
-            _assignments = Assignments.get_all_open(self.client.last_lat, self.client.last_lng)
+            _assignments = Assignments.get_all_open(
+                self.client.id,
+                self.client.last_lat,
+                self.client.last_lng,
+            )
             resp = {'assignments': [a.to_dict() for a in _assignments]}
         else:
             self.request.response.status = 400
@@ -287,6 +292,7 @@ class PostsAPI(object):
         if self.client:
             start, count = build_paging(self.request)
             _posts = Posts.get_approved_posts(
+                client_id=self.client.id,
                 lat=self.client.last_lat,
                 lng=self.client.last_lng,
                 start=self.start,
@@ -320,7 +326,15 @@ class PostsAPI(object):
                 approved=False,
                 flagged=False,
             )
-            resp = {'post': post.to_dict(self.client.id)}
+            vote = Votes.register_vote(
+                post_id=post.id,
+                client_id=self.client.id,
+                is_up_vote=True,
+            )
+            resp = {
+                'post': {'id': post.id}, #post.to_dict(self.client.id),
+                'vote': {'id': vote.id}, #to_dict(),
+            }
         else:
             self.request.response.status = 400
         return resp
@@ -384,23 +398,25 @@ class MediaObjectsAPI(object):
 class VoteAPI(object):
 
     post_req = (
-        'post_id',
         'is_up_vote',
     )
 
     def __init__(self, request):
         self.request = request
+        self.client = check_in(request)
 
     # [ POST ] - votes on a post
     @view_config(request_method='POST')
     def post(self):
         resp = {'vote': None}
+        payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req) and self.client:
             vote = Votes.register_vote(
-                post_id=payload['post_id'],
+                post_id=self.request.matchdict['id'],
                 client_id=self.client.id,
                 is_up_vote=payload['is_up_vote']
             )
+            resp = {'vote': vote.to_dict()}
         else:
             self.request.response.status = 400
         return resp
@@ -421,6 +437,7 @@ class FlagAPI(object):
     @view_config(request_method='POST')
     def post(self):
         resp = {'post': None}
+        payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req) and self.client:
             post = Posts.flag_post(
                 post_id=payload['post_id'],

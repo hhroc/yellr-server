@@ -44,6 +44,16 @@ def get_posts(client):
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
+def register_vote(client, post, is_up_vote):
+    url = base_url + '/api/posts/{id}/vote'.replace('{id}', post['id'])
+    data = json.dumps({
+        'is_up_vote': is_up_vote,
+    })
+    resp = requests.post(client.build_url(url), data)
+    print('[' + str(resp.status_code) + ']')
+    return json.loads(resp.text)
+
+
 def publish_post(client, contents, assignment_id=None):
     url = base_url + '/api/posts'
     data = json.dumps({
@@ -116,7 +126,7 @@ def admin_update_post(user, post, deleted, flagged, approved):
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
-def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng):
+def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng, question_type):
     url = base_url + '/api/admin/assignments'
     data = json.dumps({
         'life_time': str(life_time),
@@ -125,19 +135,20 @@ def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, b
         'top_left_lng': top_left_lng,
         'bottom_right_lat': bottom_right_lat,
         'bottom_right_lng': bottom_right_lng,
+        'question_type': question_type,
     })
     resp = requests.post(user.build_url(url), data, cookies=user.cookies)
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
-def admin_create_question(user, assignment, langauge_code, question_text, description, question_type, answer0, answer1, answer2, answer3, answer4):
+def admin_create_question(user, assignment, langauge_code, question_text, description, answer0, answer1, answer2, answer3, answer4):
     url = base_url + '/api/admin/questions'
     data = json.dumps({
         'assignment_id': assignment['id'],
         'language_code': 'en',
         'question_text': question_text,
         'description': description,
-        'question_type': question_type,
+        #'question_type': question_type,
         'answer0': answer0,
         'answer1': answer1,
         'answer2': answer2,
@@ -195,6 +206,7 @@ if __name__ == '__main__':
     print('[GET] /api/posts')
     posts = get_posts(client_a)
     print('\tpost count: ' + str(len(posts['posts'])))
+    print(json.dumps(posts, indent=4))
 
     #
     # Test Image Post
@@ -285,15 +297,28 @@ if __name__ == '__main__':
     print('\tpost count:' + str(len(posts_a['posts'])))
 
     #
+    # Test Voting
+    #
+
+    print('[POST] /api/post/{id}/vote')
+    video_post_vote = register_vote(client_b, image_post['post'], True)
+    print('vote id: ' + video_post_vote['vote']['id'])
+    
+    print('[GET] /api/posts')
+    posts = get_posts(client_a)
+    print('\tpost count: ' + str(len(posts['posts'])))
+    print(json.dumps(posts, indent=4))
+
+    #
     # Test Assignments
     #
 
     print("[POST] /api/admin/assignments")
-    assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3)
+    assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3, 'text')
     print("\tassignment id:" + assignment_a['assignment']['id'])
 
     print("[POST] /api/admin/question")
-    question_a = admin_create_question(user_a, assignment_a['assignment'],'en', 'How is your day going?', 'Tell us about your day so far!', 'text', '', '', '', '', '')
+    question_a = admin_create_question(user_a, assignment_a['assignment'],'en', 'How is your day going?', 'Tell us about your day so far!', '', '', '', '', '')
     print('\tquestion id: ' + question_a['question']['id'])
 
     print('[GET] /api/assignments')
@@ -322,11 +347,11 @@ if __name__ == '__main__':
     # 
 
     print("[POST] /api/admin/assignments")
-    assignment_b = admin_create_assignment(user_a, "Tell me about the wind ...", 72, 43.4, -77.9, 43.0, -77.3)
+    assignment_b = admin_create_assignment(user_a, "Tell me about the wind ...", 72, 43.4, -77.9, 43.0, -77.3, 'text')
     print("\tassignment id:" + assignment_a['assignment']['id'])
 
     print("[POST] /api/admin/question")
-    question_b = admin_create_question(user_a, assignment_b['assignment'],'en', 'Tell me about the wind ...', 'OMG TELL ME.', 'text', '', '', '', '', '')
+    question_b = admin_create_question(user_a, assignment_b['assignment'],'en', 'Tell me about the wind ...', 'OMG TELL ME.', '', '', '', '', '')
     print('\tquestion id: ' + question_b['question']['id'])
 
     print('[GET] /api/assignments')

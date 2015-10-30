@@ -217,6 +217,7 @@ class AdminAssignmentsAPI(object):
         'top_left_lng',
         'bottom_right_lat',
         'bottom_right_lng',
+        'question_type',
     )
 
     def __init__(self, request):
@@ -248,6 +249,7 @@ class AdminAssignmentsAPI(object):
                     top_left_lng=payload['top_left_lng'],
                     bottom_right_lat=payload['bottom_right_lat'],
                     bottom_right_lng=payload['bottom_right_lng'],
+                    question_type=payload['question_type'],
                 )
                 resp = {'assignment': assignment.to_dict()}
             else:
@@ -265,7 +267,6 @@ class AdminQuestionsAPI(object):
         'language_code',
         'question_text',
         'description',
-        'question_type',
         'answer0',
         'answer1',
         'answer2',
@@ -289,7 +290,6 @@ class AdminQuestionsAPI(object):
                     language_code=payload['language_code'],
                     question_text=payload['question_text'],
                     description=payload['description'],
-                    question_type=payload['question_type'],
                     answer0=payload['answer0'],
                     answer1=payload['answer1'],
                     answer2=payload['answer2'],
@@ -336,7 +336,6 @@ class AdminQuestionAPI(object):
                     language_code=payload['language_code'],
                     question_text=payload['question_text'],
                     description=payload['description'],
-                    question_type=question.question_type,
                     answer0=payload['answer0'],
                     answer1=payload['answer1'],
                     answer2=payload['answer2'],
