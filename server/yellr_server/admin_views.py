@@ -253,9 +253,9 @@ class AdminAssignmentsAPI(object):
                 )
                 resp = {'assignment': assignment.to_dict()}
             else:
-                self.response.request.status = 400
+                self.request.response.status = 400
         else:
-            self.response.request.status = 403
+            self.request.response.status = 403
         return resp
 
 

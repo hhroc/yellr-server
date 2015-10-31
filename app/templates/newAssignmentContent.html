@@ -1,6 +1,19 @@
 <form no-validate ng-submit="save(assignment)">
     <div class="row">
+
+        <label for="exp-datepicker">
+            <h3>Assignment Name</h3>
+        </label>
         <input ng-model="assignment.name" type="text" class="main-input" placeholder="Assignment Name" required/>
+
+        <label for="exp-datepicker">
+            <h3>Question Type</h3>
+        </label>
+        <select id="question-type" ng-model="assignment.question_type" required>
+            <option value="">Choose Question Type</option>
+            <option value="text">Text</option>
+            <option value="poll">Poll</option>
+        </select>
 
         <label for="exp-datepicker">
             <h3>Expiration Date</h3>

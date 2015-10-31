@@ -9,7 +9,7 @@
             <div class="assignment-question" ng-repeat="question in assignment.questions">
                 <h3><a href="#/assignments/{{assignment.id}}">{{question.question_text}}</a></h3>
                 <p ng-if="question.question_type_id==2"><b>Poll</b></p>
-                <p>Response Count: {{assignment.post_count}}</p>
+                <p>Response Count: {{assignment.response_count}}</p>
             </div>
        </div>
     </div>
