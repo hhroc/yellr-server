@@ -92,7 +92,7 @@ angular
                 method: 'POST',
                 url: url,
                 data: $.param(params)
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         userApi.changePassword = function (username, oldPassword, newPassword) {
@@ -109,7 +109,7 @@ angular
                     old_password: oldPassword,
                     new_password: newPassword
                 })
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -123,7 +123,7 @@ angular
             return $http({
                 method: 'GET',
                 url: url
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         return userApi;
