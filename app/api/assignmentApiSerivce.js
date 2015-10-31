@@ -26,7 +26,7 @@ angular
                 method: 'GET',
                 url: url,
                 params: params
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -56,7 +56,7 @@ angular
             return $http({
                 method: 'GET',
                 url: url
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -92,7 +92,7 @@ angular
                 method: 'POST',
                 url: url,
                 data: data,
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -131,7 +131,7 @@ angular
                 method: 'POST',
                 url: url,
                 data: data
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -164,7 +164,7 @@ angular
                 method: 'PUT',
                 url: url,
                 params: params
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -186,7 +186,7 @@ angular
                 method: 'GET',
                 url: url,
                 //params: params
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -208,7 +208,7 @@ angular
                 method: 'PUT',
                 url: url,
                 data: data,
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -230,7 +230,7 @@ angular
                 method: 'PUT',
                 url: url,
                 data: data,
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -252,7 +252,7 @@ angular
                 method: 'PUT',
                 url: url,
                 data: data,
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         }
 
         /**
@@ -271,7 +271,7 @@ angular
                 data: $.param({
                     post_id: id
                 })
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         return assignmentApi;

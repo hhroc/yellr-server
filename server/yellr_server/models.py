@@ -476,7 +476,7 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
 
 
     @classmethod
-    def get_all_open(cls, client_id, lat, lng):
+    def get_all_assignments(cls, admin, client_id=None, lat=0, lng=0):
         _results = DBSession.query(
             Assignments,
             DBSession.query(
@@ -520,19 +520,18 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
                 Posts.assignment_id == Assignments.id,
                 Posts.poll_response == 4,
             ).label('answer4_count'),        
-        #).outerjoin(
-        #   Posts,Posts.assignment_id == Assignments.id,
-        ).filter(
-            # we add offsets so we can do simple comparisons
-            Assignments.top_left_lat + 90 > lat + 90,
-            Assignments.top_left_lng + 180 < lng + 180,
-            Assignments.bottom_right_lat + 90 < lat + 90,
-            Assignments.bottom_right_lng + 180 > lng + 180,
-            cast(Assignments.expire_datetime, Date) >= \
-                cast(datetime.datetime.now(), Date),
-        #).group_by(
-        #    Assignments.id,
-        ).all()
+        )
+        if not admin:
+            _results = _results.filter(
+                # we add offsets so we can do simple comparisons
+                Assignments.top_left_lat + 90 > lat + 90,
+                Assignments.top_left_lng + 180 < lng + 180,
+                Assignments.bottom_right_lat + 90 < lat + 90,
+                Assignments.bottom_right_lng + 180 > lng + 180,
+                cast(Assignments.expire_datetime, Date) >= \
+                    cast(datetime.datetime.now(), Date),
+            )
+        _results = _results.all()
 
         assignments = []
         for result in _results:
@@ -548,8 +547,8 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
         return assignments
 
     @classmethod
-    def get_poll_results(cls, assignment_id):
-        _results = DBSession.query(
+    def get_assignment_by_id(cls, assignment_id, client_id=None):
+        _result = DBSession.query(
             Assignments,
             DBSession.query(
                 func.count(distinct(Posts.id)).label('response_count'),
@@ -594,17 +593,15 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
             ).label('answer4_count'),
         ).filter(
             Assignments.id == assignment_id,
-        ).all()
-        assignment = None
-        if _result[0].question_type == 'poll':
-            assignment = _results[0]
-            assignment.response_count = _results[1]
-            assignmnet.has_responded = _results[2]
-            assignment.answer0_count = _results[3]
-            assignment.answer1_count = _results[4]
-            assignment.answer2_count = _results[5]
-            assignment.answer3_count = _results[6]
-            assignment.answer4_count = _results[7]
+        ).first()
+        assignment = _result[0]
+        assignment.response_count = _result[1]
+        assignment.has_responded = _result[2]
+        assignment.answer0_count = _result[3]
+        assignment.answer1_count = _result[4]
+        assignment.answer2_count = _result[5]
+        assignment.answer3_count = _result[6]
+        assignment.answer4_count = _result[7]
         return assignment
 
 
@@ -669,6 +666,11 @@ class Questions(Base, TimeStampMixin, CreationMixin):
             language_code = self.language_code,
             question_text = self.question_text,
             description = self.description,
+            answer0=self.answer0,
+            answer1=self.answer1,
+            answer2=self.answer2,
+            answer3=self.answer3,
+            answer4=self.answer4,
         )
         return resp
 
@@ -787,6 +789,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
                 ((lng + 0.5) + 180 > Posts.lng + 180) &
                 ((lat - 0.5) + 90 < Posts.lat + 90) &
                 ((lng - 0.5) + 180 < Posts.lng + 180)),
+        ).filter(
             Posts.contents != '',
         ).filter(
             Posts.deleted == False,
@@ -824,6 +827,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
                 (top_left_lng + 180 > Posts.lng + 180) &
                 (bottom_right_lat + 90 < Posts.lat + 90) &
                 (bottom_right_lng + 180 < Posts.lng + 180)),
+        ).filter(
             Posts.contents != '',
         ).filter(
             Posts.deleted == deleted,
@@ -860,8 +864,10 @@ class Posts(Base, TimeStampMixin, CreationMixin):
         ).outerjoin(
             MediaObjects, MediaObjects.post_id == Posts.id,
         ).filter(
-            Posts.contents != '',
             Posts.assignment_id == assignment_id,
+        ).filter(
+            Posts.contents != '',
+        ).filter(
             Posts.deleted == deleted,
         ).slice(start, start+count).all()
         posts = []

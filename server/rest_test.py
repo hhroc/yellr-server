@@ -330,7 +330,7 @@ if __name__ == '__main__':
 
     print('[GET] /api/assignments')
     assignments_a = get_assignments(client_a)
-    print('\tassignment count' + str(len(assignments_a['assignments'])))
+    print('\tassignment count: ' + str(len(assignments_a['assignments'])))
     #print(json.dumps(assignments_a, indent=4))
 
     #
@@ -382,7 +382,7 @@ if __name__ == '__main__':
     print('[GET] /api/assignments')
     assignments_c = get_assignments(client_a)
     #print(json.dumps(assignments_c, indent=4))
-    print('\tassignment count' + str(len(assignments_c['assignments'])))
+    print('\tassignment count: ' + str(len(assignments_c['assignments'])))
 
     #
     # Test Delete Post
@@ -426,7 +426,7 @@ if __name__ == '__main__':
 
     print('[GET] /api/assignments')
     poll_assignments = get_assignments(client_a)
-    print('\tassignment count' + str(len(poll_assignments['assignments'])))
+    print('\tassignment count: ' + str(len(poll_assignments['assignments'])))
 
     print('[POST] /api/posts')
     poll_response_post = publish_post(client_a, "", assignment_id=poll_assignment['assignment']['id'], poll_response=1) # green
@@ -443,4 +443,13 @@ if __name__ == '__main__':
     print('[GET] /api/assignments')
     poll_assignments = get_assignments(client_a)
     print('\tassignment count: ' + str(len(poll_assignments['assignments'])))
+
+    #
+    # Test Get Poll Assignment Responses
+    #
+
+    print('[GET] /api/admin/assignments/{id}/responses')
+    poll_assignment_responses = admin_get_assignment_responses(user_a, poll_assignment['assignment'])
+    print('\tresponse count: ' + str(len(poll_assignment_responses['posts'])))
+    #print(json.dumps(poll_assignment_responses, indent=4))
 

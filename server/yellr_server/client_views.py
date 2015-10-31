@@ -261,7 +261,8 @@ class AssignmentsAPI(object):
         resp = {'assignments': []}
         if self.client:
             start, count = build_paging(self.request)
-            _assignments = Assignments.get_all_open(
+            _assignments = Assignments.get_all_assignments(
+                False,
                 self.client.id,
                 self.client.last_lat,
                 self.client.last_lng,

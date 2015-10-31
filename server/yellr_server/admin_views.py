@@ -228,7 +228,7 @@ class AdminAssignmentsAPI(object):
     def get(self):
         resp = {'assignments': None}
         if self.user:
-            _assignments = Assignments.get_all()
+            _assignments = Assignments.get_all_assignments(True)
             assignments = [a.to_dict() for a in _assignments]
             resp = {'assignments': assignments}
         else:
@@ -273,10 +273,9 @@ class AdminAssignmentResponsesAPI(object):
         resp = {'posts': None}
         if self.user:
             id = self.request.matchdict['id']
-            print(id)
+            assignment = Assignments.get_assignment_by_id(id)
             posts = Posts.get_all_by_assignment_id(id)
-            print(posts)
-            resp = {'posts': [p.to_dict(None) for p in posts]}
+            resp = {'assignment': assignment.to_dict(), 'posts': [p.to_dict(None) for p in posts]}
         else:
             self.request.response.status = 403
         print('\n\n')
