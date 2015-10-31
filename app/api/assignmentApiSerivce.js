@@ -69,18 +69,24 @@ angular
          *
          * @return response : either error or sucess response with question id
          */
-        assignmentApi.createQuestion = function (languageCode,
+        assignmentApi.createQuestion = function (assignmentid, languageCode,
                                            questionText, description,
-                                           questionType, answers) {
+                                           questionType, answer0, answer1,
+                                           answer2, answer3, answer4) {
             var url = '/api/admin/questions',
                 data = {
+                    assignment_id: assignment_id,
                     language_code: languageCode,
                     question_text: questionText,
                     description: description,
                     question_type: questionType
                 };
 
-            if (answers !== undefined) data.answers = answers;
+            if (answer0 !== undefined) data.answer0 = answer0;
+            if (answer1 !== undefined) data.answer1 = answer1;
+            if (answer2 !== undefined) data.answer2 = answer2;
+            if (answer3 !== undefined) data.answer3 = answer3;
+            if (answer4 !== undefined) data.answer4 = answer4;
 
             return $http({
                 method: 'POST',
@@ -92,19 +98,22 @@ angular
         /**
          * Publishes assignment to all users within given GeoBox
          *
+         * @param name :  name of the assignment
          * @param lifeTime : time that assignment will last (hours)
          * @param questions : json array of question ids
          * @param topLeftLat : top left latitude of geobox
          * @param topLeftLng : top left longitude of geobox
          * @param bottomRightLat : bottom right latitude of geobox
          * @param bottomRightLng : bottom right longitude of geobox
+         * @param question_type : either 'text' or 'poll'
          *
          * @return response : either error or sucess response with assignment
          *                    id
          */
         assignmentApi.publishAssignment = function (name, lifeTime,
                                                questions, topLeftLat, topLeftLng,
-                                               bottomRightLat, bottomRightLng) {
+                                               bottomRightLat, bottomRightLng,
+                                               question_type) {
 
             var url = '/api/admin/assignments',
                 data = {
@@ -114,7 +123,8 @@ angular
                     top_left_lat: topLeftLat,
                     top_left_lng: topLeftLng,
                     bottom_right_lat: bottomRightLat,
-                    bottom_right_lng: bottomRightLng
+                    bottom_right_lng: bottomRightLng,
+                    question_type: question_type
                 };
 
             return $http({
@@ -136,12 +146,13 @@ angular
          * @return response : either error or success response with assignment
          *                    id
          */
-        assignmentApi.updateAssignment = function (lifeTime, topLeftLat,
+        assignmentApi.updateAssignment = function (id, name, lifeTime, topLeftLat,
                                               topLeftLng, bottomRightLat,
                                               bottomRightLng) {
 
-            var url = '/admin/update_assignment.json',
+            var url = '/api/admin/assignments/' + id,
                 params = {
+                    name: name,
                     life_time: lifeTime,
                     top_left_lat: topLeftLat,
                     top_left_lng: topLeftLng,
@@ -150,7 +161,7 @@ angular
                 };
 
             return $http({
-                method: 'POST',
+                method: 'PUT',
                 url: url,
                 params: params
             }).error(function(responce){ window.location = '/login'; });
@@ -167,17 +178,15 @@ angular
          */
         assignmentApi.getAssignmentResponses = function (id, start, count) {
 
-            var url = '/admin/get_assignment_responses.json',
-                params = { assignment_id: id };
+            var url = '/api/admin/assignments/' + id + '/responses';
 
-            if (start !== undefined) params.start = start;
-            if (count !== undefined) params.count = count;
+            if (start !== undefined && count !== undefined) url += ('?start=' + start + '&count=' + count);
 
             return $http({
-                method: 'POST',
+                method: 'GET',
                 url: url,
-                params: params
-            }).error(function(responce){ window.location = '/login'; });
+                //params: params
+            }); //.error(function(responce){ window.location = '/login'; });
         };
 
         /**

@@ -7,7 +7,7 @@
     <div ng-if="assignments.length">
         <div class="assignment-block" ng-repeat="assignment in assignments" ng-click="showGeofence(assignment)">
             <div class="assignment-question" ng-repeat="question in assignment.questions">
-                <h3><a href="#/assignments/{{assignment.assignment_id}}">{{question.question_text}}</a></h3>
+                <h3><a href="#/assignments/{{assignment.id}}">{{question.question_text}}</a></h3>
                 <p ng-if="question.question_type_id==2"><b>Poll</b></p>
                 <p>Response Count: {{assignment.post_count}}</p>
             </div>

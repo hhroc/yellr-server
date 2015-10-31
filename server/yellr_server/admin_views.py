@@ -259,6 +259,30 @@ class AdminAssignmentsAPI(object):
         return resp
 
 
+@view_defaults(route_name='/api/admin/assignments/{id}/responses', renderer='json')
+class AdminAssignmentResponsesAPI(object):
+
+    def __init__(self, request):
+        self.request = request
+        self. user = authenticate(request)
+        self.start, self.count = build_paging(request)
+
+    @view_config(request_method='GET')
+    def get(self):
+        print('\n\n---- responses ----\n\n')  
+        resp = {'posts': None}
+        if self.user:
+            id = self.request.matchdict['id']
+            print(id)
+            posts = Posts.get_all_by_assignment_id(id)
+            print(posts)
+            resp = {'posts': [p.to_dict(None) for p in posts]}
+        else:
+            self.request.response.status = 403
+        print('\n\n')
+        return resp
+
+
 @view_defaults(route_name='/api/admin/questions', renderer='json')
 class AdminQuestionsAPI(object):
 

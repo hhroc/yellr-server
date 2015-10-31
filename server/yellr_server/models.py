@@ -63,7 +63,7 @@ class CreationMixin():
     def get_paged(cls, start=0, count=50):
         things = DBSession.query(
             cls,
-        ).slice(start, count).all()
+        ).slice(start, start+count).all()
         return things
 
     @classmethod
@@ -792,7 +792,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             Posts.deleted == False,
             Posts.flagged == False,
             Posts.approved == True,
-        ).slice(start, count).all()
+        ).slice(start, start+count).all()
 
         posts = []
         for p in _posts:
@@ -827,7 +827,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             Posts.contents != '',
         ).filter(
             Posts.deleted == deleted,
-        ).slice(start, count).all()
+        ).slice(start, start+count).all()
         posts = []
         for result in _results:
             post = result[0]
@@ -837,19 +837,28 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
 
     @classmethod
-    def get_all_from_assignment_id(cls, assignment_id,
-            deleted=False, start=0, count=0):
-        posts = DBSession.query(
+    def get_all_by_assignment_id(cls, assignment_id,
+            deleted=False, start=0, count=50):
+        _results = DBSession.query(
             Posts,
+            MediaObjects,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
         ).filter(
+            Posts.contents != '',
             Posts.assignment_id == assignment_id,
             Posts.deleted == deleted,
         ).slice(start, start+count).all()
+        posts = []
+        for result in _results:
+            post = result[0]
+            post.media_objects = result[1] if result[1] != None else None
+            posts.append(post)
         return posts
 
 
     @classmethod
-    def get_all_from_cuid(cls, cuid, deleted=False, start=0, count=0):
+    def get_all_by_cuid(cls, cuid, deleted=False, start=0, count=50):
         client = Clients.get_by_cuid(cuid)
         posts = DBSession.query(
             Posts,

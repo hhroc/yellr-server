@@ -72,6 +72,7 @@ def main(global_config, **settings):
 
     config.add_route('/api/admin/assignments', '/api/admin/assignments')
     config.add_route('/api/admin/assignments/{id}', '/api/admin/assignments/{id}')
+    config.add_route('/api/admin/assignments/{id}/responses', '/api/admin/assignments/{id}/responses')
 
     config.add_route('/api/admin/questions', '/api/admin/questions')
     config.add_route('/api/admin/questions/{id}', '/api/admin/questions/{id}')

@@ -160,6 +160,12 @@ def admin_create_question(user, assignment, langauge_code, question_text, descri
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
+def admin_get_assignment_responses(user, assignment):
+    url = base_url + '/api/admin/assignments/{id}/responses'.replace('{id}', assignment['id'])
+    resp = requests.get(user.build_url(url), cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
+    return json.loads(resp.text)
+
 def admin_update_question(user, question, language_code, question_text, description, answer0, answer1, answer2, answer3, answer4):
     url = base_url + '/api/admin/questions/' + question['id']
     data = json.dumps({
@@ -207,7 +213,7 @@ if __name__ == '__main__':
     print('[GET] /api/posts')
     posts = get_posts(client_a)
     print('\tpost count: ' + str(len(posts['posts'])))
-    print(json.dumps(posts, indent=4))
+    #print(json.dumps(posts, indent=4))
 
     #
     # Test Image Post
@@ -303,12 +309,12 @@ if __name__ == '__main__':
 
     print('[POST] /api/post/{id}/vote')
     video_post_vote = register_vote(client_b, image_post['post'], True)
-    print('vote id: ' + video_post_vote['vote']['id'])
+    print('\tvote id: ' + video_post_vote['vote']['id'])
     
     print('[GET] /api/posts')
     posts = get_posts(client_a)
     print('\tpost count: ' + str(len(posts['posts'])))
-    print(json.dumps(posts, indent=4))
+    #print(json.dumps(posts, indent=4))
 
     #
     # Test Assignments
@@ -342,6 +348,15 @@ if __name__ == '__main__':
     print("[PUT] /api/admin/posts/{id}")
     post = admin_update_post(user_a, response_post['post'], deleted=False, flagged=False, approved=True)
     print('\tapproved: ' + str(post['post']['approved']))
+
+    #
+    # Test Get Assignment Responses
+    #
+
+    print('[GET] /api/admin/assignments/{id}/responses')
+    assignment_responses = admin_get_assignment_responses(user_a, assignment_a['assignment'])
+    print('\tresponse count: ' + str(len(assignment_responses['posts'])))
+    #print(json.dumps(assignment_responses, indent=4))
 
     #
     # Test Update Assignment Question
@@ -427,4 +442,5 @@ if __name__ == '__main__':
  
     print('[GET] /api/assignments')
     poll_assignments = get_assignments(client_a)
-    print('\tassignment count' + str(len(poll_assignments['assignments'])))
+    print('\tassignment count: ' + str(len(poll_assignments['assignments'])))
+
