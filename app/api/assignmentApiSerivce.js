@@ -42,7 +42,7 @@ angular
             return $http({
                 method: 'GET',
                 url: url,
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         /**
@@ -186,7 +186,7 @@ angular
                 method: 'GET',
                 url: url,
                 //params: params
-            }); //.error(function(responce){ window.location = '/login'; });
+            }).error(function(responce){ window.location = '/login'; });
         };
 
         /**

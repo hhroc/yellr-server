@@ -837,6 +837,21 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
 
     @classmethod
+    def get_post_by_id(cls, id):
+        _result = DBSession.query(
+            Posts,
+            MediaObjects,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
+        ).filter(
+            Posts.id == id,
+        ).first()
+        post = _result[0]
+        post.media_objects = _result[1] if _result[1] != None else None
+        return post
+
+
+    @classmethod
     def get_all_by_assignment_id(cls, assignment_id,
             deleted=False, start=0, count=50):
         _results = DBSession.query(

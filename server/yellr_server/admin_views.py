@@ -197,7 +197,7 @@ class AdminPostAPI(object):
         resp = {'post': None}
         if self.user:
             id = self.request.matchdict['id']
-            post = Posts.get_by_id(id)
+            post = Posts.get_post_by_id(id)
             if post:
                 resp = {'post': post.to_dict(None)}
             else:
