@@ -19,6 +19,8 @@ from sqlalchemy import (
     DateTime,
     Index,
     CHAR,
+    distinct,
+    func,
 )
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -61,7 +63,7 @@ class CreationMixin():
     def get_paged(cls, start=0, count=50):
         things = DBSession.query(
             cls,
-        ).slice(start, count).all()
+        ).slice(start, start+count).all()
         return things
 
     @classmethod
@@ -109,43 +111,6 @@ class CreationMixin():
         }
 
 
-'''
-class UserTypes(Base, TimeStampMixin, CreationMixin):
-
-    """
-    Different types of users.  Administrators have the most access/privs,
-    Moderators have the next leve, Subscribers the next, and then users only
-    have the ability to post and view.
-    """
-
-    __tablename__ = 'user_types'
-    name = Column(UnicodeText, nullable=False)
-    description = Column(UnicodeText, nullable=False)
-
-    @classmethod
-    def get_from_name(cls, session, name):
-        with transaction.manager:
-            user_type = DBSession.query(
-                UserTypes
-            ).filter(
-                UserTypes.name == name
-            ).first()
-            transaction.commit()
-        #DBSession.flush()
-        return user_type
-
-    def to_dict(self):
-        resp = super.to_dict(UserTypes, self).to_dict()
-        resp.update(
-            name = self.name,
-            description = self.description,
-        )
-        return resp
-
-
-Index('index_user_types_id', UserTypes.id, unique=True)
-'''
-
 class Users(Base, TimeStampMixin, CreationMixin):
 
     """
@@ -160,8 +125,9 @@ class Users(Base, TimeStampMixin, CreationMixin):
     username = Column(UnicodeText, nullable=False)
     first = Column(UnicodeText, nullable=False)
     last = Column(UnicodeText, nullable=False)
-    #organization_id = Column(UUIDType(binary=False), ForeignKey('organizations.id'), nullable=True)
-    #organization = relationship('Organizations', backref='user')
+    organization_id = Column(UUIDType(binary=False),
+        ForeignKey('organizations.id'), nullable=True)
+    organization = relationship('Organizations', backref='user')
     email = Column(UnicodeText, nullable=False)
     pass_salt = Column(UnicodeText, nullable=False)
     pass_hash = Column(UnicodeText, nullable=False)
@@ -173,7 +139,7 @@ class Users(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def create_new_user(cls, user_type, user_geo_fence_id, 
-            username, password, first, last, email): #, organization_id):
+            username, password, first, last, email, organization_id):
         user = None
         salt_bytes = hashlib.sha256(str(uuid4()).encode('utf-8')).hexdigest()
         pass_bytes = hashlib.sha256(password.encode('utf-8')).hexdigest()
@@ -183,8 +149,7 @@ class Users(Base, TimeStampMixin, CreationMixin):
             user_type = user_type,
             first = first,
             last = last,
-            #organization_id = organization_id,
-            #organization = organization,
+            organization_id = organization_id,
             email = email,
             username = username,
             pass_salt = salt_bytes,
@@ -321,13 +286,12 @@ class UserGeoFences(Base, TimeStampMixin, CreationMixin):
     def to_dict(self):
         resp = super(UserGeoFences, self).to_dict()
         resp.update(
-            #user_geo_fence_id = self.user_geo_fence_id,
-            top_left_lat = self.top_left_lat,
-            top_left_lng = self.top_left_lng,
-            bottom_right_lat = self.bottom_right_lat,
-            bottom_right_lng = self.bottom_right_lng,
-            center_lat = self.center_lat,
-            center_lng = self.center_lng,
+            top_left_lat=self.top_left_lat,
+            top_left_lng=self.top_left_lng,
+            bottom_right_lat=self.bottom_right_lat,
+            bottom_right_lng=self.bottom_right_lng,
+            center_lat=self.center_lat,
+            center_lng=self.center_lng,
         )
         return resp
 
@@ -343,7 +307,6 @@ class Clients(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'clients'
     cuid = Column(UnicodeText, nullable=False)
-
     first = Column(UnicodeText, nullable=True)
     last = Column(UnicodeText, nullable=True)
     email = Column(UnicodeText, nullable=True)
@@ -351,26 +314,37 @@ class Clients(Base, TimeStampMixin, CreationMixin):
     pass_salt = Column(UnicodeText, nullable=True)
     verified = Column(Boolean, nullable=False)
     verified_datetime = Column(DateTime, nullable=True)
-
     last_lat = Column(Float, nullable=False)
     last_lng = Column(Float, nullable=False)
-
     language_code = Column(UnicodeText, nullable=False)
     platform = Column(UnicodeText, nullable=False)
-
     deleted = Column(Boolean, nullable=False)
 
     @classmethod
     def check_in(cls, cuid, lat, lng, language_code, platform):
         client = Clients.get_by_cuid(cuid, lat, lng, language_code, platform)
-        client = Clients.update_by_id(
-            client.id,
+        client = Clients.update(
+            client,
             last_lat=lat,
             last_lng=lng,
             platform=platform,
             modified_datetime=datetime.datetime.now()
         )
         return client
+
+
+    @classmethod
+    def update(cls, client, **kwargs):
+        keys = set(cls.__dict__)
+        if client is not None:
+            for k in kwargs:
+                if k in keys:
+                    setattr(client, k, kwargs[k])
+            client.modified_datetime = datetime.datetime.now()
+            DBSession.add(client)
+            DBSession.commit()
+        return client
+
 
     @classmethod
     def get_by_cuid(cls, cuid, lat, lng, language_code, platform, create=True):
@@ -490,46 +464,167 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
     bottom_right_lat = Column(Float)
     bottom_right_lng = Column(Float)
     use_fence = Column(Boolean)
-
+    question_type = Column(UnicodeText, nullable=False)
     questions = relationship('Questions', backref='assignment', lazy='joined')
+    response_count = 0
+    has_responded = False
+    answer0_count = 0
+    answer1_count = 0
+    answer2_count = 0
+    answer3_count = 0
+    answer4_count = 0
 
-    posts = relationship('Posts', backref='assignment', lazy='joined')
 
     @classmethod
-    def get_all_open(cls, lat, lng):
-        assignments = DBSession.query(
-           Assignments,
-        ).outerjoin(
-           Posts,Posts.assignment_id == Assignments.id,
-        ).filter(
-            # we add offsets so we can do simple comparisons
-            Assignments.top_left_lat + 90 > lat + 90,
-            Assignments.top_left_lng + 180 < lng + 180,
-            Assignments.bottom_right_lat + 90 < lat + 90,
-            Assignments.bottom_right_lng + 180 > lng + 180,
-            cast(Assignments.expire_datetime, Date) >= \
-                cast(datetime.datetime.now(), Date),
-            ).group_by(
-                Assignments.id,
-            ).all()
+    def get_all_assignments(cls, admin, client_id=None, lat=0, lng=0):
+        _results = DBSession.query(
+            Assignments,
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('response_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+            ).label('response_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('has_responded'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.client_id == client_id,
+            ).label('has_resonded'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer0_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 0,
+            ).label('answer0_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer1_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 1,
+            ).label('answer1_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer2_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 2,
+            ).label('answer2_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer3_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 3,
+            ).label('answer3_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer4_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 4,
+            ).label('answer4_count'),        
+        )
+        if not admin:
+            _results = _results.filter(
+                # we add offsets so we can do simple comparisons
+                Assignments.top_left_lat + 90 > lat + 90,
+                Assignments.top_left_lng + 180 < lng + 180,
+                Assignments.bottom_right_lat + 90 < lat + 90,
+                Assignments.bottom_right_lng + 180 > lng + 180,
+                cast(Assignments.expire_datetime, Date) >= \
+                    cast(datetime.datetime.now(), Date),
+            )
+        _results = _results.all()
+
+        assignments = []
+        for result in _results:
+            assignment = result[0]
+            assignment.response_count = result[1]
+            assignment.has_responded = result[2]
+            assignment.answer0_count = result[3]
+            assignment.answer1_count = result[4]
+            assignment.answer2_count = result[5]
+            assignment.answer3_count = result[6]
+            assignment.answer4_count = result[7]
+            assignments.append(assignment)
         return assignments
+
+    @classmethod
+    def get_assignment_by_id(cls, assignment_id, client_id=None):
+        _result = DBSession.query(
+            Assignments,
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('response_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+            ).label('response_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('has_responded'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.client_id == client_id,
+            ).label('has_resonded'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer0_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 0,
+            ).label('answer0_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer1_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 0,
+            ).label('answer1_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer2_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 0,
+            ).label('answer2_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer3_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 0,
+            ).label('answer3_count'),
+            DBSession.query(
+                func.count(distinct(Posts.id)).label('answer4_count'),
+            ).filter(
+                Posts.assignment_id == Assignments.id,
+                Posts.poll_response == 0,
+            ).label('answer4_count'),
+        ).filter(
+            Assignments.id == assignment_id,
+        ).first()
+        assignment = _result[0]
+        assignment.response_count = _result[1]
+        assignment.has_responded = _result[2]
+        assignment.answer0_count = _result[3]
+        assignment.answer1_count = _result[4]
+        assignment.answer2_count = _result[5]
+        assignment.answer3_count = _result[6]
+        assignment.answer4_count = _result[7]
+        return assignment
+
 
     def to_dict(self, client_id=None, simple=False):
         resp = super(Assignments, self).to_dict()
         resp.update(
-            expire_datetime = str(self.expire_datetime),
-            name = self.name,
-            top_left_lat = self.top_left_lat,
-            top_left_lng = self.top_left_lng,
-            bottom_right_lat = self.bottom_right_lat,
-            bottom_right_lng = self.bottom_right_lng,
-            questions = [q.to_dict() for q in self.questions],
-            response_count = len(self.posts),
+            expire_datetime=str(self.expire_datetime),
+            name=self.name,
+            top_left_lat=self.top_left_lat,
+            top_left_lng=self.top_left_lng,
+            bottom_right_lat=self.bottom_right_lat,
+            bottom_right_lng=self.bottom_right_lng,
+            use_fence=self.use_fence,
+            question_type=self.question_type,
+            questions=[q.to_dict() for q in self.questions],
+            response_count=self.response_count,
+            answer0_count=self.answer0_count,
+            answer1_count=self.answer1_count,
+            answer2_count=self.answer2_count,
+            answer3_count=self.answer3_count,
+            answer4_count=self.answer4_count,
+            has_responded = self.has_responded,
         )
-        if client_id != None:
-            resp.update(
-                has_responded = any(p.client_id == client_id for p in self.posts),
-            )
         return resp 
 
 
@@ -551,7 +646,6 @@ class Questions(Base, TimeStampMixin, CreationMixin):
     language_code = Column(UnicodeText)
     question_text = Column(UnicodeText)
     description = Column(UnicodeText)
-    question_type = Column(UnicodeText)
     answer0 = Column(UnicodeText)
     answer1 = Column(UnicodeText)
     answer2 = Column(UnicodeText)
@@ -572,7 +666,11 @@ class Questions(Base, TimeStampMixin, CreationMixin):
             language_code = self.language_code,
             question_text = self.question_text,
             description = self.description,
-            question_type = self.question_type,
+            answer0=self.answer0,
+            answer1=self.answer1,
+            answer2=self.answer2,
+            answer3=self.answer3,
+            answer4=self.answer4,
         )
         return resp
 
@@ -589,23 +687,17 @@ class Languages(Base, TimeStampMixin, CreationMixin):
     """
 
     __tablename__ = 'languages'
-    #language_id = Column(Integer, primary_key=True)
     language_code = Column(UnicodeText)
     name = Column(UnicodeText)
 
-    #questions = relationship('Questions', backref='language', lazy='joined')
-    #posts = relationship('Posts', backref='language', lazy='joined')
-
     @classmethod
     def get_from_code(cls, language_code):
-        with transaction.manager:
-            language = DBSession.query(
-                Languages
-            ).filter(
-                Languages.language_code == language_code
-            ).first()
-            transaction.commit()
-        #DBSession.flush()
+        language = DBSession.query(
+            Languages
+        ).filter(
+            Languages.language_code == language_code
+        ).first()
+        transaction.commit()
         return language
 
     def to_dict(self):
@@ -630,135 +722,179 @@ class Posts(Base, TimeStampMixin, CreationMixin):
     """
 
     __tablename__ = 'posts'
-    #post_id = Column(Integer, primary_key=True)
-    #user_id = Column(UUIDType(binary=False), ForeignKey('users.user_id'))
     client_id = Column(UUIDType(binary=False), ForeignKey('clients.id'), nullable=False)
     assignment_id = Column(UUIDType(binary=False), ForeignKey('assignments.id'), nullable=True)
-    #title = Column(UnicodeText)
-    #post_datetime = Column(DateTime)
-    #language_id = Column(UUIDType(binary=False), ForeignKey('languages.language_id'))
     language_code = Column(UnicodeText, nullable=False)
     lat = Column(Float, nullable=False)
     lng = Column(Float, nullable=False)
     contents = Column(UnicodeText, nullable=False)
 
+    poll_response = Column(Integer, nullable=False)
+
     deleted = Column(Boolean, nullable=False)
     approved = Column(Boolean, nullable=False)
     flagged = Column(Boolean, nullable=False)
 
-    media_objects = relationship('MediaObjects', backref='post')
-    #assignment = relationship('Assignments', backref='posts', lazy='joined')
-    votes = relationship('Votes', backref='post')
+    media_objects = None
+
+    up_vote_count = 0
+    down_vote_count = 0
+    has_voted = False
+    is_up_vote = False
+    
+    assignment = None
+    
 
     @classmethod
-    def get_approved_posts(cls, lat, lng, start=0, count=50):
-        if True:
-        #with transaction.manager:
-            posts = DBSession.query(
-                Posts,
-            ).outerjoin(
-                Assignments,
+    def get_approved_posts(cls, client_id, lat, lng, start=0, count=50):
+        _posts = DBSession.query(
+            Posts,
+            DBSession.query(
+                func.count(distinct(Votes.id)).label('up_count'),
             ).filter(
-                ((Assignments.top_left_lat + 90 > lat + 90) &
-                    (Assignments.top_left_lng + 180 < lng + 180) &
-                    (Assignments.bottom_right_lat + 90 < lat + 90) &
-                    (Assignments.bottom_right_lng + 180 > lng + 180)) |
-                (((lat + 0.5) + 90 > Posts.lat + 90) &
-                    ((lng + 0.5) + 180 > Posts.lng + 180) &
-                    ((lat - 0.5) + 90 < Posts.lat + 90) &
-                    ((lng - 0.5) + 180 < Posts.lng + 180))
+                Votes.post_id == Posts.id,
+                Votes.is_up_vote == True,
+            ).label('up_vote_count'),
+            DBSession.query(
+                func.count(distinct(Votes.id)).label('down_count'),
             ).filter(
-                Posts.deleted == False,
-                Posts.flagged == False,
-                Posts.approved == True,
-            ).slice(start, count).all()
-        #DBSession.flush()
+                Votes.post_id == Posts.id,
+                Votes.is_up_vote == False,
+            ).label('down_vote_count'),
+            DBSession.query(
+                func.count(distinct(Votes.id)),
+            ).filter(
+                Votes.client_id == client_id,
+                Votes.post_id == Posts.id,
+            ).label('has_voted'),
+            DBSession.query(
+                func.count(distinct(Votes.id)),
+            ).filter(
+                Votes.client_id == client_id,
+                Votes.post_id == Posts.id,
+                Votes.is_up_vote == True,
+            ).label('is_up_vote'),
+            MediaObjects,
+            Assignments,
+        ).outerjoin(
+            Assignments, Assignments.id == Posts.assignment_id,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
+        ).filter(
+            ((Assignments.top_left_lat + 90 > lat + 90) &
+                (Assignments.top_left_lng + 180 < lng + 180) &
+                (Assignments.bottom_right_lat + 90 < lat + 90) &
+                (Assignments.bottom_right_lng + 180 > lng + 180)) |
+            (((lat + 0.5) + 90 > Posts.lat + 90) &
+                ((lng + 0.5) + 180 > Posts.lng + 180) &
+                ((lat - 0.5) + 90 < Posts.lat + 90) &
+                ((lng - 0.5) + 180 < Posts.lng + 180)),
+        ).filter(
+            Posts.contents != '',
+        ).filter(
+            Posts.deleted == False,
+            Posts.flagged == False,
+            Posts.approved == True,
+        ).slice(start, start+count).all()
+
+        posts = []
+        for p in _posts:
+            post = p[0]
+            post.up_vote_count = p[1]
+            post.down_vote_count = p[2]
+            post.has_voted = p[3]
+            post.is_up_vote = p[4]
+            # TODO: add logic to support more than one media object 
+            #       when we decide to support that ...
+            post.media_objects = p[5] if p[5] != None else None
+            post.assignment = p[6] if p[6] != None else None
+            posts.append(post)
+
         return posts
 
+
     @classmethod
-    def get_posts(cls, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng, deleted=False, flagged=False, approved=True, start=0, count=50):
-        if True:
-        #with transaction.manager:
-            posts = DBSession.query(
-                Posts,
-            #).join(
-            #    Assignments,
-            ).filter(
-                ((top_left_lat + 90 > Posts.lat + 90) &
-                    (top_left_lng + 180 > Posts.lng + 180) &
-                    (bottom_right_lat + 90 < Posts.lat + 90) &
-                    (bottom_right_lng + 180 < Posts.lng + 180))
-            ).filter(
-                Posts.deleted == deleted,
-                #Posts.flagged == flagged,
-                #Posts.approved == approved,
-            ).slice(start, count).all()
-        #DBSession.flush()
+    def get_posts(cls, top_left_lat, top_left_lng, bottom_right_lat,
+            bottom_right_lng, deleted=False, flagged=False, approved=True,
+            start=0, count=50):
+        _results = DBSession.query(
+            Posts,
+            MediaObjects,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
+        ).filter(
+            ((top_left_lat + 90 > Posts.lat + 90) &
+                (top_left_lng + 180 > Posts.lng + 180) &
+                (bottom_right_lat + 90 < Posts.lat + 90) &
+                (bottom_right_lng + 180 < Posts.lng + 180)),
+        ).filter(
+            Posts.contents != '',
+        ).filter(
+            Posts.deleted == deleted,
+        ).slice(start, start+count).all()
+        posts = []
+        for result in _results:
+            post = result[0]
+            post.media_objects = result[1] if result[1] != None else None
+            posts.append(post)
         return posts
 
 
     @classmethod
-    def get_all_from_assignment_id(cls, assignment_id,
-            deleted=False, start=0, count=0):
-        if True:
-        #with transaction.manager:
-            posts = DBSession.query(
-                Posts,
-            ).filter(
-                Posts.assignment_id == assignment_id,
-                Posts.deleted == deleted,
-            ).slice(start, start+count).all()
-        #DBSession.flush()
-        return posts
+    def get_post_by_id(cls, id):
+        _result = DBSession.query(
+            Posts,
+            MediaObjects,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
+        ).filter(
+            Posts.id == id,
+        ).first()
+        post = _result[0]
+        post.media_objects = _result[1] if _result[1] != None else None
+        return post
 
-    # TODO; write this
-    '''
-    @classmethod
-    def get_all_from_collection_id(cls, collection_id, deleted=False, 
-            start=0, count=0):
-        with transaction.manager:
-            posts = DBSession.query(
-                Posts,
-            ).join(
-                Assignment_id
-            )
-            posts = Posts._build_posts_query(session).filter(
-                CollectionPosts.collection_id == collection_id,
-            ).slice(start, start+count).all()
-        return posts
-    '''
 
     @classmethod
-    def get_all_from_cuid(cls, cuid, deleted=False, start=0, count=0):
-        if True:
-        #with transaction.manager:
-            client = Clients.get_by_cuid(cuid)
-            posts = DBSession.query(
-                Posts,
-            ).filter(
-                Poists.client_id == client.id,
-            ).slice(start, start+count).all()
-        #DBSession.flush()
-        return posts #, total_post_count
+    def get_all_by_assignment_id(cls, assignment_id,
+            deleted=False, start=0, count=50):
+        _results = DBSession.query(
+            Posts,
+            MediaObjects,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
+        ).filter(
+            Posts.assignment_id == assignment_id,
+        ).filter(
+            Posts.contents != '',
+        ).filter(
+            Posts.deleted == deleted,
+        ).slice(start, start+count).all()
+        posts = []
+        for result in _results:
+            post = result[0]
+            post.media_objects = result[1] if result[1] != None else None
+            posts.append(post)
+        return posts
+
+
+    @classmethod
+    def get_all_by_cuid(cls, cuid, deleted=False, start=0, count=50):
+        client = Clients.get_by_cuid(cuid)
+        posts = DBSession.query(
+            Posts,
+        ).filter(
+            Poists.client_id == client.id,
+        ).slice(start, start+count).all()
+        return posts
 
 
     @classmethod
     def delete_post(cls, post_id):
-        if True:
-        #with transaction.manager:
-            #post = DBSession.query(
-            #    Posts,
-            #).filter(
-            #    Posts.post_id == post_id,
-            #).first()
-            #post.deleted = True
-            #DBSession.add(post)
-            #transaction.commit()
-            post = Posts.update_by_id(
-                post_id,
-                deleted=True,
-            )
-        #DBSession.flush()
+        post = Posts.update_by_id(
+            post_id,
+            deleted=True,
+         )
         return post
 
 
@@ -789,44 +925,39 @@ class Posts(Base, TimeStampMixin, CreationMixin):
         )
         return post
 
+
     def to_dict(self, client_id):
         resp = super(Posts, self).to_dict()
         resp.update(
-            assignment=self.assignment.to_dict() if self.assignment_id != None else {},
+            assignment=self.assignment.to_dict() if self.assignment != None else {},
             language_code=self.language_code,
             lat=self.lat,
             lng=self.lng,
-            contents = self.contents, 
+            contents=self.contents, 
+            poll_response=self.poll_response,
             deleted=self.deleted,
             approved=self.approved,
             flagged=self.flagged,
-            media_objects = [m.to_dict() for m in self.media_objects],
-            #votes = [v.to_dict() for v in self.votes],
-            up_count = sum(1 for v in self.votes if v.is_up_vote),
-            down_count = sum(1 for v in self.votes if not v.is_up_vote),
+            media_objects = [self.media_objects.to_dict()] if self.media_objects != None else [],
+            up_vote_count = self.up_vote_count,
+            down_vote_count = self.down_vote_count,
+            has_voted=self.has_voted,
+            is_up_vote=self.is_up_vote,
         )
-        if client_id:
-            resp.update(
-                has_voted = any(v.client_id == client_id for v in self.votes),
-                is_up_vote = any(v.client_id == client_id and v.is_up_vote for v in self.votes),
-            )
         return resp
 
-# Posts indexes ... these will be important to implement soon
 
 Index('index_posts_id', Posts.id, unique=True)
 Index('index_posts_assignment_id', Posts.assignment_id, mysql_length=32)
 Index('index_posts_language_code', Posts.language_code, mysql_length=2)
 Index('index_posts_lat', Posts.lat)
 Index('index_posts_lng', Posts.lng)
-#Index('index_posts_post_datetime', Posts.creation_datetime)
-#Index('index_posts_client_id', Posts.client_id)
+Index('index_posts_poll_response', Posts.poll_response)
 
 
 class Votes(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'votes'
-    #vote_id = Column(Integer, primary_key=True)
     post_id = Column(UUIDType(binary=False), ForeignKey('posts.id'))
     client_id = Column(UUIDType(binary=False), ForeignKey('clients.id'))
     is_up_vote = Column(Boolean)
@@ -834,43 +965,39 @@ class Votes(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def register_vote(cls, post_id, client_id, is_up_vote):
-        with transaction.manager:
-            _vote = DBSession.query(
-                Votes,
-            ).filter(
-                Votes.post_id == post_id,
-                Votes.client_id == client_id,
-            ).first()
-            vote = None
-            # if the client has not voted, register vote.
-            if _vote == None:
-                vote = Votes.add(
-                    post_id=post_id,
-                    client_id=client_id,
-                    is_up_vote=is_up_vote,
-                )
-            # if the client has voted, but wants to remove it
-            # (sending the vote a second time), then delete it
-            elif _vote.is_up_vote == is_up_vote:
-                #DBession.delete(_vote)
-                #transaction.commit()
-                Votes.delete_by_id(_vote.id)
-                vote = _vote
-            # the client has already voted, but wants to change
-            # their vote.
-            elif _vote.is_up_vote != is_up_vote:
-                vote = Votes.update_by_id(
-                    _vote.id,
-                    is_up_vote=is_up_vote,
-                )
-        #DBSession.flush()
+        _vote = DBSession.query(
+            Votes,
+        ).filter(
+            Votes.post_id == post_id,
+            Votes.client_id == client_id,
+        ).first()
+        vote = None
+        # if the client has not voted, register vote.
+        if _vote == None:
+            vote = Votes.add(
+                post_id=post_id,
+                client_id=client_id,
+                is_up_vote=is_up_vote,
+            )
+        # if the client has voted, but wants to remove it
+        # (sending the vote a second time), then delete it
+        elif _vote.is_up_vote == is_up_vote:
+            Votes.delete_by_id(_vote.id)
+            vote = _vote
+        # the client has already voted, but wants to change
+        # their vote.
+        elif _vote.is_up_vote != is_up_vote:
+            vote = Votes.update_by_id(
+                _vote.id,
+                is_up_vote=is_up_vote,
+            )
         return vote
 
     def to_dict(self):
         resp = super(Votes, self).to_dict()
         resp.update(
-            post_id = self.post_id, 
-            client_id = self.client_id,
+            post_id = str(self.post_id),
+            client_id = str(self.client_id),
             is_up_vote = self.is_up_vote,
             vote_datetime = str(self.vote_datetime),
         )
@@ -890,19 +1017,11 @@ class MediaObjects(Base, TimeStampMixin, CreationMixin):
     """
 
     __tablename__ = 'mediaobjects'
-    #media_object_id = Column(Integer, primary_key=True)
     post_id = Column(UUIDType(binary=False), ForeignKey('posts.id'), nullable=False)
-    #user_id = Column(UUIDType(binary=False), ForeignKey('users.id'))
     client_id = Column(UUIDType(binary=False), ForeignKey('clients.id'), nullable=False)
-    #media_type_id = Column(UUIDType(binary=False), ForeignKey('mediatypes.id'))
     media_type = Column(UnicodeText, nullable=False)
-    #media_id = Column(UnicodeText)
     filename = Column(UnicodeText, nullable=False)
     preview_filename = Column(UnicodeText, nullable=False)
-    #caption = Column(UnicodeText)
-    #media_text = Column(UnicodeText)
-
-    #post = relationship('Posts', backref='media_objects', lazy='joined')
 
     @classmethod
     def get_from_post_id(cls, post_id):
@@ -918,15 +1037,11 @@ class MediaObjects(Base, TimeStampMixin, CreationMixin):
     def to_dict(self):
         resp = super(MediaObjects, self).to_dict()
         resp.update(
-            #media_object_id=self.media_object_id,
             post_id=str(self.post_id),
             client_id=str(self.client_id),
-            #media_type=self.media_type.to_dict(),
             media_type=self.media_type,
             filename=self.filename,
-            preview_filename=self.filename.split('.')[0] + 'p.jpg',
-            #caption=self.caption,
-            #media_text=self.media_text,
+            preview_filename=self.preview_filename,
         )
         return resp
 
@@ -938,12 +1053,10 @@ Index('index_media_objects_post_id', MediaObjects.post_id, mysql_length=32)
 class Organizations(Base, TimeStampMixin, CreationMixin):
 
     __tablename__ = 'organizations'
-    #organization_id = Column(Integer, primary_key=True)
     name = Column(UnicodeText)
     description = Column(UnicodeText, nullable=False)
     contact_name = Column(UnicodeText, nullable=False)
     contact_email = Column(UnicodeText, nullable=False)
-    #creation_datetime = Column(DateTime)
 
     #users = relationship('Users', backref='organization', lazy='joined')
 

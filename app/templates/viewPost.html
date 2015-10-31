@@ -18,7 +18,16 @@
       </video>
     </div>
 
-    <!-- TODO: audio -->
+    <!-- audio -->
+    <div ng-if="media_object.media_type == 'audio'" class="player">
+        <audio class="embedded-player" controls>
+        <!-- Audio files-->
+            <source ng-src="{{getMediaObjectURL(media_object.filename)}}" type="audio/mp3">
+                <!-- Fallback for browsers that don"t support the <audio> element-->
+                <a href="{{getMediaObjectURL(media_object.filename)}}">Download</a>
+            </source>
+        </audio>
+    </div>
 
 </div>
 

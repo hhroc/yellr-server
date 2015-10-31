@@ -197,7 +197,7 @@ class AdminPostAPI(object):
         resp = {'post': None}
         if self.user:
             id = self.request.matchdict['id']
-            post = Posts.get_by_id(id)
+            post = Posts.get_post_by_id(id)
             if post:
                 resp = {'post': post.to_dict(None)}
             else:
@@ -217,6 +217,7 @@ class AdminAssignmentsAPI(object):
         'top_left_lng',
         'bottom_right_lat',
         'bottom_right_lng',
+        'question_type',
     )
 
     def __init__(self, request):
@@ -227,7 +228,7 @@ class AdminAssignmentsAPI(object):
     def get(self):
         resp = {'assignments': None}
         if self.user:
-            _assignments = Assignments.get_all()
+            _assignments = Assignments.get_all_assignments(True)
             assignments = [a.to_dict() for a in _assignments]
             resp = {'assignments': assignments}
         else:
@@ -248,12 +249,36 @@ class AdminAssignmentsAPI(object):
                     top_left_lng=payload['top_left_lng'],
                     bottom_right_lat=payload['bottom_right_lat'],
                     bottom_right_lng=payload['bottom_right_lng'],
+                    question_type=payload['question_type'],
                 )
                 resp = {'assignment': assignment.to_dict()}
             else:
                 self.response.request.status = 400
         else:
             self.response.request.status = 403
+        return resp
+
+
+@view_defaults(route_name='/api/admin/assignments/{id}/responses', renderer='json')
+class AdminAssignmentResponsesAPI(object):
+
+    def __init__(self, request):
+        self.request = request
+        self. user = authenticate(request)
+        self.start, self.count = build_paging(request)
+
+    @view_config(request_method='GET')
+    def get(self):
+        print('\n\n---- responses ----\n\n')  
+        resp = {'posts': None}
+        if self.user:
+            id = self.request.matchdict['id']
+            assignment = Assignments.get_assignment_by_id(id)
+            posts = Posts.get_all_by_assignment_id(id)
+            resp = {'assignment': assignment.to_dict(), 'posts': [p.to_dict(None) for p in posts]}
+        else:
+            self.request.response.status = 403
+        print('\n\n')
         return resp
 
 
@@ -265,7 +290,6 @@ class AdminQuestionsAPI(object):
         'language_code',
         'question_text',
         'description',
-        'question_type',
         'answer0',
         'answer1',
         'answer2',
@@ -289,7 +313,6 @@ class AdminQuestionsAPI(object):
                     language_code=payload['language_code'],
                     question_text=payload['question_text'],
                     description=payload['description'],
-                    question_type=payload['question_type'],
                     answer0=payload['answer0'],
                     answer1=payload['answer1'],
                     answer2=payload['answer2'],
@@ -336,7 +359,6 @@ class AdminQuestionAPI(object):
                     language_code=payload['language_code'],
                     question_text=payload['question_text'],
                     description=payload['description'],
-                    question_type=question.question_type,
                     answer0=payload['answer0'],
                     answer1=payload['answer1'],
                     answer2=payload['answer2'],

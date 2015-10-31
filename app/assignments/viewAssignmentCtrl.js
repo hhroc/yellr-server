@@ -24,7 +24,6 @@ angular
         $scope.selectedType = 'all';
 
         $scope.openPost = function (postId) {
-            console.log('opening post', postId);
             $scope.postId = postId;
             var modalInstance = $modal.open({
                 templateUrl: 'assets/templates/viewPost.html',
@@ -40,8 +39,11 @@ angular
          */
         assignmentApiService.getAssignments()
         .success(function (data) {
+            $scope.assignment = undefined;
             data.assignments.forEach(function (assignment) {
-                if (assignment.assignment_id == $stateParams.assignmentId) {
+                if (assignment.id == $stateParams.assignmentId) {
+                    console.log('assignment:')
+                    console.log(assignment);
                     $scope.assignment = assignment;
                 }
             });
@@ -49,7 +51,6 @@ angular
 
         assignmentApiService.getAssignmentResponses($stateParams.assignmentId)
         .success(function (data) {
-            console.log(data.posts);
             $scope.posts = data.posts;
         });
 

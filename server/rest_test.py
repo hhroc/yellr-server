@@ -44,11 +44,22 @@ def get_posts(client):
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
-def publish_post(client, contents, assignment_id=None):
+def register_vote(client, post, is_up_vote):
+    url = base_url + '/api/posts/{id}/vote'.replace('{id}', post['id'])
+    data = json.dumps({
+        'is_up_vote': is_up_vote,
+    })
+    resp = requests.post(client.build_url(url), data)
+    print('[' + str(resp.status_code) + ']')
+    return json.loads(resp.text)
+
+
+def publish_post(client, contents, assignment_id=None, poll_response=-1):
     url = base_url + '/api/posts'
     data = json.dumps({
-        'assignment_id': assignment_id,
         'contents': contents,
+        'assignment_id': assignment_id,
+        'poll_response': poll_response,
     })
     resp = requests.post(client.build_url(url), data)
     print('[' + str(resp.status_code) + ']')
@@ -116,7 +127,7 @@ def admin_update_post(user, post, deleted, flagged, approved):
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
-def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng):
+def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, bottom_right_lat, bottom_right_lng, question_type):
     url = base_url + '/api/admin/assignments'
     data = json.dumps({
         'life_time': str(life_time),
@@ -125,19 +136,20 @@ def admin_create_assignment(user, name, life_time, top_left_lat, top_left_lng, b
         'top_left_lng': top_left_lng,
         'bottom_right_lat': bottom_right_lat,
         'bottom_right_lng': bottom_right_lng,
+        'question_type': question_type,
     })
     resp = requests.post(user.build_url(url), data, cookies=user.cookies)
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
-def admin_create_question(user, assignment, langauge_code, question_text, description, question_type, answer0, answer1, answer2, answer3, answer4):
+def admin_create_question(user, assignment, langauge_code, question_text, description, answer0, answer1, answer2, answer3, answer4):
     url = base_url + '/api/admin/questions'
     data = json.dumps({
         'assignment_id': assignment['id'],
         'language_code': 'en',
         'question_text': question_text,
         'description': description,
-        'question_type': question_type,
+        #'question_type': question_type,
         'answer0': answer0,
         'answer1': answer1,
         'answer2': answer2,
@@ -145,6 +157,12 @@ def admin_create_question(user, assignment, langauge_code, question_text, descri
         'answer4': answer4,
     })
     resp = requests.post(user.build_url(url), data, cookies=user.cookies)
+    print('[' + str(resp.status_code) + ']')
+    return json.loads(resp.text)
+
+def admin_get_assignment_responses(user, assignment):
+    url = base_url + '/api/admin/assignments/{id}/responses'.replace('{id}', assignment['id'])
+    resp = requests.get(user.build_url(url), cookies=user.cookies)
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
 
@@ -178,7 +196,7 @@ if __name__ == '__main__':
 
     print('[GET] /api/clients')
     client_resp_a = get_client(client_a)
-    print('client id: ' + client_resp_a['client']['id'])
+    print('\tclient id: ' + client_resp_a['client']['id'])
 
     #
     # Text Text Post
@@ -195,6 +213,7 @@ if __name__ == '__main__':
     print('[GET] /api/posts')
     posts = get_posts(client_a)
     print('\tpost count: ' + str(len(posts['posts'])))
+    #print(json.dumps(posts, indent=4))
 
     #
     # Test Image Post
@@ -219,6 +238,18 @@ if __name__ == '__main__':
     print('[POST] /api/media_objects')
     video_media_object = upload_media_object(client_a, video_post['post'], "video", "video.mp4")
     print('\tmedia object id: ' + video_media_object['media_object']['id'])
+
+    #
+    # Test Audio Post
+    #
+
+    print('[POST] /api/posts')
+    audio_post = publish_post(client_a, "My voice ... IT IS IN YOU!")
+    print('\tpost id: ' + audio_post['post']['id'])
+
+    print('[POST] /api/media_objects')
+    audio_media_object = upload_media_object(client_a, audio_post['post'], "audio", "audio.mp3")
+    print('\tmedia object id: ' + audio_media_object['media_object']['id'])
 
     #
     # Test moderator login
@@ -265,7 +296,7 @@ if __name__ == '__main__':
 
     print("[PUT] /api/admin/posts/{id}")
     post = admin_update_post(user_a, video_post['post'], deleted=False, flagged=False, approved=True)
-    print('post id: ' + image_post['post']['id'])
+    print('\tpost id: ' + image_post['post']['id'])
     print('\tapproved: ' + str(post['post']['approved']))
 
     print("[GET] /api/posts")
@@ -273,20 +304,33 @@ if __name__ == '__main__':
     print('\tpost count:' + str(len(posts_a['posts'])))
 
     #
+    # Test Voting
+    #
+
+    print('[POST] /api/post/{id}/vote')
+    video_post_vote = register_vote(client_b, image_post['post'], True)
+    print('\tvote id: ' + video_post_vote['vote']['id'])
+    
+    print('[GET] /api/posts')
+    posts = get_posts(client_a)
+    print('\tpost count: ' + str(len(posts['posts'])))
+    #print(json.dumps(posts, indent=4))
+
+    #
     # Test Assignments
     #
 
     print("[POST] /api/admin/assignments")
-    assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3)
+    assignment_a = admin_create_assignment(user_a, "Test Assignment", 72, 43.4, -77.9, 43.0, -77.3, 'text')
     print("\tassignment id:" + assignment_a['assignment']['id'])
 
     print("[POST] /api/admin/question")
-    question_a = admin_create_question(user_a, assignment_a['assignment'],'en', 'How is your day going?', 'Tell us about your day so far!', 'text', '', '', '', '', '')
+    question_a = admin_create_question(user_a, assignment_a['assignment'],'en', 'How is your day going?', 'Tell us about your day so far!', '', '', '', '', '')
     print('\tquestion id: ' + question_a['question']['id'])
 
     print('[GET] /api/assignments')
     assignments_a = get_assignments(client_a)
-    print('\tassignment count' + str(len(assignments_a['assignments'])))
+    print('\tassignment count: ' + str(len(assignments_a['assignments'])))
     #print(json.dumps(assignments_a, indent=4))
 
     #
@@ -306,20 +350,29 @@ if __name__ == '__main__':
     print('\tapproved: ' + str(post['post']['approved']))
 
     #
+    # Test Get Assignment Responses
+    #
+
+    print('[GET] /api/admin/assignments/{id}/responses')
+    assignment_responses = admin_get_assignment_responses(user_a, assignment_a['assignment'])
+    print('\tresponse count: ' + str(len(assignment_responses['posts'])))
+    #print(json.dumps(assignment_responses, indent=4))
+
+    #
     # Test Update Assignment Question
     # 
 
     print("[POST] /api/admin/assignments")
-    assignment_b = admin_create_assignment(user_a, "Tell me about the wind ...", 72, 43.4, -77.9, 43.0, -77.3)
+    assignment_b = admin_create_assignment(user_a, "Tell me about the wind ...", 72, 43.4, -77.9, 43.0, -77.3, 'text')
     print("\tassignment id:" + assignment_a['assignment']['id'])
 
     print("[POST] /api/admin/question")
-    question_b = admin_create_question(user_a, assignment_b['assignment'],'en', 'Tell me about the wind ...', 'OMG TELL ME.', 'text', '', '', '', '', '')
+    question_b = admin_create_question(user_a, assignment_b['assignment'],'en', 'Tell me about the wind ...', 'OMG TELL ME.', '', '', '', '', '')
     print('\tquestion id: ' + question_b['question']['id'])
 
     print('[GET] /api/assignments')
     assignments_b = get_assignments(client_a)
-    print('\nassignment count: ' + str(len(assignments_b['assignments'])))
+    print('\tassignment count: ' + str(len(assignments_b['assignments'])))
     #print(json.dumps(assignments_b, indent=4))
 
     print("[PUT] /api/admin/question")
@@ -329,7 +382,7 @@ if __name__ == '__main__':
     print('[GET] /api/assignments')
     assignments_c = get_assignments(client_a)
     #print(json.dumps(assignments_c, indent=4))
-    print('\tassignment count' + str(len(assignments_c['assignments'])))
+    print('\tassignment count: ' + str(len(assignments_c['assignments'])))
 
     #
     # Test Delete Post
@@ -349,5 +402,54 @@ if __name__ == '__main__':
     print('\tpost count: ' + str(len(posts['posts'])))
 
     #
+    # Test Polls
     #
+
+    print("[POST] /api/admin/assignments")
+    poll_assignment = admin_create_assignment(user_a, "Test Poll Assignment", 72, 43.4, -77.9, 43.0, -77.3, 'poll')
+    print("\tassignment id:" + poll_assignment['assignment']['id'])
+
+    print("[POST] /api/admin/question")
+    poll_question = admin_create_question(
+        user_a,
+        poll_assignment['assignment'],
+        'en',
+        'What is your favorite Color?',
+        "You've got to have a favorite color, tell us which one it is!",
+        'Red',
+        'Green',
+        'Blue',
+        'Black',
+        'Other',
+    )
+    print('\tquestion id: ' + question_a['question']['id'])
+
+    print('[GET] /api/assignments')
+    poll_assignments = get_assignments(client_a)
+    print('\tassignment count: ' + str(len(poll_assignments['assignments'])))
+
+    print('[POST] /api/posts')
+    poll_response_post = publish_post(client_a, "", assignment_id=poll_assignment['assignment']['id'], poll_response=1) # green
+    print('\tassignment_id: ' + poll_assignment['assignment']['id'] + ', post id: ' + poll_response_post['post']['id'])
+
+    print("[PUT] /api/admin/posts/{id}")
+    poll_post = admin_update_post(user_a, poll_response_post['post'], deleted=False, flagged=False, approved=True)
+    print('\tapproved: ' + str(poll_post['post']['approved']))
+
+    print('[GET] /api/posts')
+    posts = get_posts(client_a)
+    print('\tpost count: ' + str(len(posts['posts'])))
+ 
+    print('[GET] /api/assignments')
+    poll_assignments = get_assignments(client_a)
+    print('\tassignment count: ' + str(len(poll_assignments['assignments'])))
+
     #
+    # Test Get Poll Assignment Responses
+    #
+
+    print('[GET] /api/admin/assignments/{id}/responses')
+    poll_assignment_responses = admin_get_assignment_responses(user_a, poll_assignment['assignment'])
+    print('\tresponse count: ' + str(len(poll_assignment_responses['posts'])))
+    #print(json.dumps(poll_assignment_responses, indent=4))
+

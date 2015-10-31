@@ -10,6 +10,7 @@ from .models import (
     Assignments,
     Posts,
     MediaObjects,
+    Votes,
     Clients,
     )
 
@@ -206,11 +207,11 @@ def process_audio(base_filename):
 
         mime_type = magic.from_file(base_filename, mime=True)
         allowed_audio_types = [
-            'audio/mpeg',
-            'audio/ogg',
-            'audio/x-wav',
-            'audio/mp4',
-            'video/3gpp',
+            b'audio/mpeg',
+            b'audio/ogg',
+            b'audio/x-wav',
+            b'audio/mp4',
+            b'video/3gpp',
         ]
 
         if not mime_type.lower() in allowed_audio_types:
@@ -234,13 +235,11 @@ def process_audio(base_filename):
         ]
         resp = subprocess.call(cmd)
 
-        #print "\n\nCMD: {0}\n\n".format(' '.join(cmd))
+        #
+        # Generic audio picture for preview name??
+        #
 
-        #print "\n\nbase_filename: {0}\n\nRESP: {1}\n\n".format(base_filename, resp)
-      
-        #
-        # TODO: generic audio picture for preview name??
-        #
+        preview_filename = 'audio_file.png'
 
     except Exception as ex:
         raise Exception(ex)
@@ -262,7 +261,12 @@ class AssignmentsAPI(object):
         resp = {'assignments': []}
         if self.client:
             start, count = build_paging(self.request)
-            _assignments = Assignments.get_all_open(self.client.last_lat, self.client.last_lng)
+            _assignments = Assignments.get_all_assignments(
+                False,
+                self.client.id,
+                self.client.last_lat,
+                self.client.last_lng,
+            )
             resp = {'assignments': [a.to_dict() for a in _assignments]}
         else:
             self.request.response.status = 400
@@ -273,8 +277,9 @@ class AssignmentsAPI(object):
 class PostsAPI(object):
 
     post_req = (
-        'assignment_id',
         'contents',
+        'assignment_id',
+        'poll_response',
     )
 
     def __init__(self, request):
@@ -289,6 +294,7 @@ class PostsAPI(object):
         if self.client:
             start, count = build_paging(self.request)
             _posts = Posts.get_approved_posts(
+                client_id=self.client.id,
                 lat=self.client.last_lat,
                 lng=self.client.last_lng,
                 start=self.start,
@@ -318,11 +324,20 @@ class PostsAPI(object):
                 lng=self.client.last_lng,
                 language_code=self.client.language_code,
                 contents=payload['contents'],
+                poll_response=payload['poll_response'],
                 deleted=False,
                 approved=False,
                 flagged=False,
             )
-            resp = {'post': post.to_dict(self.client.id)}
+            vote = Votes.register_vote(
+                post_id=post.id,
+                client_id=self.client.id,
+                is_up_vote=True,
+            )
+            resp = {
+                'post': {'id': post.id}, #post.to_dict(self.client.id),
+                'vote': {'id': vote.id}, #to_dict(),
+            }
         else:
             self.request.response.status = 400
         return resp
@@ -371,7 +386,7 @@ class MediaObjectsAPI(object):
                     client_id=self.client.id,
                     media_type=self.request.POST['media_type'],
                     filename=ntpath.basename(object_filename),
-                    preview_filename=preview_filename
+                    preview_filename=ntpath.basename(preview_filename),
                 )
                 resp = {'media_object': media_object.to_dict()}
             #except Exception as ex:
@@ -386,23 +401,25 @@ class MediaObjectsAPI(object):
 class VoteAPI(object):
 
     post_req = (
-        'post_id',
         'is_up_vote',
     )
 
     def __init__(self, request):
         self.request = request
+        self.client = check_in(request)
 
     # [ POST ] - votes on a post
     @view_config(request_method='POST')
     def post(self):
         resp = {'vote': None}
+        payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req) and self.client:
             vote = Votes.register_vote(
-                post_id=payload['post_id'],
+                post_id=self.request.matchdict['id'],
                 client_id=self.client.id,
                 is_up_vote=payload['is_up_vote']
             )
+            resp = {'vote': vote.to_dict()}
         else:
             self.request.response.status = 400
         return resp
@@ -423,6 +440,7 @@ class FlagAPI(object):
     @view_config(request_method='POST')
     def post(self):
         resp = {'post': None}
+        payload = get_payload(self.request)
         if payload and all(r in payload for r in self.post_req) and self.client:
             post = Posts.flag_post(
                 post_id=payload['post_id'],

@@ -32,7 +32,7 @@ angular
                 method: 'POST',
                 url: url,
                 params: params
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         messageApi.getMessages = function () {
@@ -41,7 +41,7 @@ angular
             return $http({
                 method: 'GET',
                 url: url
-            }).error(function(responce){ window.location = '/login'; });
+            }).error(function(response){ window.location = '/login'; });
         };
 
         return messageApi;

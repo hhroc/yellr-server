@@ -1,4 +1,4 @@
-<h1 class="page-title">{{assignment.name}}</h1>
+<h1 class="page-title">{{assignment.question[0].question_text}}</h1>
 
 <div class="filter-controls">
     <div class="filter-control">
@@ -7,6 +7,15 @@
     <div class="filter-control">
         <select ng-options="option.type as option.name for option in responseTypes" ng-model="selectedType"></select>
     </div>
+</div>
+
+<div ng-if="assignment.question_type == 'poll'" class="poll-results">
+    <br><br><br>
+    <p>{{assignment.questions[0].answer0}} = {{assignment.answer0_count}}</p>
+    <p>{{assignment.questions[0].answer1}} = {{assignment.answer1_count}}</p>
+    <p>{{assignment.questions[0].answer2}} = {{assignment.answer2_count}}</p>
+    <p>{{assignment.questions[0].answer3}} = {{assignment.answer3_count}}</p>
+    <p>{{assignment.questions[0].answer4}} = {{assignment.answer4_count}}</p>
 </div>
 
 <div ng-include src="'assets/templates/posts.html'"></div>

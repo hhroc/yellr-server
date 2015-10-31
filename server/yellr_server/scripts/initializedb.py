@@ -41,7 +41,7 @@ def main(argv=sys.argv):
     #with transaction.manager:
     #    model = MyModel(name='one', value=1)
     #    DBSession.add(model)
- 
+
     system_user_geo_fence = UserGeoFences.add(
         top_left_lat = 90,
         top_left_lng = 180,
@@ -59,5 +59,5 @@ def main(argv=sys.argv):
         first = 'SYSTEM',
         last = 'USER',
         email = '',
-        #organization_id = None,
+        organization_id = None,
     )
