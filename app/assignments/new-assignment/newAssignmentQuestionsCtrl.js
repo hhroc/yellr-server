@@ -18,7 +18,7 @@ angular
          * @return void
          */
         $scope.addQuestion = function () {
-            $scope.questions.push({ question_text: '', question_type: 1 });
+            $scope.questions.push({ questionText: '', questionType: 1 });
         };
 
         /**
@@ -46,6 +46,7 @@ angular
          * @return void
          */
         $scope.save = function (questions) {
+            console.log('$scope.save()');
             $scope.$parent.assignment.questions = questions;
             $scope.$parent.notify('Saved Questions.');
             $scope.$parent.validate();
@@ -63,12 +64,12 @@ angular
          *
          * @return void
          */
-        $scope.getLanguages = function () {
-            userApiService.getLanguages()
-            .success(function (data) {
-                $scope.languages = data.languages;
-            });
-        };
+        //$scope.getLanguages = function () {
+        //    userApiService.getLanguages()
+        //    .success(function (data) {
+        //        $scope.languages = data.languages;
+        //    });
+        //};
 
-        $scope.getLanguages();
+        //$scope.getLanguages();
     }]);

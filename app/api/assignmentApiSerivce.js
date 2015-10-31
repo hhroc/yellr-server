@@ -69,6 +69,7 @@ angular
          *
          * @return response : either error or sucess response with question id
          */
+        /*
         assignmentApi.createQuestion = function (assignmentid, languageCode,
                                            questionText, description,
                                            questionType, answer0, answer1,
@@ -94,6 +95,7 @@ angular
                 data: data,
             }).error(function(response){ window.location = '/login'; });
         };
+        */
 
         /**
          * Publishes assignment to all users within given GeoBox
@@ -110,28 +112,83 @@ angular
          * @return response : either error or sucess response with assignment
          *                    id
          */
-        assignmentApi.publishAssignment = function (name, lifeTime,
-                                               questions, topLeftLat, topLeftLng,
-                                               bottomRightLat, bottomRightLng,
-                                               question_type) {
+        assignmentApi.publishAssignment = function (assignment) {
+                                               //name, lifeTime,
+                                               //questions, topLeftLat, topLeftLng,
+                                               //bottomRightLat, bottomRightLng,
+                                               //question_type) {
 
             var url = '/api/admin/assignments',
                 data = {
-                    name: name,
-                    life_time: lifeTime,
-                    questions: JSON.stringify(questions),
-                    top_left_lat: topLeftLat,
-                    top_left_lng: topLeftLng,
-                    bottom_right_lat: bottomRightLat,
-                    bottom_right_lng: bottomRightLng,
-                    question_type: question_type
+                    name: assignment.name,
+                    life_time: assignment.lifeTime,
+                    //questions: JSON.stringify(questions),
+                    top_left_lat: assignment.geofence.topLeft.lat, //topLeftLat,
+                    top_left_lng: assignment.geofence.topLeft.lng, //topLeftLng,
+                    bottom_right_lat: assignment.geofence.bottomRight.lat,
+                    bottom_right_lng: assignment.geofence.bottomRight.lng,
+                    question_type: assignment.question_type
                 };
-
+                console.log('assignmentApi.publishAssignment()');
+                console.log(assignment);
+                console.log(data);
             return $http({
                 method: 'POST',
                 url: url,
                 data: data
-            }).error(function(response){ window.location = '/login'; });
+            }).success(function(response) {
+                console.log('assignmentApi.publishAssignment.success()');
+                console.log(assignment);
+                assignment.questions.forEach(function(question) {
+                    /*
+                    q = assignmentApi.creationQuestion(
+                        response.assignment.id,
+                        question.languageCode,
+                        question.questionText,
+                        question.description,
+                        question.questionType,
+                        question.answer0,
+                        question.answer1,
+                        question.answer2,
+                        question.answer3,
+                        question.answer4
+                    );
+                    */
+                    console.log('question:');
+                    console.log(question);
+                    var url = '/api/admin/questions',
+                        data = {
+                            assignment_id: response.assignment.id,
+                            language_code: question.languageCode,
+                            question_text: question.questionText,
+                            description: question.description,
+                            question_type: question.questionType,
+                            answer0: '',
+                            answer1: '',
+                            answer2: '',
+                            answer3: '',
+                            answer4: ''
+                        };
+                    console.log('post question data:');
+                    console.log(data);
+
+                    if (question.answer0 !== undefined) data.answer0 = question.answer0;
+                    if (question.answer1 !== undefined) data.answer1 = question.answer1;
+                    if (question.answer2 !== undefined) data.answer2 = question.answer2;
+                    if (question.answer3 !== undefined) data.answer3 = question.answer3;
+                    if (question.answer4 !== undefined) data.answer4 = question.answer4;
+
+                    console.log('post question data:');
+                    console.log(data);
+
+                    return $http({
+                        method: 'POST',
+                        url: url,
+                        data: data,
+                    }).error(function(response){ console.log('add question error: '); console.log(response); /*window.location = '/login';*/ });
+
+                });
+            }); //.error(function(response){ window.location = '/login'; });
         };
 
         /**

@@ -2,7 +2,7 @@
     <div class="question-form" ng-repeat="question in questions">
         <label>
             <h3>Question:</h3>
-            <input ng-model="question.question_text" type="text" class="main-input" placeholder="Question Text" required/>
+            <input ng-model="question.questionText" type="text" class="main-input" placeholder="Question Text" required/>
         </label>
 
         <label>
@@ -13,29 +13,45 @@
         <label for="language" class="select-label">
             <h3>Select Language</h3>
         </label>
-        <select id="language" ng-model="question.language_code" required>
+
+        <select id="language" ng-model="question.languageCode" required>
             <option value="">Choose Language</option>
-            <option value="{{lang.code}}" ng-repeat="lang in languages">{{lang.name}}</option>
+            <!--<option value="{{lang.code}}" ng-repeat="lang in languages">{{lang.name}}</option>-->
+            <option value="en">English</option>
+            <option value="es">Español</option>
         </select>
 
-        <label for="question-type" class="select-label">
+        <!--<label for="question-type" class="select-label">
             <h3>Question Type</h3>
         </label>
         <select id="question-type" ng-model="question.question_type" required>
             <option value="">Choose Question Type</option>
-            <option value="free_text">Free Text</option>
+            <option value="text">Text</option>
             <option value="poll">Poll</option>
-        </select>
+        </select>-->
 
-        <div ng-if="question.question_type == 'poll'">
-            <h4>Multiple Choice Answers</h4>
-            <div class="question-choice" ng-repeat="answer in question.answers track by $index">
-                <input ng-model="question.answers[$index]" type="text" placeholder="Question Answer" required/>
+        <div ng-if="assignment.question_type == 'poll'">
+            <h4>Poll Answers</h4>
+            <div class="question-choice"> <!-- ng-repeat="answer in question.answers track by $index"> -->
+                <input ng-model="question.answer0" type="text" placeholder="Question Answer A" required/>
             </div>
-            <button class="add-choice" ng-click="addAnswer(question)">Add Answer</button>
+            <div class="question-choice"> <!-- ng-repeat="answer in question.answers track by $index"> -->
+                <input ng-model="question.answer1" type="text" placeholder="Question Answer B" required/>
+            </div>
+            <div class="question-choice"> <!-- ng-repeat="answer in question.answers track by $index"> -->
+                <input ng-model="question.answer2" type="text" placeholder="Question Answer C" />
+            </div>
+            <div class="question-choice"> <!-- ng-repeat="answer in question.answers track by $index"> -->
+                <input ng-model="question.answer3" type="text" placeholder="Question Answer D" />
+            </div>
+            <div class="question-choice"> <!-- ng-repeat="answer in question.answers track by $index"> -->
+                <input ng-model="question.answer4" type="text" placeholder="Question Answer E" />
+            </div>
+            <!--<button class="add-choice" ng-click="addAnswer(question)">Add Answer</button>-->
+            
         </div>
 
-        <button class="delete-question" ng-click="deleteQuestion($index)">Delete Question</button>
+        <button class="delete-question" ng-if="questions.length > 1" ng-click="deleteQuestion($index)">Delete Question</button>
     </div>
     <input type="submit" class="save-button" value="Next"/>
     <button class="add-question" ng-click="addQuestion(questions)">Add Question</button>

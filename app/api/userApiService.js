@@ -112,19 +112,5 @@ angular
             }).error(function(response){ window.location = '/login'; });
         };
 
-        /**
-         * Gets all available languages
-         *
-         * @return languages : list of all languages
-         */
-        userApi.getLanguages = function () {
-            var url = '/api/admin/languages';
-
-            return $http({
-                method: 'GET',
-                url: url
-            }).error(function(response){ window.location = '/login'; });
-        };
-
         return userApi;
     }]);
