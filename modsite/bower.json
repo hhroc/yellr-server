@@ -1,12 +1,12 @@
 {
   "name": "yellr-server",
   "version": "0.1.0",
-  "homepage": "https://github.com/Nolski/yellr-server",
+  "homepage": "https://github.com/hhroc/yellr-server",
   "authors": [
     "Mike Nolan (Nolski) <me@nolski.rocks>",
-    "Tim Duffy (thequbit) <thequbit@gmail.com>"
+    "Tim Duffy (thequbit) <tim@timduffy.me>"
   ],
-  "description": "Server for yellr project",
+  "description": "Moderator website for yellr project",
   "main": "index.html",
   "license": "GPLv3",
   "ignore": [

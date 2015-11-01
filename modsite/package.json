@@ -1,21 +1,24 @@
 {
   "name": "yellr-server",
   "version": "0.1.0",
-  "description": "Server for yellr project",
+  "description": "Moderator website for yellr project",
   "main": "index.html",
   "scripts": {
     "test": "make test"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nolski/yellr-server.git"
+    "url": "https://github.com/hhroc/yellr-server.git"
   },
-  "author": "Mike Nolan <me@nolski.rocks> (Nolski)",
+  "authors": [
+      "Mike Nolan (Nolski) <me@nolski.rocks>",
+      "Tim Duffy (thequbit) <tim@timduffy.me>"
+   ],
   "license": "GPLv3",
   "bugs": {
-    "url": "https://github.com/Nolski/yellr-server/issues"
+    "url": "https://github.com/hhroc/yellr-server/issues"
   },
-  "homepage": "https://github.com/Nolski/yellr-server",
+  "homepage": "https://github.com/hhroc/yellr-server",
   "dependencies": {
     "bower": "^1.3.12",
     "grunt": "^0.4.5",

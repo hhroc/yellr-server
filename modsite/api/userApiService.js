@@ -11,8 +11,6 @@ angular
          * This gets an access token that needs to be passed around with all
          * admin api calls.
          *
-         * https://github.com/hhroc/yellr-server/wiki/API-Documentation#adminget_access_tokenjson
-         *
          * @param username : plaintext username of current user
          * @param password : plaintext password of current user (is hashed in
          *                   this function)

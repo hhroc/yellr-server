@@ -15,8 +15,8 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'yellr-serv/yellrserv/moderator/assets/js/scripts.min.js',
-      'app/tests/**/*.js'
+      '../server/yellr_server/moderator/assets/js/scripts.min.js',
+      './tests/**/*.js'
     ],
 
 
