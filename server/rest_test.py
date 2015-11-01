@@ -7,6 +7,7 @@ from datetime import timedelta
 from time import sleep
 
 base_url = "http://localhost:5003"
+#base_url = "http://192.168.3.114:5002"
 
 class Client(object):
 
