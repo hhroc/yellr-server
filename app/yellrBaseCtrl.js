@@ -3,8 +3,8 @@
 angular
     .module('Yellr')
     .controller('yellrBaseCtrl',
-    ['$scope', '$http', '$rootScope', 'userApiService',
-    function ($scope, $http, $rootScope, userApiService) {
+    ['$scope', '$http', '$rootScope', '$location', 'userApiService', 'assignmentApiService',
+    function ($scope, $http, $rootScope, $location, userApiService, assignmentApiService) {
         window.loggedIn = false;
         $scope.feedPage = false;
         $scope.assignmentsPage = false;
