@@ -6,6 +6,11 @@
     overflow: auto;
 }
 
+.assignment-page {
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
 .assignment-nav {
     @extend .small-3;
     @extend .columns;
@@ -131,4 +136,5 @@
 .non-publishable {
     color: $type-light;
     background-color: lighten($background-accent, 5);
+    cursor: not-allowed !important;
 }
