@@ -80,7 +80,7 @@ module.exports = function (grunt) {
                 }
             },
             html: {
-                files: ['templates/**/*.html'],
+                files: ['src/templates/**/*.html'],
                 tasks: ['sync'],
                 options: {
                     spawn: false
@@ -91,7 +91,7 @@ module.exports = function (grunt) {
         sync: {
             html: {
                 files: [{
-                    cwd: 'templates/',
+                    cwd: 'src/templates/',
                     src: [
                         '**/*.html'
                     ],

@@ -1,5 +1,6 @@
-<h1 class="page-title">{{assignment.question[0].question_text}}</h1>
+<h1 class="page-title">{{assignment.questions[0].question_text}}</h1>
 
+<!--
 <div class="filter-controls">
     <div class="filter-control">
         <input type="text" ng-model="search" ng-model-options="{debounce: 5}" placeholder="Search for text">
@@ -8,14 +9,19 @@
         <select ng-options="option.type as option.name for option in responseTypes" ng-model="selectedType"></select>
     </div>
 </div>
+-->
+
+
+<p class="assignment-description">{{assignment.questions[0].description}}</p>
 
 <div ng-if="assignment.question_type == 'poll'" class="poll-results">
-    <br><br><br>
-    <p>{{assignment.questions[0].answer0}} = {{assignment.answer0_count}}</p>
-    <p>{{assignment.questions[0].answer1}} = {{assignment.answer1_count}}</p>
-    <p>{{assignment.questions[0].answer2}} = {{assignment.answer2_count}}</p>
-    <p>{{assignment.questions[0].answer3}} = {{assignment.answer3_count}}</p>
-    <p>{{assignment.questions[0].answer4}} = {{assignment.answer4_count}}</p>
+    <label>Poll Results</label>
+    <div class="poll-results" ng-repeat="percent in assignment.percents" ng-click="showGeofence(assignment)">
+        <label>{{percent.name}}</label>
+        <div class="poll-result">
+            <div class="poll-percent">{{percent.percent}}% ( {{percent.count}} / {{assignment.response_count}} )</div><div class="poll-bar {{percent.index}}-result-bar" style="width: {{percent.percent}}%;"></div>
+        </div>
+    </div>
 </div>
 
 <div ng-include src="'assets/templates/posts.html'"></div>

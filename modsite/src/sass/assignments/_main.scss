@@ -26,3 +26,53 @@
         background-color: $secondary;
     }
 }
+
+.assignment-description {
+    border: 1px solid #AAAAAA;
+    padding: 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.poll-percentage {
+    padding-right: 4rem;
+}
+
+.poll-results {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.poll-result {
+    margin-bottom: .25rem;
+    border-radius: 4px;
+    border: 1px solid #AAAAAA;
+    //margin: .5rem;
+    //height: 2rem;
+    padding: .25rem;
+}
+
+.poll-bar {
+    //margin-left: 2rem;
+    height: .5rem;
+}
+
+.first-result-bar {
+    background-color: red;
+}
+
+.second-result-bar {
+    background-color: green;
+}
+
+.third-result-bar {
+    background-color: blue;
+}
+
+.fourth-result-bar {
+    background-color: orange;
+}
+
+.fifth-result-bar {
+    color: purple;
+}
