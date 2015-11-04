@@ -842,6 +842,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
     @classmethod
     def get_post_by_id(cls, id):
+        '''
         _result = DBSession.query(
             Posts,
             MediaObjects,
@@ -852,6 +853,59 @@ class Posts(Base, TimeStampMixin, CreationMixin):
         ).first()
         post = _result[0]
         post.media_objects = _result[1] if _result[1] != None else None
+        '''
+        _post = DBSession.query(
+            Posts,
+            DBSession.query(
+                func.count(distinct(Votes.id)).label('up_count'),
+            ).filter(
+                Votes.post_id == Posts.id,
+                Votes.is_up_vote == True,
+            ).label('up_vote_count'),
+            DBSession.query(
+                func.count(distinct(Votes.id)).label('down_count'),
+            ).filter(
+                Votes.post_id == Posts.id,
+                Votes.is_up_vote == False,
+            ).label('down_vote_count'),
+            #DBSession.query(
+            #    func.count(distinct(Votes.id)),
+            #).filter(
+            #    Votes.client_id == client_id,
+            #    Votes.post_id == Posts.id,
+            #).label('has_voted'),
+            #DBSession.query(
+            #    func.count(distinct(Votes.id)),
+            #).filter(
+            #    Votes.client_id == client_id,
+            #    Votes.post_id == Posts.id,
+            #    Votes.is_up_vote == True,
+            #).label('is_up_vote'),
+            MediaObjects,
+            Assignments,
+        ).outerjoin(
+            Assignments, Assignments.id == Posts.assignment_id,
+        ).outerjoin(
+            MediaObjects, MediaObjects.post_id == Posts.id,
+        ).filter(
+            Posts.id == id,
+        #).filter(
+        #    Posts.contents != '',
+        ).filter(
+            Posts.deleted == False,
+            Posts.flagged == False,
+            Posts.approved == True,
+        ).first() #slice(start, start+count).all()
+
+        post = None
+        if _post:
+            post = _post[0]
+            post.up_vote_count = _post[1]
+            post.down_vote_count = _post[2]
+            # TODO: add logic to support more than one media object 
+            #       when we decide to support that ...
+            post.media_objects = _post[3] if _post[3] != None else None
+            post.assignment = _post[4] if _post[4] != None else None
         return post
 
 
