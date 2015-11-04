@@ -64,31 +64,24 @@ bower_components/
 node_modules/
 
 # Compiled stuff
-yellr-serv/yellrserv/moderator/assets/
 server/yellr_server/moderator/assets/
-app/sass/deps/
+modsite/sass/deps/
 assets/js/
 assets/css/
 assets/templates/
-yellr-serv/yellrserv/moderator/epiceditor/
 server/yellr_server/moderator/epiceditor/
 
 # Vim stuff
 **/*.swp
 
 # Server logs
-yellr-serv/logs.json
-yellr-serv/log.txt
-yellr-serv/yellr-serv.sqlite
 server/yellr-server.sqlite
 
 # Uploaded files
-yellr-serv/uploads/
 server/uploads
 
 # API Key stuff
-app/yellr.global.js
+modsite/yellr.global.js
 
 # Sourcemaps
-yellr-serv/yellrserv/moderator/scripts.min.js.map
 server/yellr_server/moderator/scripts.min.js.map
