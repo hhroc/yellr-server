@@ -18,7 +18,16 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.include('pyramid_chameleon')
 
-    my_session_factory = SignedCookieSessionFactory('max_secret_yellr_password')
+    secret = config.get_settings().get('yellr_server.secret')
+    if not secret:
+        secret = 'yellr_secret'
+    httponly = False if config.get_settings().get('yellr_server.header_httponly') == 'false' else True
+    secure = False if config.get_settings().get('yellr_server.header_secure') == 'false' else True
+    my_session_factory = SignedCookieSessionFactory(
+        secret,
+        httponly=httponly,
+        secure=secure,
+    )
     config.set_session_factory(my_session_factory)
 
     config.add_static_view('static', 'static', cache_max_age=1)
