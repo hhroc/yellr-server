@@ -6,7 +6,7 @@ dependencies:
 
 compile:
 	# Make dirs for static assets
-	mkdir -p sass/deps
+	mkdir -p src/sass/deps
 	mkdir -p assets/templates
 	mkdir -p ../server/yellr_server/moderator/assets/css
 	mkdir -p ../server/yellr_server/moderator/assets/css/deps
@@ -14,10 +14,10 @@ compile:
 	mkdir -p ../server/yellr_server/moderator/epiceditor
 	mkdir -p ../server/yellr_server/moderator/epiceditor/themes
 	# Copy Foundation
-	cp -a bower_components/foundation/scss/. sass/deps/
+	cp -a bower_components/foundation/scss/. src/sass/deps/
 	cp -a bower_components/foundation-datepicker/stylesheets/foundation-datepicker.css ../server/yellr_server/moderator/assets/css/deps/_foundation-datepicker.css
 	# Copy Bourbon
-	cp -a bower_components/bourbon/app/assets/stylesheets/. sass/deps/
+	cp -a bower_components/bourbon/app/assets/stylesheets/. src/sass/deps/
 	# Copy ng-tags-input css
 	cp bower_components/ng-tags-input/ng-tags-input.min.css ../server/yellr_server/moderator/assets/css/ng-tags-input.min.css
 	# Copy Leaflet things
@@ -37,7 +37,7 @@ clean:
 	rm -rf yellrserv/yellrserv/moderator/epiceditor/
 	rm -rf bower_components
 	rm -rf node_modules
-	rm -rf ./sass/deps/
+	rm -rf ./src/sass/deps/
 
 dev: clean dependencies compile
 	./node_modules/grunt-cli/bin/grunt watch

@@ -11,24 +11,23 @@ module.exports = function (grunt) {
             dist: {
                 files: {
                     '../server/yellr_server/moderator/assets/js/scripts.js': [
-                        'bower_components/cryptojslib/rollups/hmac-sha256.js',
-                        'bower_components/jquery/dist/jquery.js',
-                        'bower_components/angular/angular.js',
-                        'bower_components/zeroclipboard/dist/ZeroClipboard.js',
-                        'bower_components/ng-clip/dest/ng-clip.min.js',
-                        'bower_components/ng-tags-input/ng-tags-input.js',
-                        'bower_components/leaflet/dist/leaflet.js',
-                        'bower_components/epiceditor/epiceditor/js/epiceditor.js',
-                        'bower_components/async/lib/async.js',
-                        'bower_components/masonry/dist/masonry.pkgd.min.js',
-                        'bower_components/angular-masonry/angular-masonry.js',
-                        'bower_components/angular-ui-router/release/angular-ui-router.js',
-                        'bower_components/angular-mocks/angular-mocks.js',
-                        'bower_components/angular-foundation/mm-foundation-tpls.js',
-                        'bower_components/foundation-datepicker/js/foundation-datepicker.js',
-                        '*.js', // root files first
-                        '**/*.js', // then everything else
-                        '!tests/**/*.js' // ignore tests
+                        './bower_components/cryptojslib/rollups/hmac-sha256.js',
+                        './bower_components/jquery/dist/jquery.js',
+                        './bower_components/angular/angular.js',
+                        './bower_components/zeroclipboard/dist/ZeroClipboard.js',
+                        './bower_components/ng-clip/dest/ng-clip.min.js',
+                        './bower_components/ng-tags-input/ng-tags-input.js',
+                        './bower_components/leaflet/dist/leaflet.js',
+                        './bower_components/epiceditor/epiceditor/js/epiceditor.js',
+                        './bower_components/async/lib/async.js',
+                        './bower_components/masonry/dist/masonry.pkgd.min.js',
+                        './bower_components/angular-masonry/angular-masonry.js',
+                        './bower_components/angular-ui-router/release/angular-ui-router.js',
+                        './bower_components/angular-mocks/angular-mocks.js',
+                        './bower_components/angular-foundation/mm-foundation-tpls.js',
+                        './src/*.js', // root files first
+                        './src/**/*.js', // then everything else
+                        './!tests/**/*.js', // ignore tests
                     ]
                 }
             }
@@ -60,7 +59,7 @@ module.exports = function (grunt) {
                     style: 'compress'
                 },
                 files: {
-                    '../server/yellr_server/moderator/assets/css/site.css': 'sass/site.scss'
+                    '../server/yellr_server/moderator/assets/css/site.css': 'src/sass/site.scss'
                 }
             }
         },
@@ -74,7 +73,7 @@ module.exports = function (grunt) {
                 }
             },
             sass: {
-                files: ['sass/**/*.scss'],
+                files: ['src/sass/**/*.scss'],
                 tasks: ['sass'],
                 options: {
                     spawn: false
@@ -104,8 +103,8 @@ module.exports = function (grunt) {
             js: {
                 files: [{
                     src: [
-                        '*.js',
-                        '**/*.js'
+                        'src/*.js',
+                        'src/**/*.js'
                     ],
                     dest: '../server/yellr_server/moderator/assets/js/'
                 }],
