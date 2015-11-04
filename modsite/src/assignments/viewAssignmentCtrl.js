@@ -44,6 +44,28 @@ angular
                 if (assignment.id == $stateParams.assignmentId) {
                     console.log('assignment:')
                     console.log(assignment);
+                    assignment.percents = [
+                        {'name': assignment.questions[0].answer0,
+                         'index': 'first',
+                         'count': assignment.answer0_count,
+                         'percent': (assignment.answer0_count / assignment.response_count)*100.0},
+                        {'name': assignment.questions[0].answer1,
+                         'index': 'second',
+                         'count': assignment.answer1_count,
+                         'percent': (assignment.answer1_count / assignment.response_count)*100.0},
+                        {'name': assignment.questions[0].answer2,
+                         'index': 'third',
+                         'count': assignment.answer2_count,
+                         'percent': (assignment.answer2_count / assignment.response_count)*100.0},
+                        {'name': assignment.questions[0].answer3,
+                         'index': 'fourth',
+                         'count': assignment.answer3_count,
+                         'percent': (assignment.answer3_count / assignment.response_count)*100.0},
+                        {'name': assignment.questions[0].answer4,
+                         'index': 'fifth',
+                         'count': assignment.answer4_count,
+                         'percent': (assignment.answer4_count / assignment.response_count)*100.0},
+                    ];
                     $scope.assignment = assignment;
                 }
             });

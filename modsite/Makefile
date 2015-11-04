@@ -7,7 +7,7 @@ dependencies:
 compile:
 	# Make dirs for static assets
 	mkdir -p src/sass/deps
-	mkdir -p assets/templates
+	mkdir -p ../server/yellr_server/moderator/assets/templates
 	mkdir -p ../server/yellr_server/moderator/assets/css
 	mkdir -p ../server/yellr_server/moderator/assets/css/deps
 	mkdir -p ../server/yellr_server/moderator/assets/js
@@ -24,7 +24,7 @@ compile:
 	cp bower_components/leaflet/dist/leaflet.css ../server/yellr_server/moderator/assets/css/leaflet.css
 	cp -a bower_components/leaflet/dist/images/. ../server/yellr_server/moderator/assets/css/images
 	# Copy EpicEditor Themes
-	cp -a bower_components/epiceditor/epiceditor/themes/. ../server/yellr_server/moderator/epiceditor/themes/
+	#cp -a bower_components/epiceditor/epiceditor/themes/. ../server/yellr_server/moderator/epiceditor/themes/
 	# Copy ZeroClipboard .swf
 	cp bower_components/zeroclipboard/dist/ZeroClipboard.swf ../server/yellr_server/moderator/assets/js/ZeroClipboard.swf
 	# Compile
@@ -34,7 +34,7 @@ clean:
 	rm -rf ../server/yellr_server/moderator/assets/js/
 	rm -rf ../server/yellr_server/moderator/assets/css/
 	rm -rf ../server/yellr_server/moderator/assets/templates/
-	rm -rf yellrserv/yellrserv/moderator/epiceditor/
+	#rm -rf yellrserv/yellrserv/moderator/epiceditor/
 	rm -rf bower_components
 	rm -rf node_modules
 	rm -rf ./src/sass/deps/
