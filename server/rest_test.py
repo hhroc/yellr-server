@@ -73,7 +73,7 @@ def upload_media_object(client, post, media_type, filename):
         'post_id': post['id'],
         'media_file': filename,
     }
-    files = {'media_file': open(filename, 'rb')}
+    files = {'media_file': open('./test_media/{0}'.format(filename), 'rb')}
     resp = requests.post(client.build_url(url), data, files=files)
     print('[' + str(resp.status_code) + ']')
     return json.loads(resp.text)
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     print('\tpost id: ' + image_post['post']['id'])
 
     print('[POST] /api/media_objects')
-    image_media_object = upload_media_object(client_a, image_post['post'], "image", "smiley.png")
+    image_media_object = upload_media_object(client_a, image_post['post'], "image", "image.png")
     print('\tmedia object id: ' + image_media_object['media_object']['id']) 
 
     #
@@ -343,7 +343,7 @@ if __name__ == '__main__':
     print('\tassignment_id: ' + assignment_a['assignment']['id'] + ', post id: ' + response_post['post']['id'])
 
     print('[POST] /api/media_objects')
-    response_media_object = upload_media_object(client_a, response_post['post'], "image", "smiley.png")
+    response_media_object = upload_media_object(client_a, response_post['post'], "image", "image.png")
     print('\tmedia object id: ' + response_media_object['media_object']['id'])
 
     print("[PUT] /api/admin/posts/{id}")
