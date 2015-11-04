@@ -62,7 +62,7 @@ class AdminLoginScreen(object):
         print('/login')
         self.request = request
 
-    @view_config(request_method='GET', renderer='templates/login.pt')
+    @view_config(request_method='GET', renderer='templates/login.mak')
     def get(self):
         return {} 
 

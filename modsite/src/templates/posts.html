@@ -23,7 +23,8 @@
                     <p class="post-time"><i class="fa fa-clock-o"></i> {{post.time}}</p>
                     <button ng-class="{'approve-post-active': post.approved}" class="approve-post" title="Approve Post for Local Feed." ng-click="approvePost(post)"><i class="fa fa-star"></i></button>
                     <button class="delete-post" title="Delete Post." ng-click="deletePost(post)"><i class="fa fa-trash"></i></button>
-                    <button class="view-post" ng-click="openPost(post.id)">VIEW POST</button>
+                    <button class="view-post" ng-click="openPost(post.id)">VIEW</button>
+                    <button class="embed-post">EMBED</button>
                 </div>
             </div>
         </div>

@@ -36,6 +36,11 @@ def main(global_config, **settings):
 
     #config.add_route('home', '/')
 
+    #
+    # Client html pages
+    #
+
+    config.add_route('/post', '/post')
 
     #
     # Client REST end-points

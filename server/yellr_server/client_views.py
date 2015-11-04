@@ -247,6 +247,22 @@ def process_audio(base_filename):
     return audio_filename, preview_filename
 
 
+@view_defaults(route_name='/post')
+class AdminLoginScreen(object):
+
+    def __init__(self, request):
+        print('/post')
+        self.request = request
+
+    @view_config(request_method='GET', renderer='templates/post.mak')
+    def get(self):
+        post = None
+        if 'id' in self.request.GET:
+            post_id = self.request.GET['id']
+            post = Posts.get_post_by_id(post_id)
+        return {'post': post}
+
+
 @view_defaults(route_name='/api/assignments', renderer='json')
 class AssignmentsAPI(object):
 
