@@ -19,6 +19,7 @@ import os
 import subprocess
 import magic
 import ntpath
+import datetime
 
 system_config = {
     'upload_dir': './uploads',
@@ -247,6 +248,15 @@ def process_audio(base_filename):
     return audio_filename, preview_filename
 
 
+def humanize(dt):
+
+    now = datetime.datetime.now()
+    if dt > now - datetime.timedelta(hours=24):
+        resp = dt.strftime('%I%p').replace('0','')
+    else:
+        resp = dt.strftime('%b %d, %Y')
+    return resp
+
 @view_defaults(route_name='/post')
 class AdminLoginScreen(object):
 
@@ -260,6 +270,7 @@ class AdminLoginScreen(object):
         if 'id' in self.request.GET:
             post_id = self.request.GET['id']
             post = Posts.get_post_by_id(post_id)
+            post.human_dt = humanize(post.creation_datetime)
         return {'post': post}
 
 
