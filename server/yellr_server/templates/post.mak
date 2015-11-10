@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="${request.locale_name}">
   <head>
+
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Yellr Post</title>
 
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
     <!--<link rel="stylesheet" href="static/foundation/css/foundation.css" />-->
+
+    <link rel="stylesheet" href="static/plyr/plyr.css"/>
 
     <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
 
@@ -63,6 +65,37 @@
         background-color: #FFCF13;
         color: black;
         font-weight: bold;
+      }
+
+      .header-media {
+        width: 100%;
+        background-color: #FFCF13;
+      }
+
+      .header-media img {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        min-width: 318px;
+        max-width: 398px;
+        border-bottom: 1px solid #FFCF13;
+      }
+
+      .header-media video {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        min-width: 318px;
+        max-width: 398px;
+        border-bottom: 1px solid #FFCF13;
+      }
+
+      .header-media audio {
+        padding: 10%;
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        /*min-width: 318px;
+        max-width: 398px;*/
+        width: 80%;
+        border-bottom: 1px solid #FFCF13;
       }
 
       .votes-container {
@@ -154,7 +187,27 @@
 % if post:
 <div class="post">
   <div class="container-box">
+  % if post.media_objects == None or post.media_objects == []:
   <div class="header-blank">Yellr</div>
+  % else:
+  <div class="header-media">
+    % if post.media_objects.media_type == 'image':
+    <img src="/media/${post.media_objects.preview_filename}"></img>
+    % elif post.media_objects.media_type == 'video':
+    <video class="embedded-player" controls="" poster="/media/${post.media_objects.filename}">
+      <source type="video/mp4" src="/media/${post.media_objects.filename}"></source>
+      <!--Fallback for browsers that do not support the <video> element-->
+      <a href="/media/${post.media_objects.filename}">Download</a>
+    </video>
+   % elif post.media_objects.media_type == 'audio':
+   <audio controls="">
+     <source type="audio/mp3" src="/media/${post.media_objects.filename}"></source>
+     <!--Fallback for browsers that do not support the <audio> element-->
+     <a href="/media/${post.media_objects.filename}">Download</a>
+   </audio> 
+   % endif;
+  </div>
+  % endif
   <div class="inside-container">
     <div class="small-text">
       <span class="right"><i class="fa fa-pencil icon"></i> ${post.human_dt}</span>
@@ -184,6 +237,8 @@
   <div class="yellr-label"><a href="https://yellr.net/get">Get Yellr</a></div>
 </div>
 % endif;
+
+<script src="static/plyr/plyr.js"></script>
 
 </body>
 </html>

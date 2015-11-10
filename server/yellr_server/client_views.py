@@ -270,7 +270,8 @@ class AdminLoginScreen(object):
         if 'id' in self.request.GET:
             post_id = self.request.GET['id']
             post = Posts.get_post_by_id(post_id)
-            post.human_dt = humanize(post.creation_datetime)
+            if post:
+                post.human_dt = humanize(post.creation_datetime)
         return {'post': post}
 
 
