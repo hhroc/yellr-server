@@ -454,3 +454,27 @@ if __name__ == '__main__':
     print('\tresponse count: ' + str(len(poll_assignment_responses['posts'])))
     #print(json.dumps(poll_assignment_responses, indent=4))
 
+    #
+    # Test Virtical Video Post
+    #
+
+    print('[POST] /api/posts')
+    video_post = publish_post(client_a, "Yellr Selfie!")
+    print('\tpost id: ' + video_post['post']['id'])
+
+    print('[POST] /api/media_objects')
+    video_media_object = upload_media_object(client_a, video_post['post'], "video", "VIDEO0405.mp4")
+    print('\tmedia object id: ' + video_media_object['media_object']['id'])
+
+    #
+    # Test Horizontal Video Post
+    #
+
+    print('[POST] /api/posts')
+    video_post = publish_post(client_a, "A nice video of the inside of my house.")
+    print('\tpost id: ' + video_post['post']['id'])
+
+    print('[POST] /api/media_objects')
+    video_media_object = upload_media_object(client_a, video_post['post'], "video", "VIDEO0406.mp4")
+    print('\tmedia object id: ' + video_media_object['media_object']['id'])
+

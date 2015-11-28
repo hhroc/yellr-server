@@ -146,6 +146,23 @@
             }
         }
 
+        .embed-post {
+            @extend .post-button;
+
+            text-decoration: none;
+            font-weight: bold;
+
+            display: inline-block;
+
+            margin-left: .5rem;
+
+            &:hover {
+                background-color: lighten($primary, 40);
+                border-color: $primary;
+                cursor: pointer;
+            }
+        }
+
         .post-text {
             margin: 15px 10px 15px 10px;
             word-wrap: break-word;
