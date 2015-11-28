@@ -41,6 +41,7 @@ def main(global_config, **settings):
     #
 
     config.add_route('/post', '/post')
+    config.add_route('/poll', '/poll')
 
     #
     # Client REST end-points

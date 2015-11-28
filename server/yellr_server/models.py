@@ -571,25 +571,25 @@ class Assignments(Base, TimeStampMixin, CreationMixin):
                 func.count(distinct(Posts.id)).label('answer1_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 1,
             ).label('answer1_count'),
             DBSession.query(
                 func.count(distinct(Posts.id)).label('answer2_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 2,
             ).label('answer2_count'),
             DBSession.query(
                 func.count(distinct(Posts.id)).label('answer3_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 3,
             ).label('answer3_count'),
             DBSession.query(
                 func.count(distinct(Posts.id)).label('answer4_count'),
             ).filter(
                 Posts.assignment_id == Assignments.id,
-                Posts.poll_response == 0,
+                Posts.poll_response == 4,
             ).label('answer4_count'),
         ).filter(
             Assignments.id == assignment_id,

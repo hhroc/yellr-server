@@ -49,7 +49,6 @@
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
         border-bottom-right-radius: 5px;
-        padding: 1px;
       }
 
       .inside-container {
@@ -117,37 +116,6 @@
         font-style: italic;
       }
 
-      .post-text {
-        font-size: 120%;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        font-weight: bold;
-      }
-
-      .vote-icon {
-        font-size: 150%;
-      }
-
-      .up-vote-count {
-        width: 100%;
-        color: #1ABC9C;
-        text-align: center;
-      }
-
-      .down-vote-count {
-        width: 100%;
-        color: #FF6347;
-        text-align: center;
-      }
-
-      .up-vote {
-        color: #1ABC9C;
-      }
-
-      .down-vote {
-        color: #FF6347;
-      }
-
       .assignment-contents {
         padding: 10px;
       }
@@ -181,63 +149,77 @@
         font-size:80%;
       }
 
+      .poll-percentage {
+        padding-right: 4rem;
+      }
+
+      .poll-results {
+        margin-left: 1rem;
+        margin-right: 1rem;
+      }
+
+      .poll-result {
+        margin-bottom: .25rem;
+        border-radius: 4px;
+        border: 1px solid #AAAAAA;
+        padding: .25rem;
+      }
+
+      .poll-bar {
+        height: .5rem;
+      }
+
+      .first-result-bar {
+        background-color: red;
+      }
+
+      .second-result-bar {
+        background-color: green;
+      }
+
+      .third-result-bar {
+        background-color: blue;
+      }
+
+      .fourth-result-bar {
+        background-color: orange;
+      }
+
+      .fifth-result-bar {
+        background-color: purple;
+      }
+
+
     </style>
 
   </head>
 
 <body>
 
-% if post:
+% if assignment:
 <div class="post">
   <div class="container-box">
-  % if post.media_objects == None or post.media_objects == []:
-  <div class="header-blank">Yellr</div>
-  % else:
-  <div class="header-media">
-    % if post.media_objects.media_type == 'image':
-    <img src="/media/${post.media_objects.preview_filename}"></img>
-    % elif post.media_objects.media_type == 'video':
-    <video class="embedded-player" controls="" poster="/media/${post.media_objects.filename}">
-      <source type="video/mp4" src="/media/${post.media_objects.filename}"></source>
-      <!--Fallback for browsers that do not support the <video> element-->
-      <a href="/media/${post.media_objects.filename}">Download</a>
-    </video>
-   % elif post.media_objects.media_type == 'audio':
-   <audio controls="">
-     <source type="audio/mp3" src="/media/${post.media_objects.filename}"></source>
-     <!--Fallback for browsers that do not support the <audio> element-->
-     <a href="/media/${post.media_objects.filename}">Download</a>
-   </audio> 
-   % endif;
-  </div>
-  % endif
-  <div class="inside-container">
-    <div class="small-text">
-      <span class="right"><i class="fa fa-pencil icon"></i> ${post.human_dt}</span>
-      <i class="fa fa-user anonymous-user-label icon"></i> Anonymous User
-    </div>
-    % if post.assignment_id != None and post.assignment_id != 0:
-    <div class="question-container small-text">
-      <span>
-        <i class="fa fa-question-circle question-text icon"></i>
-        ${post.assignment.questions[0].question_text}
-      </span>
-    </div>
-    % endif;
-    <div class="column column-tiny">
-      <div class="votes-container">
-        <i class="fa fa-caret-up vote-icon up-vote"></i></br>
-        <div class="up-vote-count">${post.up_vote_count}</div>
-        <div class="down-vote-count">${post.down_vote_count}</div>
-        <i class="fa fa-caret-down vote-icon down-vote"></i></br>
+    <div class="header-blank">Yellr</div>
+    <div class="inside-container">
+      <div class="question-container small-text">
+        <span>
+          <i class="fa fa-question-circle question-text icon"></i>
+          ${assignment.questions[0].question_text}
+        </span>
       </div>
+      % for percent in assignment.percents:
+      <label>${percent['name']}</label>
+      <div class="poll-result">
+        <div class="poll-percent">
+          ${int(percent['percent'])}%  ${int(percent['count'])} / ${int(assignment.response_count)}
+        </div>
+        <div class="poll-bar ${percent['index']}-result-bar" style="width: ${percent['percent'] if percent['percent'] != 0 else '8px'};">
+        </div>
+      </div>
+      % endfor
     </div>
-    <div class="column column-large">
-      <p class="post-text">${post.contents}</p>
-    </div>
+    <div class="yellr-label"><a href="https://yellr.net/get">Get Yellr</a></div>
   </div>
-  </div>
-  <div class="yellr-label"><a href="https://yellr.net/get">Get Yellr</a></div>
 </div>
 % endif;
 

@@ -292,7 +292,7 @@ def humanize(dt):
     return resp
 
 @view_defaults(route_name='/post')
-class AdminLoginScreen(object):
+class EmbeddedPost(object):
 
     def __init__(self, request):
         print('/post')
@@ -308,6 +308,46 @@ class AdminLoginScreen(object):
                 post.human_dt = humanize(post.creation_datetime)
         return {'post': post}
 
+
+@view_defaults(route_name='/poll')
+class EmbeddedPoll(object):
+
+    def __init__(self, request):
+        print('/poll')
+        self.request = request
+
+    @view_config(request_method='GET', renderer='templates/poll.mak')
+    def get(self):
+        assignment = None
+        if 'id' in self.request.GET:
+            assignment_id = self.request.GET['id']
+            _assignment = Assignments.get_assignment_by_id(assignment_id)
+            if _assignment and _assignment.question_type == 'poll':
+                assignment = _assignment
+                assignment.percents = [
+                    {'name': assignment.questions[0].answer0,
+                     'index': 'first',
+                     'count': assignment.answer0_count,
+                     'percent': (assignment.answer0_count / assignment.response_count)*100.0},
+                    {'name': assignment.questions[0].answer1,
+                     'index': 'second',
+                     'count': assignment.answer1_count,
+                     'percent': (assignment.answer1_count / assignment.response_count)*100.0},
+                    {'name': assignment.questions[0].answer2,
+                     'index': 'third',
+                     'count': assignment.answer2_count,
+                     'percent': (assignment.answer2_count / assignment.response_count)*100.0},
+                    {'name': assignment.questions[0].answer3,
+                     'index': 'fourth',
+                     'count': assignment.answer3_count,
+                     'percent': (assignment.answer3_count / assignment.response_count)*100.0},
+                    {'name': assignment.questions[0].answer4,
+                     'index': 'fifth',
+                     'count': assignment.answer4_count,
+                     'percent': (assignment.answer4_count / assignment.response_count)*100.0},
+                ]
+            print(assignment.percents)
+        return {'assignment': assignment}
 
 @view_defaults(route_name='/api/assignments', renderer='json')
 class AssignmentsAPI(object):
