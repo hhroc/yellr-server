@@ -42,6 +42,16 @@ angular
             });
         };
 
+        $scope.openEmbedPost = function (postId) {
+            $scope.postId = postId;
+            console.log("/post?id=" + postId);
+            var modalInstance = $modal.open({
+                templateUrl: 'assets/templates/viewEmbedPost.html',
+                controller: 'viewEmbedPostModalCtrl',
+                scope: $scope
+            });
+        };
+
         /**
          * Loads more posts
          *

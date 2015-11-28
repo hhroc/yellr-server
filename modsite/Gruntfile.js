@@ -27,7 +27,7 @@ module.exports = function (grunt) {
                         './bower_components/angular-foundation/mm-foundation-tpls.js',
                         './src/*.js', // root files first
                         './src/**/*.js', // then everything else
-                        './!tests/**/*.js', // ignore tests
+                        '!./src/tests/**/*.js', // ignore tests
                     ]
                 }
             }

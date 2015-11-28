@@ -128,13 +128,15 @@ def process_image(base_filename):
 
         # create preview image
         try:
-            subprocess.call(['convert', image_filename, '-resize', '450', \
+            subprocess.call(['convert', image_filename, '-resize', '400', \
                 '-size', '450', preview_filename])
         except Exception as ex:
             raise Exception("Error generating preview image: {0}".format(ex))
 
     except Exception as ex:
         raise Exception(ex)
+
+    os.remove(base_filename)
 
     return image_filename, preview_filename
 
@@ -161,7 +163,9 @@ def process_video(base_filename):
         video_filename = '{0}.mp4'.format(base_filename)
         preview_filename = '{0}p.jpg'.format(base_filename)
 
-        # convert and strip of medta data
+        temp_filename = '{0}.mp4'.format(uuid.uuid4())
+
+        # strip of medta data
         cmd = [
             'ffmpeg',
             '-i',
@@ -172,10 +176,26 @@ def process_video(base_filename):
             'copy',
             '-c:a',
             'copy',
-            video_filename,
+            temp_filename,
         ]
+        print(cmd)
         resp = subprocess.call(cmd)
        
+        # convert the video
+        cmd = [
+            'ffmpeg',
+            '-i',
+            temp_filename,
+            '-strict',
+            '-2',
+            '-y',
+            '-vf',
+            'scale=400:trunc(ow/a/2)*2',
+            video_filename,
+        ]
+        print(cmd)
+        resp = subprocess.call(cmd)
+
         # create preview file
         cmd = [
             'ffmpeg',
@@ -187,14 +207,26 @@ def process_video(base_filename):
             '1',
             preview_filename,
         ]
+        print(cmd)
         resp = subprocess.call(cmd)
 
         # resize preview file
-        subprocess.call(['convert', preview_filename, '-resize', '450', \
-                '-size', '450', preview_filename])
+        cmd = [
+            'convert',
+            preview_filename,
+            '-resize',
+            '400',
+            '-size',
+            '400',
+            preview_filename,
+        ]
+        resp = subprocess.call(cmd)
 
     except Exception as ex:
         raise Exception(ex)
+
+    os.remove(base_filename)
+    os.remove(temp_filename)
 
     return video_filename, preview_filename
 
@@ -244,6 +276,8 @@ def process_audio(base_filename):
 
     except Exception as ex:
         raise Exception(ex)
+
+    os.remove(base_filename)
 
     return audio_filename, preview_filename
 

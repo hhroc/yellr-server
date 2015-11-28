@@ -42,7 +42,7 @@ angular
             return $http({
                 method: 'GET',
                 url: url,
-            }).error(function(response){ window.location = '/login'; });
+            }) /*.error(function(response){ window.location = '/login'; });*/
         };
 
         /**

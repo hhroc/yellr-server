@@ -841,19 +841,7 @@ class Posts(Base, TimeStampMixin, CreationMixin):
 
 
     @classmethod
-    def get_post_by_id(cls, id):
-        '''
-        _result = DBSession.query(
-            Posts,
-            MediaObjects,
-        ).outerjoin(
-            MediaObjects, MediaObjects.post_id == Posts.id,
-        ).filter(
-            Posts.id == id,
-        ).first()
-        post = _result[0]
-        post.media_objects = _result[1] if _result[1] != None else None
-        '''
+    def get_post_by_id(cls, id, use_filters=True):
         _post = DBSession.query(
             Posts,
             DBSession.query(
@@ -889,13 +877,14 @@ class Posts(Base, TimeStampMixin, CreationMixin):
             MediaObjects, MediaObjects.post_id == Posts.id,
         ).filter(
             Posts.id == id,
-        #).filter(
-        #    Posts.contents != '',
-        ).filter(
-            Posts.deleted == False,
-            Posts.flagged == False,
-            Posts.approved == True,
-        ).first() #slice(start, start+count).all()
+        )
+        if use_filters:
+            _post = _post.filter(
+                Posts.deleted == False,
+                Posts.flagged == False,
+                Posts.approved == True,
+            )
+        _post = _post.first()
 
         post = None
         if _post:
