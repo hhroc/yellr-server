@@ -149,6 +149,11 @@
         font-size:80%;
       }
 
+      .results-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
       .poll-percentage {
         padding-right: 4rem;
       }
@@ -207,6 +212,7 @@
           ${assignment.questions[0].question_text}
         </span>
       </div>
+      <div class="results-container">
       % for percent in assignment.percents:
       <label>${percent['name']}</label>
       <div class="poll-result">
@@ -217,6 +223,7 @@
         </div>
       </div>
       % endfor
+      </div>
     </div>
     <div class="yellr-label"><a href="https://yellr.net/get">Get Yellr</a></div>
   </div>
