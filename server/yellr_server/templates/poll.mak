@@ -69,13 +69,11 @@
 
       .header-media {
         width: 100%;
-        /*background-color: #FFCF13;*/
       }
 
       .header-media img {
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
-        /*min-width: 318px;
         max-width: 398px;*/
         width: 100%;
         border-bottom: 1px solid #FFCF13;
@@ -84,7 +82,6 @@
       .header-media video {
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
-        /*min-width: 318px;
         max-width: 398px;*/
         width; 100%;
         border-bottom: 1px solid #FFCF13;
@@ -94,7 +91,6 @@
         padding: 10%;
         border-top-left-radius: 5px;
         border-top-right-radius: 5px;
-        /*min-width: 318px;
         max-width: 398px;*/
         width: 80%;
         border-bottom: 1px solid #FFCF13;
